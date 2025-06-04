@@ -1,0 +1,27 @@
+{
+  "name": "ummo-nextjs",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@popperjs/core": "2.11.8",
+    "@react-google-maps/api": "^2.20.6",
+    "bootstrap": "^5.0.2",
+    "next": "15.1.6",
+    "photoswipe": "^5.4.4",
+    "rc-slider": "^11.1.8",
+    "react": "19.0.0",
+    "react-countdown": "^2.3.6",
+    "react-dom": "19.0.0",
+    "react-photoswipe-gallery": "^3.0.2",
+    "react-tooltip": "^5.28.0",
+    "sass": "^1.85.0",
+    "swiper": "^11.2.3",
+    "tippy.js": "^6.3.7"
+  }
+}
