@@ -192,7 +192,7 @@ export const dashboardMenuItems = [
   {
     id: 4,
     href: "/account_edit",
-    title: "Дэлгэрэнгүй",
+    title: "Профайл",
   },
   {
     id: 5,

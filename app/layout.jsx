@@ -25,6 +25,7 @@ import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({ children }) {
   useEffect(() => {
@@ -80,7 +81,12 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-       <AuthProvider>
+            <SessionProvider
+            
+              refetchInterval={0}
+  refetchOnWindowFocus={false}
+  refetchWhenOffline={false}>
+          <AuthProvider>
       <body>
         <Svgs />
         <Context>
@@ -107,6 +113,7 @@ export default function RootLayout({ children }) {
         <ScrollTop />
       </body>
       </AuthProvider>
+      </SessionProvider>
     </html>
   );
 }
