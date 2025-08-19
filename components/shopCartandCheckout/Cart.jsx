@@ -2,39 +2,62 @@
 
 import { useContextElement } from "@/context/Context";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 
 export default function Cart() {
   const { cartProducts, setCartProducts, totalPrice } = useContextElement();
-  const setQuantity = (id, quantity) => {
-    if (quantity >= 1) {
-      const item = cartProducts.filter((elm) => elm.id == id)[0];
-      const items = [...cartProducts];
-      const itemIndex = items.indexOf(item);
-      item.quantity = quantity;
-      items[itemIndex] = item;
-      setCartProducts(items);
-    }
-  };
+
+const setQuantity = (id, q) => {
+  setCartProducts(prev =>
+    prev.map(it => {
+      console.log("niit hed bna: ", it.stock)
+      if (it.id !== id) return it;
+      const max = typeof it.stock === "number" ? it.stock : Infinity;
+      let next = Math.max(1, parseInt(q, 10) || 1);
+      if (next > max) {
+        next = max;
+        // анхааруулга хүсвэл:
+        // if (typeof window !== "undefined") alert(`Үлдэгдэл ${max} ширхэг байна.`);
+      }
+      return { ...it, quantity: next };
+    })
+  );
+};
+
   const removeItem = (id) => {
-    setCartProducts((pre) => [...pre.filter((elm) => elm.id != id)]);
+    setCartProducts((prev) => prev.filter((it) => it.id !== id));
   };
 
+  // ✅ Subtotal (context-д байхгүй бол fallback)
+  const computedSubtotal = useMemo(() => {
+    if (typeof totalPrice === "number") return totalPrice;
+    return cartProducts.reduce(
+      (sum, it) => sum + (Number(it.price || 0) * (it.quantity || 1)),
+      0
+    );
+  }, [cartProducts, totalPrice]);
+
+  // Хүргэлтийн сонголтууд
   const [checkboxes, setCheckboxes] = useState({
     free_shipping: false,
     flat_rate: false,
     local_pickup: false,
   });
-
-  // Step 2: Create a handler function
   const handleCheckboxChange = (event) => {
     const { id, checked } = event.target;
-    setCheckboxes((prevCheckboxes) => ({
-      ...prevCheckboxes,
+    setCheckboxes((prev) => ({
+      ...prev,
       [id]: checked,
     }));
   };
+
+  // Нийт (жишээнд байсан VAT=19, flat=49, pickup=8)
+  const shippingFee =
+    (checkboxes.flat_rate ? 49 : 0) + (checkboxes.local_pickup ? 8 : 0);
+  const vat = 19;
+  const grandTotal = computedSubtotal + shippingFee + vat;
+
   return (
     <div className="shopping-cart" style={{ minHeight: "calc(100vh - 300px)" }}>
       <div className="cart-table__wrapper">
@@ -52,86 +75,94 @@ export default function Cart() {
                 </tr>
               </thead>
               <tbody>
-                {cartProducts.map((elm, i) => (
-                  <tr key={i}>
-                    <td>
-                      <div className="shopping-cart__product-item">
-                        <Image
-                          loading="lazy"
-                          src={elm.imgSrc}
-                          width="120"
-                          height="120"
-                          alt="image"
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="shopping-cart__product-item__detail">
-                        <h4>{elm.title}</h4>
-                        <ul className="shopping-cart__product-item__options">
-                          <li>Color: Yellow</li>
-                          <li>Size: L</li>
-                        </ul>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="shopping-cart__product-price">
-                        ${elm.price}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="qty-control position-relative">
-                        <input
-                          type="number"
-                          name="quantity"
-                          value={elm.quantity}
-                          min={1}
-                          onChange={(e) =>
-                            setQuantity(elm.id, e.target.value / 1)
-                          }
-                          className="qty-control__number text-center"
-                        />
-                        <div
-                          onClick={() => setQuantity(elm.id, elm.quantity - 1)}
-                          className="qty-control__reduce"
-                        >
-                          -
+                {cartProducts.map((elm, i) => {
+                  const unitPrice = Number(elm.price || 0);
+                  const lineTotal = unitPrice * (elm.quantity || 1);
+                  return (
+                    <tr key={`${elm.id}-${i}`}>
+                      <td>
+                        <div className="shopping-cart__product-item">
+                          <Image
+                            loading="lazy"
+                            src={elm.image || "/images/placeholder-330x400.png"}
+                            width="120"
+                            height="120"
+                            alt={elm.name || "Product"}
+                          />
                         </div>
-                        <div
-                          onClick={() => setQuantity(elm.id, elm.quantity + 1)}
-                          className="qty-control__increase"
-                        >
-                          +
+                      </td>
+                      <td>
+                        <div className="shopping-cart__product-item__detail">
+                          <h4>{elm.name}</h4>
+
+                          {/* ✅ Variant attributes байвал харуулна */}
+                          {Array.isArray(elm.attributes) &&
+                            elm.attributes.length > 0 && (
+                              <ul className="shopping-cart__product-item__options">
+                                {elm.attributes.map((a, idx) => (
+                                  <li key={idx}>
+                                    {a.name}: {a.value}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="shopping-cart__subtotal">
-                        ${elm.price * elm.quantity}
-                      </span>
-                    </td>
-                    <td>
-                      <a
-                        onClick={() => removeItem(elm.id)}
-                        className="remove-cart"
-                      >
-                        <svg
-                          width="10"
-                          height="10"
-                          viewBox="0 0 10 10"
-                          fill="#767676"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M0.259435 8.85506L9.11449 0L10 0.885506L1.14494 9.74056L0.259435 8.85506Z" />
-                          <path d="M0.885506 0.0889838L9.74057 8.94404L8.85506 9.82955L0 0.97449L0.885506 0.0889838Z" />
-                        </svg>
-                      </a>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        <span className="shopping-cart__product-price">
+                          ${unitPrice.toLocaleString()}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="qty-control position-relative">
+                          <input
+                            type="number"
+                            name="quantity"
+                            value={elm.quantity || 1}
+                            min={1}
+                            onChange={(e) => setQuantity(elm.id, e.target.value)}
+                            className="qty-control__number text-center"
+                          />
+                          <div
+                            onClick={() => setQuantity(elm.id, (elm.quantity || 1) - 1)}
+                            className="qty-control__reduce"
+                          >
+                            -
+                          </div>
+                          <div
+                            onClick={() => setQuantity(elm.id, (elm.quantity || 1) + 1)}
+                            className="qty-control__increase"
+                          >
+                            +
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="shopping-cart__subtotal">
+                          ${lineTotal.toLocaleString()}
+                        </span>
+                      </td>
+                      <td>
+                        <a onClick={() => removeItem(elm.id)} className="remove-cart">
+                          <svg
+                            width="10"
+                            height="10"
+                            viewBox="0 0 10 10"
+                            fill="#767676"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M0.259435 8.85506L9.11449 0L10 0.885506L1.14494 9.74056L0.259435 8.85506Z" />
+                            <path d="M0.885506 0.0889838L9.74057 8.94404L8.85506 9.82955L0 0.97449L0.885506 0.0889838Z" />
+                          </svg>
+                        </a>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-            <div className="cart-table-footer">
+
+            {/* <div className="cart-table-footer">
               <form
                 onSubmit={(e) => e.preventDefault()}
                 className="position-relative bg-body"
@@ -149,18 +180,18 @@ export default function Cart() {
                 />
               </form>
               <button className="btn btn-light">UPDATE CART</button>
-            </div>
+            </div> */}
           </>
         ) : (
           <>
             <div className="fs-20">Shop cart is empty</div>
-
             <button className="btn mt-3 btn-light">
               <Link href={"/shop-1"}>Explore Products</Link>
             </button>
           </>
         )}
       </div>
+
       {cartProducts.length ? (
         <div className="shopping-cart__totals-wrapper">
           <div className="sticky-content">
@@ -170,9 +201,9 @@ export default function Cart() {
                 <tbody>
                   <tr>
                     <th>Subtotal</th>
-                    <td>${totalPrice}</td>
+                    <td>${computedSubtotal.toLocaleString()}</td>
                   </tr>
-                  <tr>
+                  {/* <tr>
                     <th>Shipping</th>
                     <td>
                       <div className="form-check">
@@ -183,10 +214,7 @@ export default function Cart() {
                           checked={checkboxes.free_shipping}
                           onChange={handleCheckboxChange}
                         />
-                        <label
-                          className="form-check-label"
-                          htmlFor="free_shipping"
-                        >
+                        <label className="form-check-label" htmlFor="free_shipping">
                           Free shipping
                         </label>
                       </div>
@@ -210,10 +238,7 @@ export default function Cart() {
                           checked={checkboxes.local_pickup}
                           onChange={handleCheckboxChange}
                         />
-                        <label
-                          className="form-check-label"
-                          htmlFor="local_pickup"
-                        >
+                        <label className="form-check-label" htmlFor="local_pickup">
                           Local pickup: $8
                         </label>
                       </div>
@@ -224,24 +249,19 @@ export default function Cart() {
                         </a>
                       </div>
                     </td>
-                  </tr>
+                  </tr> */}
                   <tr>
                     <th>VAT</th>
-                    <td>$19</td>
+                    <td>${vat.toLocaleString()}</td>
                   </tr>
                   <tr>
                     <th>Total</th>
-                    <td>
-                      $
-                      {49 * checkboxes.flat_rate +
-                        8 * checkboxes.local_pickup +
-                        totalPrice +
-                        19}
-                    </td>
+                    <td>${grandTotal.toLocaleString()}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+
             <div className="mobile_fixed-btn_wrapper">
               <div className="button-wrapper container">
                 <button className="btn btn-primary btn-checkout">
@@ -251,9 +271,7 @@ export default function Cart() {
             </div>
           </div>
         </div>
-      ) : (
-        ""
-      )}
+      ) : null}
     </div>
   );
 }

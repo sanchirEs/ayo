@@ -29,14 +29,15 @@ export default function HomePage15() {
           <Categories />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <PopulerProducts />
-          <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
+          {/* <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <Lookbook />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <Blogs />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <Brands />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
-          <Instagram />
+          <Instagram /> */}
+             <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
         </main>
         <Footer14 />
       </div>

@@ -37,7 +37,7 @@ export default function Categories() {
   return (
     <section className="category-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Most Preferred Categories
+        Онцлох ангиллууд
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
         The World's Premium Brands In One Destination.

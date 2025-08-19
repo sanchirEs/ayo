@@ -11,7 +11,7 @@ export default function () {
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <section className="shop-checkout container">
-          <h2 className="page-title">Cart</h2>
+          <h2 className="page-title">Миний сагс</h2>
           <ChectoutSteps />
           <Cart />
         </section>

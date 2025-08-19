@@ -47,7 +47,7 @@ export default function RelatedSlider() {
   return (
     <section className="products-carousel container">
       <h2 className="h3 text-uppercase mb-4 pb-xl-2 mb-xl-4">
-        Related <strong>Products</strong>
+        Төстэй <strong>бүтээгдэхүүн</strong>
       </h2>
 
       <div id="related_products" className="position-relative">

@@ -1,4 +1,4 @@
-$card-image-height: 121.212122%;
+$card-image-height: 80.212122%;
 
 .product-card {
   position: relative;
@@ -95,7 +95,7 @@ $card-image-height: 121.212122%;
     @include media-breakpoint-up(md) {
       top: 1.25rem;
       right: 1.25rem;
-      width: 2.5rem;
+      width: 0.5rem;
       height: 2.5rem;
       padding: 0.8125rem 0.75rem 0.6875rem;
     }

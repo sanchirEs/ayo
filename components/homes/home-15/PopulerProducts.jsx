@@ -28,8 +28,8 @@ export default function PopulerProducts() {
     autoplay: {
       delay: 5000,
     },
-    slidesPerView: 4,
-    slidesPerGroup: 4,
+    slidesPerView: 5,
+    slidesPerGroup: 5,
     effect: "none",
     loop: false,
     pagination: false,
@@ -60,7 +60,8 @@ export default function PopulerProducts() {
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Most Popular Products
+       
+        Хямдралтай бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-2 pb-xl-2 text-secondary text-center">
         The World's Premium Brands In One Destination.

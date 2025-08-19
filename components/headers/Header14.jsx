@@ -8,8 +8,11 @@ import User from "./components/User";
 import { currencyOptions, languageOptions2 } from "@/data/footer";
 import { socialLinks } from "@/data/socials";
 import SearchPopup from "./components/SearchPopup";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header14() {
+   const { user, logout } = useAuth();
+   console.log("user info: ", user)
   return (
     <header id="header" className="header sticky_disabled w-100">
       <div className="header-top bg-black">
@@ -125,11 +128,51 @@ export default function Header14() {
               <SearchPopup />
               {/* <!-- /.header-tools__item hover-container --> */}
 
-              <div className="header-tools__item hover-container">
+ {user ? (
+                // НЭВТЭРСЭН ҮЕД: нэр + dropdown (logout)
+                <div className="header-tools__item hover-container">
+                  <Link href="/login_register" className="menu-link menu-link_us-s d-flex align-items-center gap-2">
+                   Сайн байна уу, {user.username || user.firstName || "User"}
+                  </Link>
+                  </div>
+                // <div className="header-tools__item hover-container">
+                 
+                //     <span>
+                //       {user.username || user.firstName || "User"}
+                //     </span>
+                 
+
+                //   {/* dropdown/hover box */}
+                //   <div className="hoverbox p-3 bg-white shadow rounded-2" style={{ minWidth: 200 }}>
+                //     <div className="mb-2 small text-muted">
+                //       {user.email}
+                //     </div>
+                //     <div className="d-flex flex-column gap-2">
+                //       <Link href="/account_profile" className="menu-link">
+                //         Сайн байна уу, {user.username || user.firstName || "User"}
+                //       </Link>
+                //       <button
+                //         onClick={logout}
+                //         className="btn btn-sm btn-outline-dark text-start"
+                //       >
+                //         Logout
+                //       </button>
+                //     </div>
+                //   </div>
+                // </div>
+              ) : (
+                // НЭВТРЭЭГҮЙ ҮЕД: login/register руу
+                <div className="header-tools__item hover-container">
+                  <Link href="/login_register" className="menu-link menu-link_us-s d-flex align-items-center gap-2">
+                    <User />
+                  </Link>
+                </div>
+              )}
+              {/* <div className="header-tools__item hover-container">
                 <a className="js-open-aside" href="#">
                   <User />
                 </a>
-              </div>
+              </div> */}
 
               <Link className="header-tools__item" href="/account_wishlist">
                 <svg

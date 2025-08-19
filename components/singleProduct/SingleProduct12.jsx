@@ -1,220 +1,314 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useMemo, useState } from "react";
 import ProductSlider1 from "./sliders/ProductSlider1";
 import BreadCumb from "./BreadCumb";
 import Star from "../common/Star";
 import Colors from "./Colors";
 import Size from "./Size";
-import Description from "./Description";
 import AdditionalInfo from "./AdditionalInfo";
 import Reviews from "./Reviews";
-import Link from "next/link";
 import ShareComponent from "../common/ShareComponent";
 import { useContextElement } from "@/context/Context";
+import Link from "next/link";
+
 export default function SingleProduct12({ product }) {
   const { cartProducts, setCartProducts } = useContextElement();
   const [quantity, setQuantity] = useState(1);
+  const [warn, setWarn] = useState("");
 
-  const isIncludeCard = () => {
-    const item = cartProducts.filter((elm) => elm.id == product.id)[0];
-    return item;
+  // --- Backend талбаруудыг тааруулах ---
+  const images = product?.ProductImages?.map((i) => i.imageUrl) ?? [];
+  const defaultVariant =
+    product?.variants?.find((v) => v.isDefault) || product?.variants?.[0] || null;
+
+  const price =
+    (defaultVariant ? Number(defaultVariant.price) : Number(product?.price || 0)) || 0;
+
+  // ✅ Нийт үлдэгдэл (бүх variant + product level)
+  const totalStock = useMemo(() => {
+    const vSum = (product?.variants || []).reduce(
+      (s, v) => s + (v?.inventory?.quantity ? Number(v.inventory.quantity) : 0),
+      0
+    );
+    const pSum = (product?.inventories || []).reduce(
+      (s, inv) => s + (inv?.quantity ? Number(inv.quantity) : 0),
+      0
+    );
+    return vSum + pSum;
+  }, [product]);
+
+  // ✅ Одоогоор сонгогдсон (default) variant-ын үлдэгдэл, байхгүй бол бүх үлдэгдлийг ашиглая
+  const selectedStock = useMemo(() => {
+    if (defaultVariant?.inventory?.quantity != null) {
+      return Number(defaultVariant.inventory.quantity);
+    }
+    return totalStock;
+  }, [defaultVariant, totalStock]);
+
+  const outOfStock = selectedStock <= 0;
+
+  // cart helpers
+  const isIncludeCard = () => cartProducts.find((elm) => elm.id == product.id);
+
+  const clampQty = (q) => {
+    // 1-ээс багагүй, selectedStock-оос ихгүй
+    const n = Math.max(1, parseInt(q, 10) || 1);
+    if (selectedStock > 0 && n > selectedStock) {
+      setWarn(`Үлдэгдэл ${selectedStock} ширхэг байна. ${selectedStock}-с илүүг сагсанд хийх боломжгүй.`);
+      return selectedStock;
+    }
+    setWarn("");
+    return n;
   };
-  const setQuantityCartItem = (id, quantity) => {
-    if (isIncludeCard()) {
-      if (quantity >= 1) {
-        const item = cartProducts.filter((elm) => elm.id == id)[0];
-        const items = [...cartProducts];
-        const itemIndex = items.indexOf(item);
-        item.quantity = quantity;
-        items[itemIndex] = item;
-        setCartProducts(items);
-      }
+
+  const setQuantityCartItem = (id, q) => {
+    const qty = clampQty(q);
+    const existed = isIncludeCard();
+    if (existed) {
+      const items = cartProducts.map((it) => (it.id === id ? { ...it, quantity: qty } : it));
+      setCartProducts(items);
     } else {
-      setQuantity(quantity - 1 ? quantity : 1);
+      setQuantity(qty);
     }
   };
+
   const addToCart = () => {
-    if (!isIncludeCard()) {
-      const item = product;
-      item.quantity = quantity;
-      setCartProducts((pre) => [...pre, item]);
-    }
+    if (outOfStock) return;
+    if (isIncludeCard()) return;
+
+    // safety: сонгосон тоо үлдэгдлээс их бол дарж болохгүй
+    const safeQty = clampQty(quantity);
+
+    const item = {
+      id: product.id,
+      name: product.name,
+      price: price,
+      quantity: safeQty,
+      image: images[0] || "/images/placeholder-330x400.png",
+      sku: defaultVariant?.sku || product?.sku || "",
+      variantId: defaultVariant?.id || null,
+      attributes: (defaultVariant?.attributes || []).map((a) => ({
+        name: a?.option?.attribute?.name ?? "",
+        value: a?.option?.value ?? "",
+      })),
+      stock: selectedStock ?? 0,
+    };
+    setCartProducts((prev) => [...prev, item]);
   };
+
+  // Вариантуудаас атрибутуудын нэрсийг цуглуулах
+  const attributeNameSet = useMemo(() => {
+    const s = new Set();
+    (product?.variants || []).forEach(v => {
+      (v.attributes || []).forEach(va => {
+        const n = va?.option?.attribute?.name;
+        if (n) s.add(n.trim());
+      });
+    });
+    return s;
+  }, [product]);
+
+  // case-insensitive шалгалт (Mongolian/English аль алиныг нь барих regex)
+  const hasSize = useMemo(() => {
+    return Array.from(attributeNameSet).some(n => /^(size|хэмж(ээ)?)$/i.test(n));
+  }, [attributeNameSet]);
+
+  const hasColor = useMemo(() => {
+    return Array.from(attributeNameSet).some(n => /^(color|өнгө)$/i.test(n));
+  }, [attributeNameSet]);
+
+
   return (
     <section className="product-single container">
       <div className="row">
         <div className="col-lg-7">
-          <ProductSlider1 />
+          <ProductSlider1 images={images} />
         </div>
+
         <div className="col-lg-5">
           <div className="d-flex justify-content-between mb-4 pb-md-2">
             <div className="breadcrumb mb-0 d-none d-md-block flex-grow-1">
               <BreadCumb />
             </div>
-            {/* <!-- /.breadcrumb --> */}
 
             <div className="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
               <a className="text-uppercase fw-medium">
-                <svg
-                  className="mb-1px"
-                  width="10"
-                  height="10"
-                  viewBox="0 0 25 25"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg className="mb-1px" width="10" height="10" viewBox="0 0 25 25">
                   <use href="#icon_prev_md" />
                 </svg>
                 <span className="menu-link menu-link_us-s">Prev</span>
               </a>
               <a className="text-uppercase fw-medium">
                 <span className="menu-link menu-link_us-s">Next</span>
-                <svg
-                  className="mb-1px"
-                  width="10"
-                  height="10"
-                  viewBox="0 0 25 25"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg className="mb-1px" width="10" height="10" viewBox="0 0 25 25">
                   <use href="#icon_next_md" />
                 </svg>
               </a>
             </div>
-            {/* <!-- /.shop-acs --> */}
           </div>
-          <h1 className="product-single__name">{product.title}</h1>
+
+          <h1 className="product-single__name">{product?.name}</h1>
+
           <div className="product-single__rating">
             <div className="reviews-group d-flex">
               <Star stars={5} />
             </div>
-            <span className="reviews-note text-lowercase text-secondary ms-1">
-              8k+ reviews
-            </span>
+            <span className="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
           </div>
+
           <div className="product-single__price">
-            <span className="current-price">${product.price}</span>
+            <span className="current-price">${price.toLocaleString()}</span>
           </div>
+
+          {/* ✅ Үлдэгдэл */}
+          <div className="mb-2">
+            {outOfStock ? (
+              <span className="text-dark bg-danger">
+                Уучлаарай, уг барааны үлдэгдэл дууссан байна.
+              </span>
+            ) : (
+              <span className="text-secondary">
+                Боломжит үлдэгдэл: <strong>{selectedStock}</strong>
+              </span>
+            )}
+          </div>
+          {warn && !outOfStock && (
+            <div className="mb-2 text-dark bg-warning" role="alert">
+              {warn}
+            </div>
+          )}
+
           <div className="product-single__short-desc">
-            <p>
-              Phasellus sed volutpat orci. Fusce eget lore mauris vehicula
-              elementum gravida nec dui. Aenean aliquam varius ipsum, non
-              ultricies tellus sodales eu. Donec dignissim viverra nunc, ut
-              aliquet magna posuere eget.
-            </p>
+            <p>{product?.description || "No description."}</p>
           </div>
+
           <form onSubmit={(e) => e.preventDefault()}>
-            <div className="product-single__swatches">
-              <div className="product-swatch text-swatches">
-                <label>Sizes</label>
-                <div className="swatch-list">
-                  <Size />
-                </div>
-                <a
-                  href="#"
-                  className="sizeguide-link"
-                  data-bs-toggle="modal"
-                  data-bs-target="#sizeGuide"
-                >
-                  Size Guide
-                </a>
+            {/* ✅ Size/Color аль нэг нь байвал л swatches үзүүлнэ */}
+            {(hasSize || hasColor) && (
+              <div className="product-single__swatches">
+                {hasSize && (
+                  <div className="product-swatch text-swatches">
+                    <label>Sizes</label>
+                    <div className="swatch-list">
+                      <Size />
+                    </div>
+                    <a
+                      href="#"
+                      className="sizeguide-link"
+                      data-bs-toggle="modal"
+                      data-bs-target="#sizeGuide"
+                    >
+                      Size Guide
+                    </a>
+                  </div>
+                )}
+
+                {hasColor && (
+                  <div className="product-swatch color-swatches">
+                    <label>Color</label>
+                    <div className="swatch-list">
+                      <Colors />
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="product-swatch color-swatches">
-                <label>Color</label>
-                <div className="swatch-list">
-                  <Colors />
+            )}
+
+            {/* ✅ Үлдэгдэлгүй үед тоо болон товчнуудыг нуух */}
+            {!outOfStock && (
+              <div className="product-single__addtocart">
+                <div className="qty-control position-relative">
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={isIncludeCard()?.quantity ?? quantity}
+                    min="1"
+                    max={selectedStock || undefined}
+                    onChange={(e) => setQuantityCartItem(product.id, e.target.value)}
+                    className="qty-control__number text-center"
+                  />
+                  <div
+                    onClick={() =>
+                      setQuantityCartItem(
+                        product.id,
+                        (isIncludeCard()?.quantity || quantity) - 1
+                      )
+                    }
+                    className="qty-control__reduce"
+                  >
+                    -
+                  </div>
+                  <div
+                    onClick={() =>
+                      setQuantityCartItem(
+                        product.id,
+                        (isIncludeCard()?.quantity || quantity) + 1
+                      )
+                    }
+                    className="qty-control__increase"
+                  >
+                    +
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="product-single__addtocart">
-              <div className="qty-control position-relative">
-                <input
-                  type="number"
-                  name="quantity"
-                  value={isIncludeCard() ? isIncludeCard().quantity : quantity}
-                  min="1"
-                  onChange={(e) =>
-                    setQuantityCartItem(product.id, e.target.value)
-                  }
-                  className="qty-control__number text-center"
-                />
-                <div
-                  onClick={() =>
-                    setQuantityCartItem(
-                      product.id,
-                      isIncludeCard()?.quantity - 1 || quantity - 1
-                    )
-                  }
-                  className="qty-control__reduce"
+
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-addtocart js-open-aside"
+                  onClick={addToCart}
+                  disabled={outOfStock}
                 >
-                  -
-                </div>
-                <div
-                  onClick={() =>
-                    setQuantityCartItem(
-                      product.id,
-                      isIncludeCard()?.quantity + 1 || quantity + 1
-                    )
-                  }
-                  className="qty-control__increase"
+                  {isIncludeCard() ? "Сагсанд хийсэн" : "Сагсанд хийх"}
+                </button>
+
+                <Link
+                  href="/shop_cart"
+                  onClick={(e) => {
+                    if (outOfStock) {
+                      e.preventDefault();
+                      return;
+                    }
+                    if (!isIncludeCard()) addToCart();
+                  }}
+                  className="btn btn-primary btn-addtocart js-open-aside bg-white text-dark"
+                  aria-disabled={outOfStock}
                 >
-                  +
-                </div>
+                  Худалдаж авах
+                </Link>
               </div>
-              {/* <!-- .qty-control --> */}
-              <button
-                type="submit"
-                className="btn btn-primary btn-addtocart js-open-aside"
-                onClick={() => addToCart()}
-              >
-                {isIncludeCard() ? "Already Added" : "Add to Cart"}
-              </button>
-            </div>
+            )}
           </form>
+
           <div className="product-single__addtolinks">
             <a href="#" className="menu-link menu-link_us-s add-to-wishlist">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                 <use href="#icon_heart" />
               </svg>
               <span>Add to Wishlist</span>
             </a>
-            <ShareComponent title={product.title} />
+            <ShareComponent title={product?.name || "Product"} />
           </div>
+
           <div className="product-single__meta-info">
             <div className="meta-item">
               <label>SKU:</label>
-              <span>N/A</span>
+              <span>{product?.sku || "N/A"}</span>
             </div>
             <div className="meta-item">
               <label>Categories:</label>
-              <span>Casual & Urban Wear, Jackets, Men</span>
+              <span>{product?.category?.name || "—"}</span>
             </div>
             <div className="meta-item">
               <label>Tags:</label>
-              <span>biker, black, bomber, leather</span>
+              <span>{(product?.tags || []).map((t) => t.tag).join(", ") || "—"}</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* tabs */}
       <div className="product-single__details-tab">
         <ul className="nav nav-tabs" id="myTab1" role="tablist">
-          <li className="nav-item" role="presentation">
-            <a
-              className="nav-link nav-link_underscore active"
-              id="tab-description-tab"
-              data-bs-toggle="tab"
-              href="#tab-description"
-              role="tab"
-              aria-controls="tab-description"
-              aria-selected="true"
-            >
-              Description
-            </a>
-          </li>
           <li className="nav-item" role="presentation">
             <a
               className="nav-link nav-link_underscore"
@@ -225,7 +319,7 @@ export default function SingleProduct12({ product }) {
               aria-controls="tab-additional-info"
               aria-selected="false"
             >
-              Additional Information
+              Нэмэлт мэдээлэл
             </a>
           </li>
           <li className="nav-item" role="presentation">
@@ -238,34 +332,17 @@ export default function SingleProduct12({ product }) {
               aria-controls="tab-reviews"
               aria-selected="false"
             >
-              Reviews (2)
+              Сэтгэгдэл
             </a>
           </li>
         </ul>
+
         <div className="tab-content">
-          <div
-            className="tab-pane fade show active"
-            id="tab-description"
-            role="tabpanel"
-            aria-labelledby="tab-description-tab"
-          >
-            <Description />
+          <div className="tab-pane fade show active" id="tab-additional-info" role="tabpanel">
+            <AdditionalInfo product={product} />
           </div>
-          <div
-            className="tab-pane fade"
-            id="tab-additional-info"
-            role="tabpanel"
-            aria-labelledby="tab-additional-info-tab"
-          >
-            <AdditionalInfo />
-          </div>
-          <div
-            className="tab-pane fade"
-            id="tab-reviews"
-            role="tabpanel"
-            aria-labelledby="tab-reviews-tab"
-          >
-            <Reviews />
+          <div className="tab-pane fade" id="tab-reviews" role="tabpanel">
+             <Reviews productId={product?.id} productName={product?.name} />
           </div>
         </div>
       </div>

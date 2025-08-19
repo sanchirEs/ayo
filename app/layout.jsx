@@ -23,6 +23,7 @@ import ProductDescription from "@/components/asides/ProductDescription";
 import ProductAdditionalInformation from "@/components/asides/ProductAdditionalInformation";
 import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({ children }) {
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
+       <AuthProvider>
       <body>
         <Svgs />
         <Context>
@@ -87,7 +89,7 @@ export default function RootLayout({ children }) {
           {/* //modals and asides */}
           <LoginFormPopup />
           <QuickView />
-          <NewsLetter />
+          {/* <NewsLetter /> */}
           <CookieContainer />
           <SizeGuide />
           <Delivery />
@@ -102,6 +104,7 @@ export default function RootLayout({ children }) {
         <div className="page-overlay" id="pageOverlay"></div>
         <ScrollTop />
       </body>
+      </AuthProvider>
     </html>
   );
 }

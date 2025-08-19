@@ -30,6 +30,7 @@
   line-height: $navigation-item-line-height;
   text-decoration: none;
   text-transform: uppercase;
+  font-size: $h6-font-size;
 
   &:after {
     content: '';
