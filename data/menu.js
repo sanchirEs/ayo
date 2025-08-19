@@ -180,24 +180,19 @@ export const othersMenuItems = [
 
 export const dashboardMenuItems = [
   {
-    id: 1,
-    href: "/account_dashboard",
-    title: "Dashboard",
-  },
-  {
     id: 2,
     href: "/account_orders",
-    title: "Orders",
+    title: "Миний захиалгууд",
   },
   {
     id: 3,
     href: "/account_edit_address",
-    title: "Addresses",
+    title: "Хаяг",
   },
   {
     id: 4,
     href: "/account_edit",
-    title: "Account Details",
+    title: "Дэлгэрэнгүй",
   },
   {
     id: 5,
@@ -207,6 +202,6 @@ export const dashboardMenuItems = [
   {
     id: 6,
     href: "/login_register",
-    title: "Logout",
+    title: "Гарах",
   },
 ];

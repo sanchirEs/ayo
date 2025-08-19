@@ -24,6 +24,7 @@ import ProductAdditionalInformation from "@/components/asides/ProductAdditionalI
 import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({ children }) {
   useEffect(() => {
@@ -101,6 +102,7 @@ export default function RootLayout({ children }) {
           <ProductAdditionalInformation />
           <ProductReviews />
         </Context>
+        <Toaster position="top-right" />
         <div className="page-overlay" id="pageOverlay"></div>
         <ScrollTop />
       </body>

@@ -131,7 +131,7 @@ export default function Header14() {
  {user ? (
                 // НЭВТЭРСЭН ҮЕД: нэр + dropdown (logout)
                 <div className="header-tools__item hover-container">
-                  <Link href="/login_register" className="menu-link menu-link_us-s d-flex align-items-center gap-2">
+                  <Link href="/account_edit" className="menu-link menu-link_us-s d-flex align-items-center gap-2">
                    Сайн байна уу, {user.username || user.firstName || "User"}
                   </Link>
                   </div>
