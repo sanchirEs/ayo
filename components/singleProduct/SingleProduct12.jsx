@@ -309,7 +309,7 @@ export default function SingleProduct12({ product }) {
       {/* tabs */}
       <div className="product-single__details-tab">
         <ul className="nav nav-tabs" id="myTab1" role="tablist">
-          <li className="nav-item" role="presentation">
+          {/* <li className="nav-item" role="presentation">
             <a
               className="nav-link nav-link_underscore"
               id="tab-additional-info-tab"
@@ -321,7 +321,7 @@ export default function SingleProduct12({ product }) {
             >
               Нэмэлт мэдээлэл
             </a>
-          </li>
+          </li> */}
           <li className="nav-item" role="presentation">
             <a
               className="nav-link nav-link_underscore"
@@ -338,10 +338,10 @@ export default function SingleProduct12({ product }) {
         </ul>
 
         <div className="tab-content">
-          <div className="tab-pane fade show active" id="tab-additional-info" role="tabpanel">
+          {/* <div className="tab-pane fade show active" id="tab-additional-info" role="tabpanel">
             <AdditionalInfo product={product} />
-          </div>
-          <div className="tab-pane fade" id="tab-reviews" role="tabpanel">
+          </div> */}
+          <div className="tab-pane fade show active"  id="tab-reviews" role="tabpanel">
              <Reviews productId={product?.id} productName={product?.name} />
           </div>
         </div>

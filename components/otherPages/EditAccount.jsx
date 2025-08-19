@@ -248,7 +248,7 @@ export default function EditAccount() {
                   <div className="col-md-12">
                     <div className="my-3">
                       <button className="btn btn-primary" disabled={isSubmitting}>
-                        {isSubmitting ? "Saving..." : "Save Changes"}
+                        {isSubmitting ? "Өөрчилж байна..." : "Өөрчлөлтийг хадгалах"}
                       </button>
                     </div>
                   </div>
@@ -403,7 +403,7 @@ export default function EditAccount() {
                   <div className="col-md-12">
                     <div className="my-3">
                       <button className="btn btn-primary" disabled={isSubmitting}>
-                        {isSubmitting ? "Saving..." : "Save Changes"}
+                        {isSubmitting ? "Өөрчилж байна..." : "Өөрчлөлтийг хадгалах"}
                       </button>
                     </div>
                   </div>
