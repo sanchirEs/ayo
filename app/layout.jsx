@@ -81,13 +81,14 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-            <SessionProvider
+          
+      <body>
+          <SessionProvider
             
               refetchInterval={0}
   refetchOnWindowFocus={false}
   refetchWhenOffline={false}>
           <AuthProvider>
-      <body>
         <Svgs />
         <Context>
           <MobileHeader />
@@ -111,9 +112,10 @@ export default function RootLayout({ children }) {
         <Toaster position="top-right" />
         <div className="page-overlay" id="pageOverlay"></div>
         <ScrollTop />
-      </body>
-      </AuthProvider>
+         </AuthProvider>
       </SessionProvider>
+      </body>
+   
     </html>
   );
 }

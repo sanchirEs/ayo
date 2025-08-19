@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Header14() {
    const { user, logout } = useAuth();
-   console.log("user info: ", user)
+
   return (
     <header id="header" className="header sticky_disabled w-100">
       <div className="header-top bg-black">

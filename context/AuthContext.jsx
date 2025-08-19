@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import api from "@/lib/api";
 
@@ -9,42 +9,41 @@ export function AuthProvider({ children }) {
   const { data: session, status } = useSession(); // "authenticated" | "unauthenticated" | "loading"
   const [user, setUser] = useState(null);
   const [hydrating, setHydrating] = useState(false);
+  const inFlight = useRef(false); // давхар дуудлагын хамгаалалт
 
-  // --- профайл татах ---
   const hydrate = useCallback(async () => {
     if (status !== "authenticated") {
       setUser(null);
       return;
     }
+    if (inFlight.current) return; // guard
+    inFlight.current = true;
     try {
       setHydrating(true);
-      // Backend профайл татах
+      // Backend профайл татах (auth:true → токен автоматаар хавсарна)
       const res = await api.user.getProfile();
       const u = res?.data ?? res ?? session?.user ?? null;
       setUser(u);
     } catch {
+      // fallback: NextAuth session
       setUser(session?.user ?? null);
     } finally {
       setHydrating(false);
+      inFlight.current = false;
     }
-  }, [status, session]);
+  }, [status]); // ✅ Зөвхөн status-д хамааруулна
 
   useEffect(() => {
+    // ✅ status өөрчлөгдөх бүрт нэг удаа л ажиллана
     hydrate();
-  }, [hydrate]);
+  }, [status, hydrate]);
 
-  // --- нэвтрэх ---
   const login = useCallback(async ({ identifier, password }) => {
-    const r = await signIn("credentials", {
-      identifier,
-      password,
-      redirect: false,
-    });
+    const r = await signIn("credentials", { identifier, password, redirect: false });
     if (r?.error) throw new Error(r.error);
-    // signIn амжилттай бол session шинэчлэгдэнэ → hydrate автоматаар дуудна
+    // амжилттай бол status → "authenticated" болж, дээрх effect hydrate-ыг дуудна
   }, []);
 
-  // --- гарах ---
   const logout = useCallback(async () => {
     await signOut({ redirect: false });
     setUser(null);
