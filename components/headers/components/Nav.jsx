@@ -103,18 +103,20 @@ export default function Nav() {
       ) : (
         catTree.map((root) => (
           <li key={root.id} className="navigation__item">
-            <Link href={`/category/${root.id}`} className="navigation__link">
+            <Link href={`/shop-4/${root.id}`} className="navigation__link">
               {root.name}
             </Link>
 
             {/* Mega menu (show via CSS hover) */}
-            <div className="mega-menu">
+            {
+              root.children.length>0?(
+                <div className="mega-menu">
               <div className="container d-flex">
                 {/* One column per direct child of ROOT */}
                 {root.children?.map((child) => (
                   <div key={child.id} className="col pe-4">
                     <Link
-                      href={`/category/${child.id}`}
+                      href={`/shop-4/${child.id}`}
                       className="sub-menu__title"
                     >
                       {child.name}
@@ -125,7 +127,7 @@ export default function Nav() {
                   </div>
                 ))}
 
-                {/* Optional image column */}
+                {/* Optional image column
                 <div className="mega-menu__media col">
                   <div className="position-relative">
                     <Image
@@ -148,9 +150,15 @@ export default function Nav() {
                       </Link>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
+              ):(
+                <div></div>
+              )
+
+            }
+            
           </li>
         ))
       )}

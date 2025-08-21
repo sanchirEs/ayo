@@ -265,7 +265,7 @@ const setQuantity = (id, q) => {
             <div className="mobile_fixed-btn_wrapper">
               <div className="button-wrapper container">
                 <button className="btn btn-primary btn-checkout">
-                  PROCEED TO CHECKOUT
+                  Захиалга өгөх хаягаа оруулах
                 </button>
               </div>
             </div>
