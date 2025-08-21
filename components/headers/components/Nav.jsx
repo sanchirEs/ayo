@@ -23,6 +23,8 @@ export default function Nav() {
   // === Categories data from backend (tree or flat) ===
   const [catTree, setCatTree] = useState([]);
   const [catErr, setCatErr] = useState("");
+  const [isAllCatsOpen, setIsAllCatsOpen] = useState(false);
+  const [activeRootId, setActiveRootId] = useState(null);
 
   // If API returns FLAT data, convert to tree
   function buildTree(flat) {
@@ -69,7 +71,7 @@ export default function Nav() {
   }, []);
 
   // Recursive nested list for unlimited depth
-  function CategoryList({ nodes }) {
+  function CategoryList({ nodes, linkClassName = "" }) {
     if (!nodes || nodes.length === 0) return null;
     return (
       <ul className="sub-menu__list list-unstyled">
@@ -81,13 +83,13 @@ export default function Nav() {
                 href={href}
                 className={`menu-link menu-link_us-s ${
                   isMenuActive(href) ? "menu-active" : ""
-                }`}
+                } ${linkClassName}`}
               >
                 {n.name}
               </Link>
 
               {n.children && n.children.length > 0 && (
-                <CategoryList nodes={n.children} />
+                <CategoryList nodes={n.children} linkClassName={linkClassName} />
               )}
             </li>
           );
@@ -96,71 +98,116 @@ export default function Nav() {
     );
   }
 
+  // When categories arrive, select the first root as active by default
+  useEffect(() => {
+    if (Array.isArray(catTree) && catTree.length > 0 && !activeRootId) {
+      setActiveRootId(catTree[0].id);
+    }
+  }, [catTree, activeRootId]);
+
   return (
     <>
       {catErr ? (
         <li className="navigation__link">{catErr}</li>
       ) : (
-        catTree.map((root) => (
-          <li key={root.id} className="navigation__item">
-            <Link href={`/shop-4/${root.id}`} className="navigation__link">
-              {root.name}
+        <>
+          {/* БҮХ АНГИЛАЛ - Mega menu */}
+          <li
+            className="navigation__item"
+            onMouseEnter={() => setIsAllCatsOpen(true)}
+            onMouseLeave={() => setIsAllCatsOpen(false)}
+          >
+            <Link href="#" className="navigation__link">
+              БҮХ АНГИЛАЛ
             </Link>
 
-            {/* Mega menu (show via CSS hover) */}
-            {
-              root.children.length>0?(
-                <div className="mega-menu">
-              <div className="container d-flex">
-                {/* One column per direct child of ROOT */}
-                {root.children?.map((child) => (
-                  <div key={child.id} className="col pe-4">
-                    <Link
-                      href={`/shop-4/${child.id}`}
-                      className="sub-menu__title"
-                    >
-                      {child.name}
-                    </Link>
-
-                    {/* Render child's descendants recursively */}
-                    <CategoryList nodes={child.children} />
+            {isAllCatsOpen && (
+              <div className="mega-menu mega-menu--allcats">
+                <div className="container d-flex">
+                  {/* Left: root categories list */}
+                  <div className="col-2 pe-4 allcats__left">
+                    <ul className="list-unstyled m-0">
+                      {catTree.map((root) => (
+                        <li
+                          key={root.id}
+                          onMouseEnter={() => setActiveRootId(root.id)}
+                          className={`sub-menu__item ${
+                            activeRootId === root.id ? "menu-active is-active" : ""
+                          }`}
+                        >
+                          <Link
+                            href={`/shop-4/${root.id}`}
+                            className="menu-link  sub-menu__title"
+                          >
+                            {root.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
 
-                {/* Optional image column
-                <div className="mega-menu__media col">
-                  <div className="position-relative">
-                    <Image
-                      loading="lazy"
-                      className="mega-menu__img"
-                      src="/assets/images/mega-menu-item.jpg"
-                      width={902}
-                      height={990}
-                      style={{ height: "fit-content" }}
-                      alt="New Horizons"
-                    />
-                    <div className="mega-menu__media-content content_abs content_left content_bottom">
-                      <h3>NEW</h3>
-                      <h3 className="mb-0">HORIZONS</h3>
-                      <Link
-                        href="/shop-1"
-                        className="btn-link default-underline fw-medium"
-                      >
-                        SHOP NOW
-                      </Link>
-                    </div>
+                  {/* Right: active root details */}
+                  <div className="col allcats__right">
+                    {(() => {
+                      const active = catTree.find((r) => r.id === activeRootId);
+                      if (!active) return null;
+                      return (
+                        <div>
+                          <div className="sub-menu__title mb-3 allcats__right-title">{active.name} </div>
+                          <div className="d-flex flex-wrap">
+                            {(() => {
+                              const children = Array.isArray(active.children) ? active.children : [];
+                              const withKids = children.filter((c) => Array.isArray(c.children) && c.children.length > 0);
+                              const withoutKids = children.filter((c) => !Array.isArray(c.children) || c.children.length === 0);
+                              return (
+                                <>
+                                  {/* One column list for items without children */}
+                                  {withoutKids.length > 0 && (
+                                    <div className="col pe-4 mb-4">
+                                      <ul className="sub-menu__list list-unstyled">
+                                        {withoutKids.map((leaf) => (
+                                          <li key={leaf.id} className="sub-menu__item">
+                                            <Link href={`/shop-4/${leaf.id}`} className="menu-link menu-link_us-s sub-menu__title allcats__leaf-bold">
+                                              {leaf.name}
+                                            </Link>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  {/* Each item with children goes to its own column with its children below */}
+                                  {withKids.map((child) => (
+                                    <div key={child.id} className="col pe-4 mb-4">
+                                      <Link href={`/shop-4/${child.id}`} className="sub-menu__title allcats__leaf-bold">
+                                        {child.name}
+                                      </Link>
+                                      <CategoryList nodes={child.children} linkClassName="allcats__nested-link" />
+                                    </div>
+                                  ))}
+                                </>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
-                </div> */}
+                </div>
               </div>
-            </div>
-              ):(
-                <div></div>
-              )
-
-            }
-            
+            )}
           </li>
-        ))
+
+          {/* First 6 root categories as regular nav items */}
+          {catTree.slice(0, 6).map((root) => (
+            <li key={root.id} className="navigation__item">
+              <Link href={`/shop-4/${root.id}`} className="navigation__link">
+                {root.name}
+              </Link>
+
+            </li>
+          ))}
+        </>
       )}
     </>
   );

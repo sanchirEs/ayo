@@ -44,3 +44,39 @@ export default function HomePage15() {
     </>
   );
 }
+
+
+// import Header14 from "@/components/headers/Header14";
+// import Footer14 from "@/components/footers/Footer14";
+
+// // ШИНЭ компонентууд
+// import HeroDynamic from "@/components/homes/home-15/HeroDynamic";
+// import CategoriesGrid from "@/components/homes/home-15/CategoriesGrid";
+// import FlashSaleProducts from "@/components/homes/home-15/FlashSaleProducts";
+// import NewArrivals from "@/components/homes/home-15/NewArrivals";
+// import DealsGrid from "@/components/homes/home-15/DealsGrid";
+
+// export const metadata = {
+//   title: "Home",
+//   description: "E-commerce",
+// };
+
+// export default function HomePage15() {
+//   return (
+//     <div className="theme-15">
+//       <Header14 />
+//       <main>
+//         <HeroDynamic />
+//         <FlashSaleProducts />
+//         <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5" />
+//         <NewArrivals />
+//         <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5" />
+//         {/* <CategoriesGrid />
+//         <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5" />
+//         <DealsGrid />
+//         <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5" /> */}
+//       </main>
+//       <Footer14 />
+//     </div>
+//   );
+// }

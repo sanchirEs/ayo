@@ -158,3 +158,255 @@ body {
 .product-single__thumbnail .swiper-slide {
   height: fit-content !important;
 }
+
+/* Nav design tweaks to align with zayabilgee.mn */
+.navigation__link {
+  font-size: 1rem; /* slightly larger */
+  letter-spacing: 0.2px;
+}
+
+/* Slightly larger text inside mega menu lists */
+.mega-menu .menu-link,
+.mega-menu .sub-menu__title {
+  font-size: 1rem;
+}
+
+/* Show an arrow next to hovered items inside mega menu */
+.mega-menu .menu-link::before,
+.mega-menu .sub-menu__title::before {
+  content: '›';
+  display: inline-block;
+  opacity: 0;
+  margin-right: 6px;
+  transform: translateX(-4px);
+  transition: all 0.2s ease;
+  color: currentColor;
+}
+.mega-menu .menu-link:hover::before,
+.mega-menu .menu-link.menu-link_active::before,
+.mega-menu .sub-menu__title:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Always show right-side arrow for sub menu items (non-hover too) */
+.mega-menu .menu-link::before,
+.mega-menu .sub-menu__title::before {
+  content: none !important; /* disable left arrows if any */
+}
+.mega-menu .menu-link,
+.mega-menu .sub-menu__title {
+}
+.mega-menu .menu-link::after,
+.mega-menu .sub-menu__title::after {
+  content: '›';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35; /* visible even when not hovered */
+  color: currentColor;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.mega-menu .menu-link:hover::after,
+.mega-menu .menu-link.menu-link_active::after,
+.mega-menu .sub-menu__title:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* FINAL OVERRIDE: one arrow only, right-aligned on the same line */
+.mega-menu .menu-link::before,
+.mega-menu .sub-menu__title::before {
+  content: none !important;
+  display: none !important;
+}
+.mega-menu .menu-link,
+.mega-menu .sub-menu__title {
+  display: block;
+  position: relative;
+  padding-right: 1.25rem; /* space for right arrow */
+}
+.mega-menu .menu-link::after,
+.mega-menu .sub-menu__title::after {
+  content: '›';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35;
+  color: currentColor;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.mega-menu .menu-link:hover::after,
+.mega-menu .menu-link.menu-link_active::after,
+.mega-menu .sub-menu__title:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* OVERRIDE (fix): use ::before for right arrow so ::after remains underline */
+.mega-menu .menu-link,
+.mega-menu .sub-menu__title {
+  display: block;
+  position: relative;
+  padding-right: 1.25rem; /* reserve space for arrow */
+}
+/* Remove any right-arrow that may be on ::after from previous rules */
+.mega-menu .menu-link::after,
+.mega-menu .sub-menu__title::after {
+  background-image: none !important;
+}
+.mega-menu .menu-link::before,
+.mega-menu .sub-menu__title::before {
+  content: '›' !important;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35;
+  color: currentColor;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+.mega-menu .menu-link:hover::before,
+.mega-menu .menu-link.menu-link_active::before,
+.mega-menu .sub-menu__title:hover::before {
+  opacity: 1;
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* Keep header underline while hovering mega menu area */
+.navigation__item:hover > .navigation__link::after {
+  width: 2em; /* match $nav-link-active-bottom-width */
+}
+
+/* Make main nav text non-bold */
+.navigation__link {
+  font-weight: 500 !important; /* normal */
+}
+.mega-menu .sub-menu__title {
+  font-weight: 400 !important;
+}
+
+/* Match mega-menu (All Categories) text to main nav font */
+.mega-menu--allcats .sub-menu__title,
+.mega-menu--allcats .menu-link {
+  font-size: 1.125rem !important;        /* same as .navigation__link */
+  font-weight: 400 !important;        /* non-bold */
+  letter-spacing: 0.2px;              /* match spacing */
+  text-transform: uppercase;          /* align with nav */
+}
+
+/* Align the right-pane title vertically with left list/arrow */
+.mega-menu--allcats .allcats__right .sub-menu__title {
+  line-height: 1.5rem;         /* match nav item line height */
+  margin-bottom: 0.5rem;       /* slightly tighter spacing */
+  position: relative;
+  top: 2px;                    /* nudge down a bit for visual centering */
+}
+
+/* Make sub-menu titles use same color as menu-link */
+.mega-menu .sub-menu__title { 
+  color: $sub-menu-link-color !important; 
+}
+
+/* Force bold for right-pane active category title */
+.mega-menu--allcats .allcats__right-title {
+  font-weight: 600 !important;
+  font-size: 1.5em !important;
+}
+
+/* All Categories (left list) - gray hover background only here */
+.mega-menu--allcats .allcats__left .menu-link {
+  display: block;               /* allow background to fill row */
+  border-radius: 4px;
+}
+.mega-menu--allcats .allcats__left .menu-link:hover {
+  padding: 10px;
+  background-color: #f2f2f2;    /* light gray */
+}
+
+/* Persist gray bg while the item is active (hovered/selected) */
+.mega-menu--allcats .allcats__left .sub-menu__item.is-active > .menu-link {
+  padding: 10px;
+  background-color: #f2f2f2;
+}
+
+/* All Categories left list: keep arrow inside gray bg with padding */
+.mega-menu--allcats .allcats__left .menu-link {
+  display: block;
+  position: relative;
+  padding: 10px 28px 10px 10px; /* right pad leaves room for arrow */
+  border-radius: 4px;
+}
+.mega-menu--allcats .allcats__left .menu-link::before {
+  content: '›';
+  position: absolute;
+  right: 10px;              /* inside the 28px right padding */
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+.mega-menu--allcats .allcats__left .menu-link:hover,
+.mega-menu--allcats .allcats__left .sub-menu__item.is-active > .menu-link {
+  background-color: #f2f2f2;
+}
+.mega-menu--allcats .allcats__left .menu-link:hover::before,
+.mega-menu--allcats .allcats__left .sub-menu__item.is-active > .menu-link::before {
+  opacity: 1;
+  transform: translateY(-50%) translateX(10px);
+}
+
+/* All Categories right pane: hide arrows on titles/links */
+.mega-menu--allcats .allcats__right .menu-link::before,
+.mega-menu--allcats .allcats__right .sub-menu__title::before {
+  content: none !important;
+}
+
+/* Hide arrows completely across All Categories (left and right), incl. hover/active */
+.mega-menu--allcats .allcats__left .menu-link::before,
+.mega-menu--allcats .allcats__left .sub-menu__title::before,
+.mega-menu--allcats .allcats__right .menu-link::before,
+.mega-menu--allcats .allcats__right .sub-menu__title::before,
+.mega-menu--allcats .allcats__left .menu-link:hover::before,
+.mega-menu--allcats .allcats__left .sub-menu__item.is-active > .menu-link::before {
+  content: none !important;
+  opacity: 0 !important;
+  transform: none !important;
+}
+
+/* Only hide arrows in All Categories RIGHT pane */
+.mega-menu--allcats .allcats__right .menu-link::before,
+.mega-menu--allcats .allcats__right .menu-link::after,
+.mega-menu--allcats .allcats__right .sub-menu__title::before,
+.mega-menu--allcats .allcats__right .sub-menu__title::after {
+  content: none !important;
+  background: none !important;
+}
+
+/* Right pane leaf items: bold text */
+.mega-menu--allcats .allcats__right .allcats__leaf-bold {
+  font-weight: 400 !important;
+  // font-size: 1em !important;
+}
+
+/* Right pane CategoryList: slightly smaller text for nested items */
+.mega-menu--allcats .allcats__right .sub-menu__list .menu-link {
+  font-size: 0.9rem;   /* a touch smaller than 1rem */
+  line-height: 1.4;
+}
+
+/* Smaller font for nested links passed via CategoryList in right pane */
+.mega-menu--allcats .allcats__right .allcats__nested-link {
+  font-size: 0.9rem !important;
+}
+
+/* Inside All Categories mega-menu, do NOT uppercase; keep normal/capitalized case */
+.mega-menu--allcats .allcats__left .menu-link,
+.mega-menu--allcats .allcats__right .sub-menu__title,
+.mega-menu--allcats .allcats__right .menu-link {
+  text-transform: none !important;
+}
