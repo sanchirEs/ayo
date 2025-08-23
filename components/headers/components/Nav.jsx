@@ -25,6 +25,77 @@ export default function Nav() {
   const [catErr, setCatErr] = useState("");
   const [isAllCatsOpen, setIsAllCatsOpen] = useState(false);
   const [activeRootId, setActiveRootId] = useState(null);
+  const [isAllCatsHovered, setIsAllCatsHovered] = useState(false);
+
+  // Function to get arrow icon for БҮХ АНГИЛАЛ
+  const getArrowIcon = (isHovered = false) => {
+    return (
+      <svg 
+        width="20" 
+        height="20" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2"
+        className="ms-1 transition-transform duration-200"
+        style={{ 
+          transform: isHovered ? 'rotate(180deg)' : 'rotate(0deg)'
+        }}
+      >
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    );
+  };
+
+  // Function to get appropriate icon for category
+  const getCategoryIcon = (categoryName) => {
+    const name = categoryName.toLowerCase();
+    
+    if (name.includes('арьс') || name.includes('нүүр')) {
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+        </svg>
+      );
+    } else if (name.includes('бие') || name.includes('биеийн')) {
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      );
+    } else if (name.includes('будалт') || name.includes('будаг')) {
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      );
+    } else if (name.includes('өсвөр') || name.includes('нас')) {
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+      );
+    } else if (name.includes('уруул') || name.includes('уруулын')) {
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      );
+    } else if (name.includes('хувцас') || name.includes('хувцасны')) {
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M21.6 18.2L13 11.75v-.91c1.65-.49 2.8-2.17 2.43-4.05-.26-1.31-1.3-2.4-2.61-2.7C10.54 3.57 8.5 5.3 8.5 7.5h2c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .84-.69 1.52-1.53 1.5-.54-.01-.97.45-.97.99v1.76L2.4 18.2c-.77.58-.36 1.8.6 1.8h18c.96 0 1.37-1.22.6-1.8zM6 18l6-4.5 6 4.5H6z"/>
+        </svg>
+      );
+    } else {
+      // Default icon for other categories
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      );
+    }
+  };
 
   // If API returns FLAT data, convert to tree
   function buildTree(flat) {
@@ -114,11 +185,18 @@ export default function Nav() {
           {/* БҮХ АНГИЛАЛ - Mega menu */}
           <li
             className="navigation__item"
-            onMouseEnter={() => setIsAllCatsOpen(true)}
-            onMouseLeave={() => setIsAllCatsOpen(false)}
+            onMouseEnter={() => {
+              setIsAllCatsOpen(true);
+              setIsAllCatsHovered(true);
+            }}
+            onMouseLeave={() => {
+              setIsAllCatsOpen(false);
+              setIsAllCatsHovered(false);
+            }}
           >
-            <Link href="#" className="navigation__link">
+            <Link href="#" className="navigation__link d-flex align-items-center">
               БҮХ АНГИЛАЛ
+              {getArrowIcon(isAllCatsHovered)}
             </Link>
 
             {isAllCatsOpen && (
@@ -139,6 +217,9 @@ export default function Nav() {
                             href={`/shop-4/${root.id}`}
                             className="menu-link  sub-menu__title"
                           >
+                            {/* {getCategoryIcon(root.name)} */}
+
+
                             {root.name}
                           </Link>
                         </li>
