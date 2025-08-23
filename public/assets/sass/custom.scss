@@ -582,3 +582,36 @@ body {
     transform: scale(1);
   }
 }
+
+/* Product Swatch Styles */
+.swatch {
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 100%;
+      height: 2px;
+      background-color: #ff0000;
+    }
+  }
+  
+  &.selected {
+    border: 2px solid #000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.swatch-color {
+  &.disabled {
+    &::after {
+      background-color: #ff0000;
+    }
+  }
+}

@@ -16,14 +16,19 @@ export default function SingleProduct12({ product }) {
   const { cartProducts, setCartProducts } = useContextElement();
   const [quantity, setQuantity] = useState(1);
   const [warn, setWarn] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   // --- Backend талбаруудыг тааруулах ---
   const images = product?.ProductImages?.map((i) => i.imageUrl) ?? [];
-  const defaultVariant =
-    product?.variants?.find((v) => v.isDefault) || product?.variants?.[0] || null;
+  
+  // Selected variant-ыг initialize хийх
+  React.useEffect(() => {
+    const defaultVariant = product?.variants?.find((v) => v.isDefault) || product?.variants?.[0] || null;
+    setSelectedVariant(defaultVariant);
+  }, [product]);
 
-  const price =
-    (defaultVariant ? Number(defaultVariant.price) : Number(product?.price || 0)) || 0;
+  const currentVariant = selectedVariant || product?.variants?.[0] || null;
+  const price = (currentVariant ? Number(currentVariant.price) : Number(product?.price || 0)) || 0;
 
   // ✅ Нийт үлдэгдэл (бүх variant + product level)
   const totalStock = useMemo(() => {
@@ -38,13 +43,13 @@ export default function SingleProduct12({ product }) {
     return vSum + pSum;
   }, [product]);
 
-  // ✅ Одоогоор сонгогдсон (default) variant-ын үлдэгдэл, байхгүй бол бүх үлдэгдлийг ашиглая
+  // ✅ Одоогоор сонгогдсон variant-ын үлдэгдэл, байхгүй бол бүх үлдэгдлийг ашиглая
   const selectedStock = useMemo(() => {
-    if (defaultVariant?.inventory?.quantity != null) {
-      return Number(defaultVariant.inventory.quantity);
+    if (currentVariant?.inventory?.quantity != null) {
+      return Number(currentVariant.inventory.quantity);
     }
     return totalStock;
-  }, [defaultVariant, totalStock]);
+  }, [currentVariant, totalStock]);
 
   const outOfStock = selectedStock <= 0;
 
@@ -86,9 +91,9 @@ export default function SingleProduct12({ product }) {
       price: price,
       quantity: safeQty,
       image: images[0] || "/images/placeholder-330x400.png",
-      sku: defaultVariant?.sku || product?.sku || "",
-      variantId: defaultVariant?.id || null,
-      attributes: (defaultVariant?.attributes || []).map((a) => ({
+      sku: currentVariant?.sku || product?.sku || "",
+      variantId: currentVariant?.id || null,
+      attributes: (currentVariant?.attributes || []).map((a) => ({
         name: a?.option?.attribute?.name ?? "",
         value: a?.option?.value ?? "",
       })),
@@ -189,9 +194,13 @@ export default function SingleProduct12({ product }) {
               <div className="product-single__swatches">
                 {hasSize && (
                   <div className="product-swatch text-swatches">
-                    <label>Sizes</label>
+                    <label>Хэмжээ</label>
                     <div className="swatch-list">
-                      <Size />
+                      <Size 
+                        product={product}
+                        selectedVariant={selectedVariant}
+                        onVariantChange={setSelectedVariant}
+                      />
                     </div>
                     <a
                       href="#"
@@ -199,16 +208,20 @@ export default function SingleProduct12({ product }) {
                       data-bs-toggle="modal"
                       data-bs-target="#sizeGuide"
                     >
-                      Size Guide
+                      Хэмжээний хүснэгт
                     </a>
                   </div>
                 )}
 
                 {hasColor && (
                   <div className="product-swatch color-swatches">
-                    <label>Color</label>
+                    <label>Өнгө</label>
                     <div className="swatch-list">
-                      <Colors />
+                      <Colors 
+                        product={product}
+                        selectedVariant={selectedVariant}
+                        onVariantChange={setSelectedVariant}
+                      />
                     </div>
                   </div>
                 )}
