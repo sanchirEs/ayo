@@ -136,7 +136,7 @@ export default function Featured() {
                       </svg>
                     </button>
 
-                    <button
+                    {/* <button
                       className="btn btn-square btn-hover-primary d-block border-1 text-uppercase js-quick-view"
                       data-bs-toggle="modal"
                       data-bs-target="#quickView"
@@ -146,7 +146,7 @@ export default function Featured() {
                       <svg className="d-inline-block" width="14" height="14" viewBox="0 0 18 18">
                         <use href="#icon_view"></use>
                       </svg>
-                    </button>
+                    </button> */}
                   </div>
                 </div>
 

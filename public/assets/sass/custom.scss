@@ -624,6 +624,44 @@ body {
   border: 1px solid #e9ecef;
 }
 
+/* Product Card Hover Effects */
+.product-card {
+  .pc__img-wrapper {
+    position: relative;
+    overflow: hidden;
+    
+    .anim_appear-bottom {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .anim_appear-right {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(20px);
+      transition: all 0.3s ease;
+    }
+  }
+  
+  &:hover {
+    .pc__img-wrapper {
+      .anim_appear-bottom {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      
+      .anim_appear-right {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
 .reviews-header {
   .reviews-title {
     color: #193D35;

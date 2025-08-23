@@ -102,7 +102,7 @@ export default function Featured() {
             const finalPrice = typeof price === "number" ? price : Number(price);
 
             return (
-              <SwiperSlide key={p.id} className="">
+              <SwiperSlide key={p.id} className="product-card">
                 <div className="pc__img-wrapper">
                   <Link href={`/product1_simple/${p.id}`}>
                     <Image
@@ -118,12 +118,12 @@ export default function Featured() {
                   <button
                     className="pc__atc btn btn-primary btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-white d-flex align-items-center justify-content-center gap-2"
                     onClick={() => addProductToCart(p.id)}
-                    title={isAddedToCartProducts(p.id) ? "Already Added" : "Add to Cart"}
+                    title={isAddedToCartProducts(p.id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
                   >
                     <svg className="d-block me-1" width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <use href={isAddedToCartProducts(p.id) ? "#icon_cart_added" : "#icon_cart"}></use>
                     </svg>
-                    <span>{isAddedToCartProducts(p.id) ? "Already Added" : "Add To Cart"}</span>
+                    <span>{isAddedToCartProducts(p.id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}</span>
                   </button>
 
                   <div className="anim_appear-right position-absolute top-0 mt-3 me-3">
@@ -132,7 +132,7 @@ export default function Featured() {
                         isAddedtoWishlist(p.id) ? "active" : ""
                       }`}
                       onClick={() => toggleWishlist(p.id)}
-                      title="Add To Wishlist"
+                      title="Хүслийн жагсаалтад нэмэх"
                     >
                       <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
                         <use href="#icon_heart"></use>
@@ -144,7 +144,7 @@ export default function Featured() {
                       data-bs-toggle="modal"
                       data-bs-target="#quickView"
                       onClick={() => setQuickViewItem(p)}
-                      title="Quick view"
+                      title="Хурдан харах"
                     >
                       <svg className="d-inline-block" width="14" height="14" viewBox="0 0 18 18">
                         <use href="#icon_view"></use>

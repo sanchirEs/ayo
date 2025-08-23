@@ -139,8 +139,8 @@ export default function PopulerProducts() {
                         onClick={() => addProductToCart(p.id)}
                         title={
                           isAddedToCartProducts(p.id)
-                            ? "Already Added"
-                            : "Add to Cart"
+                            ? "Сагсанд нэмэгдсэн"
+                            : "Сагсанд нэмэх"
                         }
                       >
                         <svg
@@ -161,8 +161,8 @@ export default function PopulerProducts() {
                         </svg>
                         <span>
                           {isAddedToCartProducts(p.id)
-                            ? "Already Added"
-                            : "Add To Cart"}
+                            ? "Сагсанд нэмэгдсэн"
+                            : "Сагсанд нэмэх"}
                         </span>
                       </button>
                       <div className="anim_appear-right position-absolute top-0 mt-3 me-3">
@@ -171,7 +171,7 @@ export default function PopulerProducts() {
                             isAddedtoWishlist(p.id) ? "active" : ""
                           }`}
                           onClick={() => toggleWishlist(p.id)}
-                          title="Add To Wishlist"
+                          title="Хүслийн жагсаалтад нэмэх"
                         >
                           <svg
                             width="14"
@@ -183,7 +183,7 @@ export default function PopulerProducts() {
                             <use href="#icon_heart"></use>
                           </svg>
                         </button>
-                        <button
+                        {/* <button
                           className="btn btn-square btn-hover-primary d-block border-1 text-uppercase js-quick-view"
                           data-bs-toggle="modal"
                           data-bs-target="#quickView"
@@ -199,7 +199,7 @@ export default function PopulerProducts() {
                           >
                             <use href="#icon_view"></use>
                           </svg>
-                        </button>
+                        </button> */}
                       </div>
                     </div>
 

@@ -142,58 +142,59 @@ export default function RelatedSlider({ currentProduct }) {
             
             return (
               <SwiperSlide key={product.id} className="swiper-slide product-card">
-                <div className="pc__img-wrapper">
-                  <Link href={`/product1_simple/${product.id}`}>
-                    <Image
-                      loading="lazy"
-                      src={imageUrl}
-                      width={330}
-                      height={400}
-                      alt={product.name}
-                      className="pc__img"
-                    />
-                  </Link>
-                  <button
-                    className="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside"
-                    onClick={() => addProductToCart(product.id)}
-                    title={
-                      isAddedToCartProducts(product.id)
-                        ? "Сагсанд нэмэгдсэн"
-                        : "Сагсанд нэмэх"
-                    }
-                  >
-                    {isAddedToCartProducts(product.id)
-                      ? "Сагсанд нэмэгдсэн"
-                      : "Сагсанд нэмэх"}
-                  </button>
-                </div>
+                                 <div className="pc__img-wrapper">
+                   <Link href={`/product1_simple/${product.id}`}>
+                     <Image
+                       loading="lazy"
+                       src={imageUrl}
+                       width={330}
+                       height={400}
+                       alt={product.name}
+                       className="pc__img"
+                     />
+                   </Link>
+                   <button
+                     className="pc__atc btn btn-primary btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-white d-flex align-items-center justify-content-center gap-2"
+                     onClick={() => addProductToCart(product.id)}
+                     title={
+                       isAddedToCartProducts(product.id)
+                         ? "Сагсанд нэмэгдсэн"
+                         : "Сагсанд нэмэх"
+                     }
+                   >
+                     <svg className="d-block me-1" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                       <use href={isAddedToCartProducts(product.id) ? "#icon_cart_added" : "#icon_cart"}></use>
+                     </svg>
+                     <span>{isAddedToCartProducts(product.id)
+                       ? "Сагсанд нэмэгдсэн"
+                       : "Сагсанд нэмэх"}</span>
+                   </button>
 
-                <div className="pc__info position-relative">
-                  <p className="pc__category">{categoryName}</p>
-                  <h6 className="pc__title">
+                   <div className="anim_appear-right position-absolute top-0 mt-3 me-3">
+                     <button
+                       className={`btn btn-square btn-hover-primary d-block border-1 text-uppercase mb-2 js-add-wishlist ${
+                         isAddedtoWishlist(product.id) ? "active" : ""
+                       }`}
+                       onClick={() => toggleWishlist(product.id)}
+                       title="Хүслийн жагсаалтад нэмэх"
+                     >
+                       <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                         <use href="#icon_heart"></use>
+                       </svg>
+                     </button>
+
+                    
+                   </div>
+                 </div>
+
+                <div className="pc__info position-relative text-center">
+                  <p className="pc__category text-secondary">{categoryName}</p>
+                  <h6 className="pc__title text-uppercase fw-medium mb-2">
                     <Link href={`/product1_simple/${product.id}`}>{product.name}</Link>
                   </h6>
-                  <div className="product-card__price d-flex">
-                    <span className="money price">₮{price.toLocaleString()}</span>
+                  <div className="product-card__price d-flex align-items-center justify-content-center mb-2">
+                    <span className="money price fw-medium">₮{price.toLocaleString()}</span>
                   </div>
-
-                  <button
-                    className={`pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist ${
-                      isAddedtoWishlist(product.id) ? "active" : ""
-                    }`}
-                    title="Хүслийн жагсаалтад нэмэх"
-                    onClick={() => toggleWishlist(product.id)}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <use href="#icon_heart" />
-                    </svg>
-                  </button>
                 </div>
               </SwiperSlide>
             );
