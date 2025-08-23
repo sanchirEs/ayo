@@ -5,11 +5,13 @@ import Header14 from "@/components/headers/Header14";
 
 import Blogs from "@/components/homes/home-15/Blogs";
 import Categories from "@/components/homes/home-15/Categories";
-import Featured from "@/components/homes/home-15/Featured";
+import Featured from "@/components/homes/home-15/NewProducts";
 import Hero from "@/components/homes/home-15/Hero";
 import Instagram from "@/components/homes/home-15/Instagram";
 import Lookbook from "@/components/homes/home-15/Lookbook";
 import PopulerProducts from "@/components/homes/home-15/PopulerProducts";
+import FlashSaleProducts from "@/components/homes/home-15/FlashSaleProducts";
+import DiscountedProducts from "@/components/homes/home-15/DiscountedProducts";
 import React from "react";
 
 export const metadata = {
@@ -24,11 +26,16 @@ export default function HomePage15() {
         <main>
           <Hero />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
+          <Categories />
+          
+          <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
+          <FlashSaleProducts />
+          <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <Featured />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
-          <Categories />
-          <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <PopulerProducts />
+          <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
+          <DiscountedProducts />
           {/* <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
           <Lookbook />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
@@ -44,7 +51,6 @@ export default function HomePage15() {
     </>
   );
 }
-
 
 // import Header14 from "@/components/headers/Header14";
 // import Footer14 from "@/components/footers/Footer14";
@@ -80,3 +86,4 @@ export default function HomePage15() {
 //     </div>
 //   );
 // }
+

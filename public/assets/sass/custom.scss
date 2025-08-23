@@ -410,3 +410,175 @@ body {
 .mega-menu--allcats .allcats__right .menu-link {
   text-transform: none !important;
 }
+
+/* Category hover effects */
+.category-link {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: block;
+  padding: 10px;
+  border-radius: 8px;
+  
+  &:hover {
+    text-decoration: none;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2) !important;
+    
+    h6 {
+      color: var(--bs-primary) !important;
+    }
+  }
+}
+
+.category-image {
+  transition: all 0.3s ease;
+  box-shadow: none;
+}
+
+/* Flash Sale Preview Styles */
+.flash-sale-preview {
+  margin: 3rem 0;
+  padding: 0 15px; /* Add container padding */
+}
+
+.flash-sale-preview-card {
+  position: relative;
+  background: linear-gradient(135deg, #F32020 0%, #f85a5a 50%, #ff8e8e 100%);
+  border-radius: 15px;
+  padding: 2rem 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+  min-height: 133px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Ensure full width */
+}
+
+.flash-sale-bg-pattern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10rem;
+  opacity: 0.1;
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  animation: pulse 2s infinite;
+}
+
+.flash-sale-content {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+}
+
+.flash-sale-headline {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.75rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+  }
+}
+
+.flash-sale-subtitle {
+  font-size: 1rem;
+  color: #fff3cd;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* Countdown Timer Styles */
+.countdown-timer {
+  margin: 1.5rem 0;
+}
+
+.countdown-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.countdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+}
+
+.countdown-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: 'Courier New', monospace;
+  
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+  }
+}
+
+.countdown-label {
+  font-size: 0.8rem;
+  color: #fff3cd;
+  font-weight: 500;
+  margin-top: 0.4rem;
+}
+
+.countdown-separator {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-top: -0.75rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+}
+
+.flash-sale-cta-btn {
+  background: linear-gradient(45deg, #ffc107, #ffeb3b);
+  border: none;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+    animation: pulse 1s infinite;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

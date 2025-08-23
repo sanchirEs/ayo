@@ -9,7 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import api from "@/lib/api";
 
-export default function PopulerProducts() {
+export default function DiscountedProducts() {
   const { toggleWishlist, isAddedtoWishlist } = useContextElement();
   const { setQuickViewItem } = useContextElement();
   const { addProductToCart, isAddedToCartProducts } = useContextElement();
@@ -20,17 +20,17 @@ export default function PopulerProducts() {
 
   useEffect(() => {
     let mounted = true;
-    // Use homepageService to get featured products
+    // Use homepageService to get discounted products
     api.homepage
-      .bundled({ sections: 'featured', limit: 20, include: 'card' })
+      .bundled({ sections: 'discounted', limit: 20, include: 'card' })
       .then((res) => {
         if (!mounted) return;
-        // Extract featured products from homepage response
-        const featuredProducts = res.data?.featured || [];
-        setProducts(featuredProducts);
-        console.log("featured products: ", featuredProducts)
+        // Extract discounted products from homepage response
+        const discountedProducts = res.data?.discounted || [];
+        setProducts(discountedProducts);
+        console.log("discounted products: ", discountedProducts)
       })
-      .catch((e) => setErr(e.message || "Failed to load featured products"))
+      .catch((e) => setErr(e.message || "Failed to load discounted products"))
       .finally(() => setLoading(false));
     return () => {
       mounted = false;
@@ -39,18 +39,17 @@ export default function PopulerProducts() {
 
   const swiperOptions = {
     autoplay: {
-      delay: 5000,
-      disableOnInteraction: false,
+      delay: 4000,
     },
     slidesPerView: 5,
     slidesPerGroup: 5,
     effect: "none",
-    loop: true,
+    loop: false,
     pagination: false,
     modules: [Navigation, Autoplay],
     navigation: {
-      nextEl: "#product_1 .products-carousel__next",
-      prevEl: "#product_1 .products-carousel__prev",
+      nextEl: "#discounted_products .products-carousel__next",
+      prevEl: "#discounted_products .products-carousel__prev",
     },
     breakpoints: {
       320: {
@@ -64,7 +63,7 @@ export default function PopulerProducts() {
         spaceBetween: 24,
       },
       992: {
-        slidesPerView: 5,
+        slidesPerView: 4,
         slidesPerGroup: 1,
         spaceBetween: 30,
         pagination: false,
@@ -76,7 +75,7 @@ export default function PopulerProducts() {
     return (
       <section className="products-carousel container">
         <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Онцлох бүтээгдэхүүнүүд
+          Хямдралтай бүтээгдэхүүнүүд
         </h2>
         <p className="text-center">Loading products…</p>
       </section>
@@ -87,7 +86,7 @@ export default function PopulerProducts() {
     return (
       <section className="products-carousel container">
         <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Онцлох бүтээгдэхүүнүүд
+          Хямдралтай бүтээгдэхүүнүүд
         </h2>
         <p className="text-danger text-center">{err}</p>
       </section>
@@ -97,10 +96,10 @@ export default function PopulerProducts() {
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Онцлох бүтээгдэхүүнүүд
+        Хямдралтай бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-2 pb-xl-2 text-secondary text-center">
-        The World's Premium Brands In One Destination.
+        Great Deals on Premium Products.
       </p>
 
       <div className="tab-content pt-2" id="collections-tab-content">
@@ -110,7 +109,7 @@ export default function PopulerProducts() {
           role="tabpanel"
           aria-labelledby="collections-tab-1-trigger"
         >
-          <div id="product_1" className="position-relative">
+          <div id="discounted_products" className="position-relative">
             <Swiper
               className="swiper-container js-swiper-slider"
               {...swiperOptions}
@@ -124,18 +123,25 @@ export default function PopulerProducts() {
                 return (
                   <SwiperSlide key={p.id} className="swiper-slide product-card">
                     <div className="pc__img-wrapper">
+                      {/* Discount Badge */}
+                      <div className="position-absolute top-0 start-0 m-3">
+                        <span className="badge bg-warning text-dark px-3 py-2">
+                          SALE
+                        </span>
+                      </div>
+
                       <Link href={`/product1_simple/${p.id}`}>
                         <Image
                           loading="lazy"
                           src={img}
-                          width={280}
-                          height={340}
+                          width="330"
+                          height="400"
                           alt={p.name || "Product"}
                           className="pc__img"
                         />
                       </Link>
                       <button
-                        className="pc__atc btn btn-primary btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-white d-flex align-items-center justify-content-center gap-2"
+                        className="pc__atc btn btn-warning btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-dark d-flex align-items-center justify-content-center gap-2"
                         onClick={() => addProductToCart(p.id)}
                         title={
                           isAddedToCartProducts(p.id)
@@ -213,7 +219,7 @@ export default function PopulerProducts() {
                         </Link>
                       </h6>
                       <div className="product-card__price d-flex align-items-center justify-content-center mb-2">
-                        <span className="money price fw-medium">
+                        <span className="money price fw-medium text-warning">
                           ${finalPrice?.toLocaleString()}
                         </span>
                       </div>

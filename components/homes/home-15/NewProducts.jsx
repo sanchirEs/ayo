@@ -10,60 +10,7 @@ import Star from "@/components/common/Star";
 import { useContextElement } from "@/context/Context";
 import api from "@/lib/api";
 
-// Countdown Timer Component
-function CountdownTimer({ targetTime }) {
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date().getTime();
-      const target = new Date(targetTime).getTime();
-      const difference = target - now;
-
-      if (difference > 0) {
-        const hours = Math.floor(difference / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-        setTimeLeft({ hours, minutes, seconds });
-      } else {
-        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
-      }
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-
-    return () => clearInterval(timer);
-  }, [targetTime]);
-
-  return (
-    <div className="countdown-timer">
-      <div className="countdown-display">
-        <div className="countdown-item">
-          <span className="countdown-number">{String(timeLeft.hours).padStart(2, '0')}</span>
-          <span className="countdown-label">Цаг</span>
-        </div>
-        <div className="countdown-separator">:</div>
-        <div className="countdown-item">
-          <span className="countdown-number">{String(timeLeft.minutes).padStart(2, '0')}</span>
-          <span className="countdown-label">Мин</span>
-        </div>
-        <div className="countdown-separator">:</div>
-        <div className="countdown-item">
-          <span className="countdown-number">{String(timeLeft.seconds).padStart(2, '0')}</span>
-          <span className="countdown-label">Сек</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function FlashSaleProducts() {
+export default function Featured() {
   const { toggleWishlist, isAddedtoWishlist } = useContextElement();
   const { setQuickViewItem } = useContextElement();
   const { addProductToCart, isAddedToCartProducts } = useContextElement();
@@ -74,17 +21,17 @@ export default function FlashSaleProducts() {
 
   useEffect(() => {
     let mounted = true;
-    // Use homepageService to get flash sale products
+    // Use homepageService to get new arrivals
     api.homepage
-      .bundled({ sections: 'flash', limit: 20, include: 'card' })
+      .bundled({ sections: 'new', limit: 20, include: 'card' })
       .then((res) => {
         if (!mounted) return;
-        // Extract flashSale from homepage response
-        const flashSaleProducts = res.data?.flashSale || [];
-        setData({ products: flashSaleProducts, pagination: null });
-        console.log("flash sale products: ", flashSaleProducts)
+        // Extract newArrivals from homepage response
+        const newArrivals = res.data?.newArrivals || [];
+        setData({ products: newArrivals, pagination: null });
+        console.log("new arrivals: ", newArrivals)
       })
-      .catch((e) => setErr(e.message || "Failed to load flash sale products"))
+      .catch((e) => setErr(e.message || "Failed to load new products"))
       .finally(() => setLoading(false));
     return () => {
       mounted = false;
@@ -95,7 +42,7 @@ export default function FlashSaleProducts() {
 
   const swiperOptions = useMemo(
     () => ({
-      autoplay: { delay: 3000 }, // Faster autoplay for flash sale
+      autoplay: { delay: 5000 },
       modules: [Autoplay, Navigation],
       slidesPerView: 5,
       slidesPerGroup: 5,
@@ -103,8 +50,8 @@ export default function FlashSaleProducts() {
       loop: products.length > 5, // loop only if enough items
       pagination: false,
       navigation: {
-        nextEl: ".flash-sale-carousel__next",
-        prevEl: ".flash-sale-carousel__prev",
+        nextEl: ".products-carousel__next",
+        prevEl: ".products-carousel__prev",
       },
       breakpoints: {
         320: { slidesPerView: 2, slidesPerGroup: 2, spaceBetween: 14 },
@@ -119,7 +66,7 @@ export default function FlashSaleProducts() {
     return (
       <section className="products-carousel container">
         <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Flash Sale
+          Шинээр нэмэгдсэн бүтээгдэхүүнүүд
         </h2>
         <p className="text-center">Loading products…</p>
       </section>
@@ -130,55 +77,20 @@ export default function FlashSaleProducts() {
     return (
       <section className="products-carousel container">
         <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Flash Sale
+          Шинээр нэмэгдсэн бүтээгдэхүүнүүд
         </h2>
         <p className="text-danger text-center">{err}</p>
       </section>
     );
   }
 
-  // If no products, show countdown preview
-  // if (products.length === 0) {
-  //   const today = new Date();
-  //   const targetTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 22, 0, 0);
-    
-  //   // If it's past 22:00 today, set target to tomorrow 22:00
-  //   if (today.getHours() >= 22) {
-  //     targetTime.setDate(targetTime.getDate() + 1);
-  //   }
-
-  //        return (
-  //      <section className="flash-sale-preview">
-  //        <div className="flash-sale-preview-card">
-  //         <div className="flash-sale-bg-pattern">⚡</div>
-          
-  //         <div className="flash-sale-content text-center">
-  //           <h2 className="flash-sale-headline">
-  //             Өнөөдрийн хямдрал 22:00 цагт эхэлнэ!
-  //           </h2>
-            
-  //           <p className="flash-sale-subtitle">
-  //             Та бэлэн үү? ⚡
-  //           </p>
-            
-  //           <CountdownTimer targetTime={targetTime} />
-            
-  //           <button className="flash-sale-cta-btn">
-  //             Удахгүй эхлэх хямдралуудыг харах
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </section>
-  //   );
-  // }
-
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Flash Sale
+        Шинээр нэмэгдсэн бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
-        Limited Time Offers - Don't Miss Out!
+        The World's Premium Brands In One Destination.
       </p>
 
       <div className="position-relative">
@@ -190,15 +102,8 @@ export default function FlashSaleProducts() {
             const finalPrice = typeof price === "number" ? price : Number(price);
 
             return (
-              <SwiperSlide key={p.id} className="swiper-slide product-card">
+              <SwiperSlide key={p.id} className="">
                 <div className="pc__img-wrapper">
-                  {/* Flash Sale Badge */}
-                  <div className="position-absolute top-0 start-0 m-3">
-                    <span className="badge bg-danger text-white px-3 py-2">
-                      FLASH SALE
-                    </span>
-                  </div>
-
                   <Link href={`/product1_simple/${p.id}`}>
                     <Image
                       loading="lazy"
@@ -211,7 +116,7 @@ export default function FlashSaleProducts() {
                   </Link>
 
                   <button
-                    className="pc__atc btn btn-danger btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-white d-flex align-items-center justify-content-center gap-2"
+                    className="pc__atc btn btn-primary btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-white d-flex align-items-center justify-content-center gap-2"
                     onClick={() => addProductToCart(p.id)}
                     title={isAddedToCartProducts(p.id) ? "Already Added" : "Add to Cart"}
                   >
@@ -254,7 +159,7 @@ export default function FlashSaleProducts() {
                     <Link href={`/product1_simple/${p.id}`}>{p.name}</Link>
                   </h6>
                   <div className="product-card__price d-flex align-items-center justify-content-center mb-2">
-                    <span className="money price fw-medium text-danger">${finalPrice?.toLocaleString()}</span>
+                    <span className="money price fw-medium">${finalPrice?.toLocaleString()}</span>
                   </div>
                   <div className="product-card__review d-flex align-items-center justify-content-center">
                     <div className="reviews-group d-flex">
@@ -267,7 +172,6 @@ export default function FlashSaleProducts() {
           })}
         </Swiper>
 
-        
         <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">
           <svg width="25" height="25" viewBox="0 0 25 25">
             <use href="#icon_prev_md" />
