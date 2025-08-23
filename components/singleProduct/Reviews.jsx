@@ -44,7 +44,7 @@ export default function Reviews({ productId, productName }) {
     if (!items.length) return;
 
     let h = 0;
-    const visibleCount = Math.min(3, items.length);
+    const visibleCount = Math.min(2, items.length);
     for (let i = 0; i < visibleCount; i++) {
       h += items[i].offsetHeight;
       // мөр хоорондын завсар (gap) бага зэрэг нэмж өгье
@@ -175,14 +175,19 @@ const cancelEdit = () => {
 
   return (
      <>
-      <h2 className="product-single__reviews-title">Reviews</h2>
+      <div className="reviews-header d-flex align-items-center justify-content-between mb-3">
+        <h3 className="reviews-title mb-0">Хэрэглэгчдийн сэтгэгдэл</h3>
+        <div className="reviews-summary">
+          <span className="reviews-count">{reviews.length} сэтгэгдэл</span>
+        </div>
+      </div>
 
       {/* Reviews list */}
       <div
         ref={listRef}
         className="product-single__reviews-list"
         style={
-          reviews.length > 3
+          reviews.length > 2
             ? { maxHeight: maxH || 0, overflowY: "auto" }
             : undefined
         }
@@ -207,19 +212,23 @@ const cancelEdit = () => {
             return (
               <div key={key} className="product-single__reviews-item">
                 <div className="customer-avatar">
-                  <Image loading="lazy" width={80} height={80} src={avatar} alt={name} />
+                  <Image loading="lazy" width={50} height={50} src={avatar} alt={name} className="rounded-circle" />
                 </div>
                 <div className="customer-review">
-                  <div className="customer-name d-flex align-items-center gap-2">
-                    <h6 className="mb-0">{name}</h6>
+                  <div className="customer-name d-flex align-items-center gap-2 mb-1">
+                    <h6 className="mb-0 fs-6">{name}</h6>
                     <div className="reviews-group d-flex">
                       {Array.from({ length: stars }).map((_, i) => (
                         <svg key={i} className="review-star" viewBox="0 0 9 9"><use href="#icon_star" /></svg>
                       ))}
                     </div>
+                    <small className="text-muted ms-auto">{createdAt}</small>
                   </div>
-                  <div className="review-date">{createdAt}</div>
-                  <div className="review-text"><p>{r.review || ""}</p></div>
+                  {r.review && (
+                    <div className="review-text">
+                      <p className="mb-0 fs-6">{r.review}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -236,7 +245,7 @@ const cancelEdit = () => {
 
 
       {/* My review form / state */}
-      <div className="product-single__review-form mt-4">
+      <div className="product-single__review-form mt-4 pt-3 border-top">
         {!authChecked ? (
           <div className="text-secondary">Шалгаж байна…</div>
         ) : !me ? (
@@ -289,7 +298,7 @@ const cancelEdit = () => {
             )}
 
             <div className="select-star-rating mb-3">
-              <label className="me-2">Your rating *</label>
+              <label className="me-2">Таны үнэлгээ *</label>
               <span className="star-rating">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} filled={myRating >= i + 1} onClick={() => setMyRating(i + 1)} />
@@ -300,8 +309,8 @@ const cancelEdit = () => {
             <div className="mb-3">
               <textarea
                 className="form-control form-control_gray"
-                placeholder="Your Review"
-                rows={5}
+                placeholder="Таны сэтгэгдэл "
+                rows={3}
                 value={myText}
                 onChange={(e) => setMyText(e.target.value)}
               />
@@ -309,17 +318,15 @@ const cancelEdit = () => {
 
             {submitErr && <div className="text-danger mb-2">{submitErr}</div>}
 
-            <div className="d-flex gap-2">
-              <button type="submit" className="btn btn-primary" disabled={submitting || myRating === 0}>
-                {submitting ? (editing ? "Шинэчилж байна…" : "Илгээж байна…") : (editing ? "Шинэчлэх" : "Submit")}
+            <div className="d-flex flex-column flex-sm-row gap-2">
+              <button type="submit" className="btn btn-primary btn-sm flex-fill" disabled={submitting || myRating === 0}>
+                {submitting ? (editing ? "Шинэчилж байна…" : "Илгээж байна…") : (editing ? "Шинэчлэх" : "Илгээх")}
               </button>
               {editing && (
-                <button type="button" className="btn btn-outline-secondary" onClick={cancelEdit} disabled={submitting}>
+                <button type="button" className="btn btn-outline-secondary btn-sm flex-fill" onClick={cancelEdit} disabled={submitting}>
                   Болих
                 </button>
-                
               )}
-                 
             </div>
           </form>
         )}

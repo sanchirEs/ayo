@@ -319,43 +319,13 @@ export default function SingleProduct12({ product }) {
         </div>
       </div>
 
-      {/* tabs */}
-      <div className="product-single__details-tab">
-        <ul className="nav nav-tabs" id="myTab1" role="tablist">
-          {/* <li className="nav-item" role="presentation">
-            <a
-              className="nav-link nav-link_underscore"
-              id="tab-additional-info-tab"
-              data-bs-toggle="tab"
-              href="#tab-additional-info"
-              role="tab"
-              aria-controls="tab-additional-info"
-              aria-selected="false"
-            >
-              Нэмэлт мэдээлэл
-            </a>
-          </li> */}
-          <li className="nav-item" role="presentation">
-            <a
-              className="nav-link nav-link_underscore"
-              id="tab-reviews-tab"
-              data-bs-toggle="tab"
-              href="#tab-reviews"
-              role="tab"
-              aria-controls="tab-reviews"
-              aria-selected="false"
-            >
-              Сэтгэгдэл
-            </a>
-          </li>
-        </ul>
-
-        <div className="tab-content">
-          {/* <div className="tab-pane fade show active" id="tab-additional-info" role="tabpanel">
-            <AdditionalInfo product={product} />
-          </div> */}
-          <div className="tab-pane fade show active"  id="tab-reviews" role="tabpanel">
-             <Reviews productId={product?.id} productName={product?.name} />
+      {/* Reviews Section - Compact */}
+      <div className="product-single__reviews-section mt-5 mb-5">
+        <div className="row">
+          <div className="col-12">
+            <div className="reviews-compact-container">
+              <Reviews productId={product?.id} productName={product?.name} />
+            </div>
           </div>
         </div>
       </div>

@@ -31,7 +31,7 @@ export default async function ProductDetailsPage1({ params }) {
         ) : (
           <div className="container text-danger">Product not found.</div>
         )}
-        <RelatedSlider />
+        <RelatedSlider currentProduct={product} />
       </main>
       <Footer1 />
     </>

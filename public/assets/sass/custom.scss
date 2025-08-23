@@ -615,3 +615,121 @@ body {
     }
   }
 }
+
+/* Compact Reviews Styles */
+.reviews-compact-container {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.reviews-header {
+  .reviews-title {
+    color: #193D35;
+    font-weight: 600;
+  }
+  
+  .reviews-summary {
+    .reviews-count {
+      background: #DCE5D9;
+      color: #193D35;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  }
+}
+
+.product-single__reviews-list {
+  .product-single__reviews-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .customer-avatar {
+      flex-shrink: 0;
+    }
+    
+    .customer-review {
+      flex: 1;
+      
+      .customer-name {
+        h6 {
+          color: #193D35;
+          font-weight: 600;
+        }
+        
+        .reviews-group {
+          .review-star {
+            width: 14px;
+            height: 14px;
+            fill: #ffc107;
+          }
+        }
+      }
+      
+      .review-text {
+        p {
+          color: #6c757d;
+          line-height: 1.5;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+.product-single__review-form {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  
+  .select-star-rating {
+    .star-rating {
+      .review-star {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+  
+  .form-control_gray {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    
+    &:focus {
+      border-color: #193D35;
+      box-shadow: 0 0 0 0.2rem rgba(25, 61, 53, 0.25);
+    }
+  }
+  
+  // Responsive button layout
+  .d-flex.flex-column.flex-sm-row {
+    @media (max-width: 575px) {
+      .btn {
+        min-height: 44px; // Touch-friendly height
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (min-width: 576px) {
+      .btn {
+        min-width: 120px;
+      }
+    }
+  }
+}
