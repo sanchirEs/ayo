@@ -90,10 +90,10 @@ a {
   }
 }
 .page-wrapper {
-  padding-top: 90px;
-  @media (max-width: 1000px) {
-    padding-top: 60px;
-  }
+  padding-top: 10px;
+  // @media (max-width: 1000px) {
+  //   padding-top: 60px;
+  // }
 }
 .page-wrapper-3 {
   @media (max-width: 991px) {
@@ -421,8 +421,8 @@ body {
   
   &:hover {
     text-decoration: none;
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2) !important;
+    transform: translateY(-3px);
+    // box-shadow: 0 8px 15px rgba(0,0,0,0.2) !important;
     
     h6 {
       color: var(--bs-primary) !important;
@@ -658,6 +658,73 @@ body {
         visibility: visible;
         transform: translateX(0);
       }
+    }
+  }
+}
+
+/* Wishlist Button Styles */
+.add-to-wishlist {
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &.active {
+    color: #ff6b6b !important;
+    
+    svg {
+      fill: #ff6b6b;
+    }
+    
+    svg use {
+      fill: #ff6b6b;
+    }
+  }
+  
+  &:not(.active) {
+    svg {
+      fill: transparent;
+    }
+    
+    svg use {
+      fill: transparent;
+    }
+  }
+  
+  &:hover {
+    color: #ff6b6b;
+    
+    svg {
+      fill: #ff6b6b;
+    }
+    
+    svg use {
+      fill: #ff6b6b;
+    }
+  }
+}
+
+.js-add-wishlist {
+  &.active {
+    color: #ff6b6b !important;
+    background-color: rgba(255, 107, 107, 0.1) !important;
+    
+    svg {
+      fill: #ff6b6b;
+    }
+    
+    svg use {
+      fill: #ff6b6b;
+    }
+  }
+  
+  &:not(.active) {
+    svg {
+      fill: transparent;
+    }
+    
+    svg use {
+      fill: transparent;
     }
   }
 }

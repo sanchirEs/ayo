@@ -225,31 +225,82 @@ $card-image-height: 80.212122%;
 }
 
 .js-add-wishlist.active {
-  color: var(--theme-color) !important;
+  color: #fff !important;
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+
+  svg {
+    fill: #fff !important;
+    color: #fff !important;
+  }
+
+  svg path {
+    fill: #fff !important;
+  }
+
+  svg g {
+    fill: #fff !important;
+  }
+
+  svg g path {
+    fill: #fff !important;
+  }
+
+  use {
+    fill: #fff !important;
+  }
 
   &.btn-hover-red {
     color: #fff !important;
-    background-color: var(--theme-color) !important;
+    background-color: #dc3545 !important;
   }
 
   &.btn-hover-primary {
     color: #fff !important;
-    background-color: $primary !important;
+    background-color: #dc3545 !important;
   }
 
   &.theme-bg-color.text-white {
-    color: var(--theme-color) !important;
-    background-color: #fff !important;
+    color: #fff !important;
+    background-color: #dc3545 !important;
   }
 
   &.bg-transparent.text-white {
-    color: var(--theme-color) !important;
-    background-color: #fff !important;
+    color: #fff !important;
+    background-color: #dc3545 !important;
   }
 
   &.bg-black.text-white {
     color: #fff !important;
-    background-color: var(--theme-color) !important;
+    background-color: #dc3545 !important;
+  }
+}
+
+// Additional specificity for wishlist button
+button.js-add-wishlist.active {
+  color: #fff !important;
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+
+  svg {
+    fill: #fff !important;
+    color: #fff !important;
+  }
+
+  svg path {
+    fill: #fff !important;
+  }
+
+  svg g {
+    fill: #fff !important;
+  }
+
+  svg g path {
+    fill: #fff !important;
+  }
+
+  use {
+    fill: #fff !important;
   }
 }
 
@@ -561,4 +612,248 @@ $card-image-height: 80.212122%;
 
 .product-card:hover .anim_appear-bottom.product-card__actions {
   bottom: 0;
+}
+
+// Wishlist count badge styling
+.js-wishlist-items-count {
+  top: -8px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  background-color: #dc3545;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0 4px;
+}
+
+// Header shadow styling
+.header {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  z-index: 1000 !important;
+  background-color: #fff !important;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+  }
+}
+
+// Account Wishlist specific styling
+.my-account__wishlist {
+  .wishlist-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-color: #e0e0e0;
+    }
+    
+    &.removing {
+      opacity: 0.5;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+  }
+  
+  .wishlist-image-wrapper {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+    
+    .wishlist-product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+  
+  .btn-remove-wishlist {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    
+    &:hover {
+      background: #fff;
+      color: #dc3545;
+      transform: scale(1.1);
+    }
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  
+  .wishlist-product-info {
+    padding: 0;
+  }
+  
+  .wishlist-product-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    
+    a {
+      color: #333;
+      text-decoration: none;
+      
+      &:hover {
+        color: #007bff;
+      }
+    }
+  }
+  
+  .wishlist-product-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .price-amount {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .price-sale {
+      font-size: 14px;
+      color: #dc3545;
+      font-weight: 500;
+    }
+  }
+  
+  // Header styling
+  h4 {
+    font-size: 18px;
+    font-weight: 400;
+    color: #6c757d;
+  }
+  
+  .text-muted {
+    font-size: 16px;
+    color: #adb5bd;
+  }
+}
+
+// Category title styling
+.category-title {
+  h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--theme-color, #007bff);
+    margin-bottom: 0.25rem;
+  }
+  
+  small {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+}
+
+// Category filter styling
+.categories-list {
+  .category-item {
+    margin-bottom: 0;
+  }
+  
+  .category-row {
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+  
+  .category-active {
+    // background-color: #e3f2fd;
+    
+    // Зөвхөн үндсэн category-д улаан зураас харуулах
+    &.parent-category {
+      border-left: 3px solid var(--theme-color, #007bff);
+    }
+    
+    // Active category-ийн текст улаан өнгөтэй болгох
+    .category-link {
+      color: #dc3545 !important;
+    }
+  }
+  
+  .category-link {
+    font-size: 14px;
+    line-height: 1.4;
+    cursor: pointer;
+    user-select: none;
+    
+    &:hover {
+      color: var(--theme-color, #007bff) !important;
+    }
+    
+    // Active category-ийн текст улаан өнгөтэй болгох
+    &.text-primary {
+      color: #dc3545 !important;
+    }
+  }
+  
+  .btn-link {
+    &:hover {
+      color: var(--theme-color, #007bff) !important;
+    }
+    
+    svg {
+      color: #6c757d;
+    }
+    
+    &:hover svg {
+      color: var(--theme-color, #007bff) !important;
+    }
+  }
+  
+  .subcategories {
+    margin-top: 4px;
+    
+    .category-row {
+      font-size: 13px;
+    }
+  }
+  
+  .transition-transform {
+    transition: transform 0.2s ease;
+  }
+  
+  .rotate-90 {
+    transform: rotate(90deg);
+  }
 }

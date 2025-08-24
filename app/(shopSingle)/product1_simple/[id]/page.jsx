@@ -1,12 +1,13 @@
 // app/product1_simple/[id]/page.jsx
-import Header1 from "@/components/headers/Header1";
+import Header14 from "@/components/headers/Header14";
 import Footer1 from "@/components/footers/Footer1";
 import RelatedSlider from "@/components/singleProduct/RelatedSlider";
 import SingleProduct12 from "@/components/singleProduct/SingleProduct12";
 import api from "@/lib/api"; // <-- import your client
 
 export default async function ProductDetailsPage1({ params }) {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
 
   console.log("id: ", id)
 
@@ -23,7 +24,7 @@ export default async function ProductDetailsPage1({ params }) {
 
   return (
     <>
-      <Header1 />
+              <Header14 />
       <main className="page-wrapper">
         <div className="mb-md-1 pb-md-3" />
         {product ? (

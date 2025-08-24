@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import { useParams } from "next/navigation";
 
 import { useContextElement } from "@/context/Context";
 import { openModalShopFilter } from "@/utlis/aside";
@@ -26,8 +27,16 @@ function mapSortToParams(value) {
       return { sortField: "price", sortOrder: "asc" };
     case "price-desc":
       return { sortField: "price", sortOrder: "desc" };
+    case "name-asc":
+      return { sortField: "name", sortOrder: "asc" };
+    case "name-desc":
+      return { sortField: "name", sortOrder: "desc" };
     case "rating-desc":
       return { sortField: "rating", sortOrder: "desc" };
+    case "popular":
+      return { sortField: "popularity", sortOrder: "desc" };
+    case "oldest":
+      return { sortField: "createdAt", sortOrder: "asc" };
     case "newest":
     default:
       return { sortField: "createdAt", sortOrder: "desc" };
@@ -42,16 +51,21 @@ function mapSortToParams(value) {
  * - initialSort?: "newest" | "price-asc" | "price-desc" | "rating-desc"
  */
 export default function Shop4({
-  categoryId = null,
+  categoryId: propCategoryId = null,
   initialPage = 1,
   initialLimit = 12,
   initialSort = "newest",
 }) {
+  const params = useParams();
+  const urlCategoryId = params?.categoryId ? parseInt(params.categoryId) : null;
+  const categoryId = propCategoryId || urlCategoryId;
+  
   const { toggleWishlist, isAddedtoWishlist } = useContextElement();
   const { setQuickViewItem } = useContextElement();
   const { addProductToCart, isAddedToCartProducts } = useContextElement();
 
   const [selectedColView, setSelectedColView] = useState(4);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   // ---- products state ----
   const [products, setProducts] = useState([]);
@@ -64,14 +78,92 @@ export default function Shop4({
   const [sort, setSort] = useState(initialSort);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    colors: [],
+    sizes: [],
+    brands: [],
+    price: [20, 70987],
+    search: ""
+  });
+
+  // ---- category state ----
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryLoading, setCategoryLoading] = useState(false);
+
+  // ---- global category name cache ----
+  const [categoryCache, setCategoryCache] = useState(() => {
+    // Use global cache if available, otherwise create new
+    if (typeof window !== 'undefined' && window.__categoryCache) {
+      return window.__categoryCache;
+    }
+    return new Map();
+  });
+
+  // ---- load category name with caching ----
+  useEffect(() => {
+    if (categoryId) {
+      // Check cache first
+      if (categoryCache.has(categoryId)) {
+        setCategoryName(categoryCache.get(categoryId));
+        return;
+      }
+
+      // Load from API if not in cache
+      setCategoryLoading(true);
+      api.categories.getById(categoryId)
+        .then(response => {
+          if (response.success && response.data) {
+            const name = response.data.name;
+            setCategoryName(name);
+            // Cache the result globally
+            setCategoryCache(prev => {
+              const newCache = new Map(prev).set(categoryId, name);
+              if (typeof window !== 'undefined') {
+                window.__categoryCache = newCache;
+              }
+              return newCache;
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching category:', error);
+        })
+        .finally(() => {
+          setCategoryLoading(false);
+        });
+    } else {
+      setCategoryName("");
+    }
+  }, [categoryId, categoryCache]);
+
+  // Filter change handler
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
   // ---- load products from backend ----
-  async function loadProducts({ page = initialPage, limit = initialLimit, sortValue = sort } = {}) {
-    setLoading(true);
+  async function loadProducts({ page = initialPage, limit = initialLimit, sortValue = sort, showLoading = true } = {}) {
+    if (showLoading) {
+      setLoading(true);
+    }
     setErr("");
     try {
       const { sortField, sortOrder } = mapSortToParams(sortValue);
-      const params = { page, limit, sortField, sortOrder };
+      const params = { 
+        page, 
+        limit, 
+        sortField, 
+        sortOrder,
+        // Add filter parameters
+        ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
+        ...(filters.sizes.length > 0 && { sizes: filters.sizes.join(',') }),
+        ...(filters.brands.length > 0 && { brands: filters.brands.join(',') }),
+        ...(filters.price[0] !== 20 && { minPrice: filters.price[0] }),
+        ...(filters.price[1] !== 70987 && { maxPrice: filters.price[1] }),
+        ...(filters.search && { search: filters.search })
+      };
 
       const res = categoryId
         ? await api.products.getByCategory(categoryId, params)
@@ -103,17 +195,66 @@ export default function Shop4({
 
   
 
+
+
   // эхний ачаалт + dependency өөрчлөгдөхөд дахин ачаал
   useEffect(() => {
-    loadProducts({ page: 1, limit: initialLimit, sortValue: initialSort });
+    // Only show loading for initial load or when categoryId changes from null to a value
+    const shouldShowLoading = !products.length || (categoryId && !pagination.total);
+    loadProducts({ 
+      page: 1, 
+      limit: initialLimit, 
+      sortValue: initialSort, 
+      showLoading: shouldShowLoading 
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryId]);
+  }, [categoryId, initialLimit, initialSort]);
 
   // sort өөрчлөгдөхөд 1-р хуудаснаас эхлүүлэн дахин ачаал
   useEffect(() => {
-    loadProducts({ page: 1, limit: pagination.limit, sortValue: sort });
+    loadProducts({ 
+      page: 1, 
+      limit: pagination.limit, 
+      sortValue: sort, 
+      showLoading: false 
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
+
+  // filters өөрчлөгдөхөд 1-р хуудаснаас эхлүүлэн дахин ачаал
+  useEffect(() => {
+    // Skip initial load when filters are empty
+    if (filters.colors.length === 0 && filters.sizes.length === 0 && filters.brands.length === 0 && 
+        filters.price[0] === 20 && filters.price[1] === 70987 && !filters.search) {
+      return;
+    }
+    
+    loadProducts({ 
+      page: 1, 
+      limit: pagination.limit, 
+      sortValue: sort, 
+      showLoading: false 
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.colors, filters.sizes, filters.brands, filters.price, filters.search]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const sortDropdown = document.querySelector('.shop-acs__select');
+      if (sortDropdown && !sortDropdown.contains(event.target)) {
+        setShowSortDropdown(false);
+      }
+    };
+
+    if (showSortDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSortDropdown]);
 
   // ---- pagination handler ----
   const canPrev = pagination.currentPage > 1;
@@ -121,7 +262,12 @@ export default function Shop4({
 
  const goPage = (p) => {
   if (p < 1 || p > pagination.totalPages) return;
-  loadProducts({ page: p, limit: pagination.limit, sortValue: sort });
+  loadProducts({ 
+    page: p, 
+    limit: pagination.limit, 
+    sortValue: sort, 
+    showLoading: false 
+  });
 };
 
   // ---- helpers to read fields safely ----
@@ -152,7 +298,7 @@ export default function Shop4({
           <button className="btn-close-lg js-close-aside btn-close-aside ms-auto" />
         </div>
         <div className="pt-4 pt-lg-0" />
-        <FilterAll />
+        <FilterAll onFiltersChange={handleFiltersChange} />
       </div>
 
       {/* LIST */}
@@ -163,19 +309,101 @@ export default function Shop4({
           </div>
 
           <div className="shop-acs d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
-            {/* Sort */}
-            <select
-              className="shop-acs__select form-select w-auto border-0 py-0 order-1 order-md-0"
-              aria-label="Sort Items"
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-            >
-              {sortingOptions.map((option, index) => (
-                <option key={index} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            {/* Category Title */}
+            {categoryId && (
+              <div className="category-title me-3">
+                <h4 className="mb-0 text-primary">
+                  {categoryLoading ? "Ачаалж байна..." : categoryName}
+                </h4>
+                <small className="text-muted">
+                  {pagination.total} бүтээгдэхүүн
+                </small>
+              </div>
+            )}
+
+            {/* Sort - Clickable dropdown */}
+            <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
+              <button
+                className="btn btn-link text-decoration-none p-0"
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                style={{ 
+                  cursor: 'pointer',
+                  color: '#6c757d',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  minWidth: '150px',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <span>{sortingOptions.find(opt => opt.value === sort)?.label || 'ЭНГИЙН'}</span>
+                <svg 
+                  className={`transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} 
+                  width="12" 
+                  height="12" 
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+              
+              {showSortDropdown && (
+                <div 
+                  className="position-absolute top-100 start-0 mt-1 bg-white border rounded shadow-sm"
+                  style={{ 
+                    zIndex: 1000,
+                    minWidth: '150px',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  {sortingOptions.map((option, index) => (
+                    <button
+                      key={index}
+                      className="btn btn-link text-decoration-none w-100 text-start"
+                      onClick={() => {
+                        setSort(option.value);
+                        setShowSortDropdown(false);
+                      }}
+                      style={{ 
+                        border: 'none',
+                        borderBottom: index < sortingOptions.length - 1 ? '1px solid #f8f9fa' : 'none',
+                        padding: '10px 12px',
+                        fontSize: '14px',
+                        color: sort === option.value ? '#007bff' : '#212529',
+                        backgroundColor: sort === option.value ? '#f8f9fa' : 'transparent',
+                        fontWeight: sort === option.value ? '500' : '400',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (sort !== option.value) {
+                          e.target.style.backgroundColor = '#f8f9fa';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (sort !== option.value) {
+                          e.target.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="shop-asc__seprator mx-3 bg-light d-none d-md-block order-md-0" />
 

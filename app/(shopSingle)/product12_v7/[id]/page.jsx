@@ -1,6 +1,6 @@
 import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header1";
+import Header14 from "@/components/headers/Header14";
 
 import RelatedSlider from "@/components/singleProduct/RelatedSlider";
 import SingleProduct7 from "@/components/singleProduct/SingleProduct7";
@@ -19,7 +19,7 @@ export default async function ProductDetailsPage12(props) {
   return (
     <>
       <div className="header_dark">
-        <Header1 />
+        <Header14 />
       </div>
       <main className="page-wrapper">
         {/* <div className="mb-md-1 pb-md-3"></div> */}

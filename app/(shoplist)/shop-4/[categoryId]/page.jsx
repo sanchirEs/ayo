@@ -1,25 +1,29 @@
 import Footer1 from "@/components/footers/Footer1";
-
-import Header1 from "@/components/headers/Header1";
-
+import Header14 from "@/components/headers/Header14";
 import Shop4 from "@/components/shoplist/Shop4";
 
 export const metadata = {
   title: "Shop 4 || Uomo eCommerce React Nextjs Template",
   description: "Uomo eCommerce React Nextjs Template",
 };
-export default function ShopPage4({ params, searchParams }) {
-    const { id } = params;
+
+export default async function ShopPage4WithCategory({ params, searchParams }) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  
+  const categoryId = parseInt(resolvedParams.categoryId);
+  
   // URL: /category/123?page=2&limit=12&sort=price-asc
-  const page = Number(searchParams.page || 1);
-  const limit = Number(searchParams.limit || 12);
-  const sort = String(searchParams.sort || "newest");
+  const page = Number(resolvedSearchParams.page || 1);
+  const limit = Number(resolvedSearchParams.limit || 12);
+  const sort = String(resolvedSearchParams.sort || "newest");
+  
   return (
     <>
-      <Header1 />
+      <Header14 />
       <main className="page-wrapper">
-           <Shop4
-          categoryId={Number(id)}
+        <Shop4 
+          categoryId={categoryId}
           initialPage={page}
           initialLimit={limit}
           initialSort={sort}

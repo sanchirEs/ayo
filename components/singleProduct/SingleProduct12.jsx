@@ -13,7 +13,7 @@ import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 
 export default function SingleProduct12({ product }) {
-  const { cartProducts, setCartProducts } = useContextElement();
+  const { cartProducts, setCartProducts, toggleWishlist, isAddedtoWishlist } = useContextElement();
   const [quantity, setQuantity] = useState(1);
   const [warn, setWarn] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -293,12 +293,15 @@ export default function SingleProduct12({ product }) {
           </form>
 
           <div className="product-single__addtolinks">
-            <a href="#" className="menu-link menu-link_us-s add-to-wishlist">
+            <button 
+              onClick={() => toggleWishlist(product.id)}
+              className={`menu-link menu-link_us-s add-to-wishlist ${isAddedtoWishlist(product.id) ? 'active' : ''}`}
+            >
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                 <use href="#icon_heart" />
               </svg>
-              <span>Add to Wishlist</span>
-            </a>
+              <span>{isAddedtoWishlist(product.id) ? 'Хүслийн жагсаалтаас хасах' : 'Хүслийн жагсаалтад нэмэх'}</span>
+            </button>
             <ShareComponent title={product?.name || "Product"} />
           </div>
 

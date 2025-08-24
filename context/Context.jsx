@@ -2,12 +2,15 @@
 import { allProducts } from "@/data/products";
 import React, { useEffect } from "react";
 import { useContext, useState } from "react";
+import api from "@/lib/api";
+import { useAuth } from "./AuthContext";
 const dataContext = React.createContext();
 export const useContextElement = () => {
   return useContext(dataContext);
 };
 
 export default function Context({ children }) {
+  const { user } = useAuth();
   const [cartProducts, setCartProducts] = useState([]);
   const [wishList, setWishList] = useState([]);
   const [quickViewItem, setQuickViewItem] = useState(allProducts[0]);
@@ -40,11 +43,37 @@ export default function Context({ children }) {
     return false;
   };
 
-  const toggleWishlist = (id) => {
-    if (wishList.includes(id)) {
-      setWishList((pre) => [...pre.filter((elm) => elm != id)]);
-    } else {
-      setWishList((pre) => [...pre, id]);
+  const toggleWishlist = async (id) => {
+    // Check if user is logged in
+    if (!user) {
+      console.log('User not logged in, using local storage for wishlist');
+      // Fallback to local storage if not logged in
+      if (wishList.includes(id)) {
+        setWishList((pre) => [...pre.filter((elm) => elm != id)]);
+      } else {
+        setWishList((pre) => [...pre, id]);
+      }
+      return;
+    }
+
+    try {
+      if (wishList.includes(id)) {
+        // Remove from wishlist
+        await api.wishlist.remove(id);
+        setWishList((pre) => [...pre.filter((elm) => elm != id)]);
+      } else {
+        // Add to wishlist
+        await api.wishlist.add(id);
+        setWishList((pre) => [...pre, id]);
+      }
+    } catch (error) {
+      console.error('Wishlist toggle error:', error);
+      // Fallback to local storage if API fails
+      if (wishList.includes(id)) {
+        setWishList((pre) => [...pre.filter((elm) => elm != id)]);
+      } else {
+        setWishList((pre) => [...pre, id]);
+      }
     }
   };
   const isAddedtoWishlist = (id) => {
@@ -63,12 +92,36 @@ export default function Context({ children }) {
   useEffect(() => {
     localStorage.setItem("cartList", JSON.stringify(cartProducts));
   }, [cartProducts]);
+  // Load wishlist from backend on component mount
   useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("wishlist"));
-    if (items?.length) {
-      setWishList(items);
-    }
-  }, []);
+    const loadWishlist = async () => {
+      // Check if user is logged in
+      if (!user) {
+        console.log('User not logged in, loading wishlist from local storage');
+        const items = JSON.parse(localStorage.getItem("wishlist"));
+        if (items?.length) {
+          setWishList(items);
+        }
+        return;
+      }
+
+      try {
+        const response = await api.wishlist.get();
+        const wishlistData = response?.data || response || [];
+        const wishlistIds = wishlistData.map(item => item.productId || item.id);
+        setWishList(wishlistIds);
+      } catch (error) {
+        console.error('Failed to load wishlist from backend:', error);
+        // Fallback to local storage
+        const items = JSON.parse(localStorage.getItem("wishlist"));
+        if (items?.length) {
+          setWishList(items);
+        }
+      }
+    };
+
+    loadWishlist();
+  }, [user]);
 
   useEffect(() => {
     localStorage.setItem("wishlist", JSON.stringify(wishList));

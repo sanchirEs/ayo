@@ -1,6 +1,6 @@
 import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header1";
+import Header14 from "@/components/headers/Header14";
 
 import Banner5 from "@/components/shoplist/Banner5";
 
@@ -14,7 +14,7 @@ export const metadata = {
 export default function ShopPage7() {
   return (
     <>
-      <Header1 />
+              <Header14 />
       <main className="page-wrapper">
         <Banner5 />
         <div className="mb-4 pb-lg-3"></div>

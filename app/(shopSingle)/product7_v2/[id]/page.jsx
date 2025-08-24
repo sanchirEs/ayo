@@ -1,8 +1,6 @@
 import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header1";
-import Header23 from "@/components/headers/Header23";
-import Header3 from "@/components/headers/Header3";
+import Header14 from "@/components/headers/Header14";
 import RelatedSlider from "@/components/singleProduct/RelatedSlider";
 
 import SingleProduct2 from "@/components/singleProduct/SingleProduct2";
@@ -20,7 +18,7 @@ export default async function ProductDetailsPage7(props) {
     allProducts.filter((elm) => elm.id == productId)[0] || allProducts[0];
   return (
     <>
-      <Header23 />
+      <Header14 />
       <main style={{ paddingTop: "70px" }}>
         <div className="mb-md-1 pb-md-3"></div>
         <SingleProduct2 product={product} />

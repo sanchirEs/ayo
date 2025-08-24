@@ -1,6 +1,6 @@
 import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header1";
+import Header1 from "@/components/headers/Header14";
 import Lookbook from "@/components/otherPages/Lookbook";
 import React from "react";
 

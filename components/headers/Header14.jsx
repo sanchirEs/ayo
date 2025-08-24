@@ -9,12 +9,22 @@ import { currencyOptions, languageOptions2 } from "@/data/footer";
 import { socialLinks } from "@/data/socials";
 import SearchPopup from "./components/SearchPopup";
 import { useAuth } from "@/context/AuthContext";
+import { useContextElement } from "@/context/Context";
 
 export default function Header14() {
-   const { user, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const { wishList } = useContextElement();
 
   return (
-    <header id="header" className="header sticky_disabled w-100">
+    <header 
+      id="header" 
+      className="header sticky_disabled w-100"
+      style={{
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        zIndex: 1000,
+        backgroundColor: "#fff"
+      }}
+    >
       <div className="header-top bg-black">
         <div className="container d-flex container color-white align-items-center">
           <ul className="list-unstyled d-flex flex-1 gap-3 m-0">
@@ -174,7 +184,7 @@ export default function Header14() {
                 </a>
               </div> */}
 
-              <Link className="header-tools__item" href="/account_wishlist">
+              <Link className="header-tools__item header-tools__cart js-open-aside" href="/account_wishlist">
                 <svg
                   className="d-block"
                   width="20"
@@ -185,6 +195,14 @@ export default function Header14() {
                 >
                   <use href="#icon_heart" />
                 </svg>
+                {wishList.length > 0 && (
+                  <span className="cart-amount d-block position-absolute js-cart-items-count">
+                    {wishList.length}
+                  </span>
+                )}
+                  {/* <span className="cart-amount d-block position-absolute js-cart-items-count">
+                  <CartLength />
+                </span> */}
               </Link>
 
               <a
