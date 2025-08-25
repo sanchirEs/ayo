@@ -13,22 +13,17 @@ import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 
 export default function SingleProduct12({ product }) {
-  const { cartProducts, setCartProducts, toggleWishlist, isAddedtoWishlist } = useContextElement();
+  const { cartProducts, setCartProducts } = useContextElement();
   const [quantity, setQuantity] = useState(1);
   const [warn, setWarn] = useState("");
-  const [selectedVariant, setSelectedVariant] = useState(null);
 
   // --- Backend талбаруудыг тааруулах ---
   const images = product?.ProductImages?.map((i) => i.imageUrl) ?? [];
-  
-  // Selected variant-ыг initialize хийх
-  React.useEffect(() => {
-    const defaultVariant = product?.variants?.find((v) => v.isDefault) || product?.variants?.[0] || null;
-    setSelectedVariant(defaultVariant);
-  }, [product]);
+  const defaultVariant =
+    product?.variants?.find((v) => v.isDefault) || product?.variants?.[0] || null;
 
-  const currentVariant = selectedVariant || product?.variants?.[0] || null;
-  const price = (currentVariant ? Number(currentVariant.price) : Number(product?.price || 0)) || 0;
+  const price =
+    (defaultVariant ? Number(defaultVariant.price) : Number(product?.price || 0)) || 0;
 
   // ✅ Нийт үлдэгдэл (бүх variant + product level)
   const totalStock = useMemo(() => {
@@ -43,13 +38,13 @@ export default function SingleProduct12({ product }) {
     return vSum + pSum;
   }, [product]);
 
-  // ✅ Одоогоор сонгогдсон variant-ын үлдэгдэл, байхгүй бол бүх үлдэгдлийг ашиглая
+  // ✅ Одоогоор сонгогдсон (default) variant-ын үлдэгдэл, байхгүй бол бүх үлдэгдлийг ашиглая
   const selectedStock = useMemo(() => {
-    if (currentVariant?.inventory?.quantity != null) {
-      return Number(currentVariant.inventory.quantity);
+    if (defaultVariant?.inventory?.quantity != null) {
+      return Number(defaultVariant.inventory.quantity);
     }
     return totalStock;
-  }, [currentVariant, totalStock]);
+  }, [defaultVariant, totalStock]);
 
   const outOfStock = selectedStock <= 0;
 
@@ -91,9 +86,9 @@ export default function SingleProduct12({ product }) {
       price: price,
       quantity: safeQty,
       image: images[0] || "/images/placeholder-330x400.png",
-      sku: currentVariant?.sku || product?.sku || "",
-      variantId: currentVariant?.id || null,
-      attributes: (currentVariant?.attributes || []).map((a) => ({
+      sku: defaultVariant?.sku || product?.sku || "",
+      variantId: defaultVariant?.id || null,
+      attributes: (defaultVariant?.attributes || []).map((a) => ({
         name: a?.option?.attribute?.name ?? "",
         value: a?.option?.value ?? "",
       })),
@@ -194,13 +189,9 @@ export default function SingleProduct12({ product }) {
               <div className="product-single__swatches">
                 {hasSize && (
                   <div className="product-swatch text-swatches">
-                    <label>Хэмжээ</label>
+                    <label>Sizes</label>
                     <div className="swatch-list">
-                      <Size 
-                        product={product}
-                        selectedVariant={selectedVariant}
-                        onVariantChange={setSelectedVariant}
-                      />
+                      <Size />
                     </div>
                     <a
                       href="#"
@@ -208,20 +199,16 @@ export default function SingleProduct12({ product }) {
                       data-bs-toggle="modal"
                       data-bs-target="#sizeGuide"
                     >
-                      Хэмжээний хүснэгт
+                      Size Guide
                     </a>
                   </div>
                 )}
 
                 {hasColor && (
                   <div className="product-swatch color-swatches">
-                    <label>Өнгө</label>
+                    <label>Color</label>
                     <div className="swatch-list">
-                      <Colors 
-                        product={product}
-                        selectedVariant={selectedVariant}
-                        onVariantChange={setSelectedVariant}
-                      />
+                      <Colors />
                     </div>
                   </div>
                 )}
@@ -293,15 +280,12 @@ export default function SingleProduct12({ product }) {
           </form>
 
           <div className="product-single__addtolinks">
-            <button 
-              onClick={() => toggleWishlist(product.id)}
-              className={`menu-link menu-link_us-s add-to-wishlist ${isAddedtoWishlist(product.id) ? 'active' : ''}`}
-            >
+            <a href="#" className="menu-link menu-link_us-s add-to-wishlist">
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                 <use href="#icon_heart" />
               </svg>
-              <span>{isAddedtoWishlist(product.id) ? 'Хүслийн жагсаалтаас хасах' : 'Хүслийн жагсаалтад нэмэх'}</span>
-            </button>
+              <span>Add to Wishlist</span>
+            </a>
             <ShareComponent title={product?.name || "Product"} />
           </div>
 
@@ -322,13 +306,43 @@ export default function SingleProduct12({ product }) {
         </div>
       </div>
 
-      {/* Reviews Section - Compact */}
-      <div className="product-single__reviews-section mt-5 mb-5">
-        <div className="row">
-          <div className="col-12">
-            <div className="reviews-compact-container">
-              <Reviews productId={product?.id} productName={product?.name} />
-            </div>
+      {/* tabs */}
+      <div className="product-single__details-tab">
+        <ul className="nav nav-tabs" id="myTab1" role="tablist">
+          {/* <li className="nav-item" role="presentation">
+            <a
+              className="nav-link nav-link_underscore"
+              id="tab-additional-info-tab"
+              data-bs-toggle="tab"
+              href="#tab-additional-info"
+              role="tab"
+              aria-controls="tab-additional-info"
+              aria-selected="false"
+            >
+              Нэмэлт мэдээлэл
+            </a>
+          </li> */}
+          <li className="nav-item" role="presentation">
+            <a
+              className="nav-link nav-link_underscore"
+              id="tab-reviews-tab"
+              data-bs-toggle="tab"
+              href="#tab-reviews"
+              role="tab"
+              aria-controls="tab-reviews"
+              aria-selected="false"
+            >
+              Сэтгэгдэл
+            </a>
+          </li>
+        </ul>
+
+        <div className="tab-content">
+          {/* <div className="tab-pane fade show active" id="tab-additional-info" role="tabpanel">
+            <AdditionalInfo product={product} />
+          </div> */}
+          <div className="tab-pane fade show active"  id="tab-reviews" role="tabpanel">
+             <Reviews productId={product?.id} productName={product?.name} />
           </div>
         </div>
       </div>

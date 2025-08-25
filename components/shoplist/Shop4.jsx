@@ -125,10 +125,38 @@ export default function Shop4({
               }
               return newCache;
             });
+          } else if (response.success && response.data === null) {
+            // API returned null data (404 handled by API client)
+            console.log('Category data is null, using fallback name');
+            setCategoryName("Ангилал");
+            // Cache the fallback
+            setCategoryCache(prev => {
+              const newCache = new Map(prev).set(categoryId, "Ангилал");
+              if (typeof window !== 'undefined') {
+                window.__categoryCache = newCache;
+              }
+              return newCache;
+            });
           }
         })
         .catch(error => {
           console.error('Error fetching category:', error);
+          // Don't show error for 404, just use fallback name
+          if (error.message.includes('404') || error.message.includes('Not Found')) {
+            console.log('Category endpoint not found, using fallback name');
+            setCategoryName("Ангилал");
+            // Cache the fallback to prevent repeated API calls
+            setCategoryCache(prev => {
+              const newCache = new Map(prev).set(categoryId, "Ангилал");
+              if (typeof window !== 'undefined') {
+                window.__categoryCache = newCache;
+              }
+              return newCache;
+            });
+            return;
+          }
+          // Set a fallback name if API fails
+          setCategoryName("Ангилал");
         })
         .finally(() => {
           setCategoryLoading(false);
@@ -146,7 +174,7 @@ export default function Shop4({
   // ---- load products from backend ----
   async function loadProducts({ page = initialPage, limit = initialLimit, sortValue = sort, showLoading = true } = {}) {
     if (showLoading) {
-      setLoading(true);
+    setLoading(true);
     }
     setErr("");
     try {
@@ -185,7 +213,22 @@ export default function Shop4({
       setProducts(list);
       setPagination(pg);
     } catch (e) {
-      setErr(e?.message || "Бүтээгдэхүүн ачаалахад алдаа гарлаа.");
+      console.error('Error loading products:', e);
+      
+      // Handle different types of errors
+      let errorMessage = "Бүтээгдэхүүн ачаалахад алдаа гарлаа.";
+      
+      if (e.message.includes('fetch')) {
+        errorMessage = "Сүлжээний холболт асуудалтай байна. Дахин оролдоно уу.";
+      } else if (e.message.includes('500')) {
+        errorMessage = "Серверийн алдаа гарлаа. Дахин оролдоно уу.";
+      } else if (e.message.includes('404')) {
+        errorMessage = "Хүссэн мэдээлэл олдсонгүй.";
+      } else if (e.message) {
+        errorMessage = e.message;
+      }
+      
+      setErr(errorMessage);
       setProducts([]);
       setPagination((p) => ({ ...p, total: 0, totalPages: 1 }));
     } finally {
@@ -195,7 +238,7 @@ export default function Shop4({
 
   
 
-
+  
 
   // эхний ачаалт + dependency өөрчлөгдөхөд дахин ачаал
   useEffect(() => {
@@ -312,9 +355,9 @@ export default function Shop4({
             {/* Category Title */}
             {categoryId && (
               <div className="category-title me-3">
-                <h4 className="mb-0 text-primary">
+                {/* <h4 className="mb-0 text-primary">
                   {categoryLoading ? "Ачаалж байна..." : categoryName}
-                </h4>
+                </h4> */}
                 <small className="text-muted">
                   {pagination.total} бүтээгдэхүүн
                 </small>
@@ -334,15 +377,15 @@ export default function Shop4({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '8px 12px',
+                  // padding: '8px 12px',
                   border: '1px solid #dee2e6',
                   borderRadius: '4px',
                   backgroundColor: 'white',
-                  minWidth: '150px',
+                  // minWidth: '150px',
                   justifyContent: 'space-between'
                 }}
               >
-                <span>{sortingOptions.find(opt => opt.value === sort)?.label || 'ЭНГИЙН'}</span>
+                <span style={{padding: '8px 12px'}}>{sortingOptions.find(opt => opt.value === sort)?.label || 'ЭНГИЙН'}</span>
                 <svg 
                   className={`transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} 
                   width="12" 
@@ -351,6 +394,7 @@ export default function Shop4({
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
+                  style={{margin: '0px 4px'}}
                 >
                   <path d="M6 9l6 6 6-6"/>
                 </svg>
@@ -368,8 +412,8 @@ export default function Shop4({
                     borderRadius: '4px',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                   }}
-                >
-                  {sortingOptions.map((option, index) => (
+            >
+              {sortingOptions.map((option, index) => (
                     <button
                       key={index}
                       className="btn btn-link text-decoration-none w-100 text-start"
@@ -398,9 +442,9 @@ export default function Shop4({
                         }
                       }}
                     >
-                      {option.label}
+                  {option.label}
                     </button>
-                  ))}
+              ))}
                 </div>
               )}
             </div>
@@ -444,7 +488,18 @@ export default function Shop4({
           {loading ? (
             <div className="text-secondary p-3">Loading…</div>
           ) : err ? (
-            <div className="alert alert-danger">{err}</div>
+            <div className="alert alert-danger">
+              <div className="d-flex justify-content-between align-items-start">
+                <div className="flex-grow-1">{err}</div>
+                <button 
+                  className="btn btn-outline-danger btn-sm ms-3"
+                  onClick={() => loadProducts()}
+                  disabled={loading}
+                >
+                  {loading ? 'Ачаалж байна...' : 'Дахин оролдох'}
+                </button>
+              </div>
+            </div>
           ) : products.length === 0 ? (
             <div className="text-secondary p-3">No products.</div>
           ) : (

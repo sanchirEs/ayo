@@ -68,6 +68,12 @@ export default function Context({ children }) {
       }
     } catch (error) {
       console.error('Wishlist toggle error:', error);
+      
+      // Don't show error for 404 or network issues, just use local storage
+      if (error.message.includes('404') || error.message.includes('Not Found') || error.message.includes('fetch')) {
+        console.log('Wishlist API not available, using local storage');
+      }
+      
       // Fallback to local storage if API fails
       if (wishList.includes(id)) {
         setWishList((pre) => [...pre.filter((elm) => elm != id)]);
@@ -112,6 +118,12 @@ export default function Context({ children }) {
         setWishList(wishlistIds);
       } catch (error) {
         console.error('Failed to load wishlist from backend:', error);
+        
+        // Don't show error for 404 or network issues, just use local storage
+        if (error.message.includes('404') || error.message.includes('Not Found') || error.message.includes('fetch')) {
+          console.log('Wishlist API not available, using local storage');
+        }
+        
         // Fallback to local storage
         const items = JSON.parse(localStorage.getItem("wishlist"));
         if (items?.length) {

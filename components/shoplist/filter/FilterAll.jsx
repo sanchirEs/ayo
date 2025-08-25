@@ -40,13 +40,40 @@ export default function FilterAll({ onFiltersChange }) {
     (async () => {
       try {
         setCatLoading(true);
+        setCatError(null);
         const res = await api.categories.getTree();
         const payload = res?.data ?? res;
-        if (alive && Array.isArray(payload)) {
-          setCatTree(payload);
+        if (alive) {
+          if (Array.isArray(payload)) {
+            setCatTree(payload);
+          } else if (payload === null) {
+            // API returned null data (404 handled by API client)
+            console.log('Categories data is null, using empty array');
+            setCatTree([]);
+          }
         }
       } catch (e) {
-        if (alive) setCatError(e?.message || "Ангилал ачилт алдаа");
+        console.error('Error loading categories:', e);
+        if (alive) {
+          // Don't show error for 404, just use empty categories
+          if (e.message.includes('404') || e.message.includes('Not Found')) {
+            console.log('Categories endpoint not found, using empty categories');
+            setCatTree([]);
+            return;
+          }
+          
+          let errorMessage = "Ангилал ачилт алдаа";
+          
+          if (e.message.includes('fetch')) {
+            errorMessage = "Сүлжээний холболт асуудалтай байна.";
+          } else if (e.message.includes('500')) {
+            errorMessage = "Серверийн алдаа гарлаа.";
+          } else if (e.message) {
+            errorMessage = e.message;
+          }
+          
+          setCatError(errorMessage);
+        }
       } finally {
         if (alive) setCatLoading(false);
       }
@@ -62,13 +89,40 @@ export default function FilterAll({ onFiltersChange }) {
     (async () => {
       try {
         setAttributesLoading(true);
+        setAttributesError(null);
         const res = await api.attributes.getAll();
         const payload = res?.data ?? res;
-        if (alive && Array.isArray(payload)) {
-          setAttributes(payload);
+        if (alive) {
+          if (Array.isArray(payload)) {
+            setAttributes(payload);
+          } else if (payload === null) {
+            // API returned null data (404 handled by API client)
+            console.log('Attributes data is null, using empty array');
+            setAttributes([]);
+          }
         }
       } catch (e) {
-        if (alive) setAttributesError(e?.message || "Шинж чанар ачилт алдаа");
+        console.error('Error loading attributes:', e);
+        if (alive) {
+          // Don't show error for 404, just use empty attributes
+          if (e.message.includes('404') || e.message.includes('Not Found')) {
+            console.log('Attributes endpoint not found, using empty attributes');
+            setAttributes([]);
+            return;
+          }
+          
+          let errorMessage = "Шинж чанар ачилт алдаа";
+          
+          if (e.message.includes('fetch')) {
+            errorMessage = "Сүлжээний холболт асуудалтай байна.";
+          } else if (e.message.includes('500')) {
+            errorMessage = "Серверийн алдаа гарлаа.";
+          } else if (e.message) {
+            errorMessage = e.message;
+          }
+          
+          setAttributesError(errorMessage);
+        }
       } finally {
         if (alive) setAttributesLoading(false);
       }
@@ -329,7 +383,7 @@ export default function FilterAll({ onFiltersChange }) {
               ) : (
                 <ul className="categories-list list-unstyled mb-0">
                   {catTree.map(category => renderCategory(category))}
-                </ul>
+              </ul>
               )}
             </div>
           </div>
@@ -387,7 +441,7 @@ export default function FilterAll({ onFiltersChange }) {
                   {colorAttributes.map((attribute) => (
                     <div key={attribute.id} className="mb-2">
                       <h6 className="text-muted small mb-2">{attribute.name}</h6>
-                      <div className="d-flex flex-wrap">
+              <div className="d-flex flex-wrap">
                         {attribute.options.map((option) => (
                           <button
                             key={option.id}
@@ -400,9 +454,9 @@ export default function FilterAll({ onFiltersChange }) {
                               border: '1px solid #ddd'
                             }}
                             title={option.value}
-                          />
-                        ))}
-                      </div>
+                  />
+                ))}
+              </div>
                     </div>
                   ))}
                 </div>
@@ -465,7 +519,7 @@ export default function FilterAll({ onFiltersChange }) {
                   {sizeAttributes.map((attribute) => (
                     <div key={attribute.id} className="mb-2">
                       <h6 className="text-muted small mb-2">{attribute.name}</h6>
-                      <div className="d-flex flex-wrap">
+              <div className="d-flex flex-wrap">
                         {attribute.options.map((option) => (
                           <button
                             key={option.id}
@@ -476,8 +530,8 @@ export default function FilterAll({ onFiltersChange }) {
                           >
                             {option.value}
                           </button>
-                        ))}
-                      </div>
+                ))}
+              </div>
                     </div>
                   ))}
                 </div>
@@ -545,7 +599,7 @@ export default function FilterAll({ onFiltersChange }) {
               ) : attributesError ? (
                 <div className="text-danger small py-2">{attributesError}</div>
               ) : brandAttributes.length > 0 ? (
-                <ul className="multi-select__list list-unstyled">
+              <ul className="multi-select__list list-unstyled">
                   {brandAttributes.map((attribute) => (
                     <div key={attribute.id} className="mb-3">
                       <h6 className="text-muted small mb-2">{attribute.name}</h6>
@@ -557,18 +611,18 @@ export default function FilterAll({ onFiltersChange }) {
                           <li
                             key={option.id}
                             onClick={() => toggleBrand(option.id)}
-                            className={`search-suggestion__item multi-select__item text-primary js-search-select js-multi-select ${
+                      className={`search-suggestion__item multi-select__item text-primary js-search-select js-multi-select ${
                               activeBrands.includes(option.id)
-                                ? "mult-select__item_selected"
-                                : ""
-                            }`}
-                          >
+                          ? "mult-select__item_selected"
+                          : ""
+                      }`}
+                    >
                             <span className="me-auto">{option.value}</span>
-                          </li>
+                    </li>
                         ))}
                     </div>
                   ))}
-                </ul>
+              </ul>
               ) : (
                 <div className="text-muted small py-2">Брэнд байхгүй</div>
               )}
@@ -614,6 +668,8 @@ export default function FilterAll({ onFiltersChange }) {
               overflow: 'hidden'
             }}
           >
+
+            <div className="mt-2">
             <Slider
               range
               formatLabel={() => ``}
@@ -623,6 +679,8 @@ export default function FilterAll({ onFiltersChange }) {
               onChange={(value) => handleOnChange(value)}
               id="slider"
             />
+            </div>
+           
             <div className="price-range__info d-flex align-items-center mt-2">
               <div className="me-auto">
                 <span className="text-secondary">Min Price: </span>

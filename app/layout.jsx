@@ -34,6 +34,25 @@ export default function RootLayout({ children }) {
       import("bootstrap/dist/js/bootstrap.esm").then(() => {
         // Module is imported, you can access any exported functionality if
       });
+      
+      // Global error handler to prevent unhandled promise rejections
+      const handleUnhandledRejection = (event) => {
+        console.error('Unhandled promise rejection:', event.reason);
+        
+        // Don't show error for 404 or network issues
+        if (event.reason?.message?.includes('404') || 
+            event.reason?.message?.includes('Not Found') ||
+            event.reason?.message?.includes('fetch')) {
+          event.preventDefault();
+          console.log('Suppressing 404/network error from global handler');
+        }
+      };
+      
+      window.addEventListener('unhandledrejection', handleUnhandledRejection);
+      
+      return () => {
+        window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      };
     }
   }, []);
   return (

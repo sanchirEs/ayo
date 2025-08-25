@@ -78,9 +78,9 @@ export default function PopulerProducts() {
   }
 
   if (err) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
+  return (
+    <section className="products-carousel container">
+      <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
           Онцлох бүтээгдэхүүнүүд
         </h2>
         <p className="text-danger text-center">{err}</p>
