@@ -1,5 +1,3 @@
-import Footer1 from "@/components/footers/Footer1";
-import Header14 from "@/components/headers/Header14";
 import Shop4 from "@/components/shoplist/Shop4";
 
 export const metadata = {
@@ -20,17 +18,13 @@ export default async function ShopPage4WithCategory({ params, searchParams }) {
   
   return (
     <>
-      <Header14 />
-      <main className="page-wrapper">
-        <Shop4 
-          categoryId={categoryId}
-          initialPage={page}
-          initialLimit={limit}
-          initialSort={sort}
-        />
-      </main>
+      <Shop4 
+        categoryId={categoryId}
+        initialPage={page}
+        initialLimit={limit}
+        initialSort={sort}
+      />
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
     </>
   );
 }

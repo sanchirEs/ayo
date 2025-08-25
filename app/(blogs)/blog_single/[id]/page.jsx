@@ -12,13 +12,11 @@ export default async function BlogDetailsPage(props) {
   const blog = allBlogs.filter((elm) => elm.id == id)[0] || allBlogs[0];
   return (
     <>
-              <Header14 />
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <BlogDetails blog={blog} />
       </main>
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
     </>
   );
 }

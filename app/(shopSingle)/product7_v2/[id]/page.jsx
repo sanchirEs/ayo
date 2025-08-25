@@ -18,13 +18,11 @@ export default async function ProductDetailsPage7(props) {
     allProducts.filter((elm) => elm.id == productId)[0] || allProducts[0];
   return (
     <>
-      <Header14 />
       <main style={{ paddingTop: "70px" }}>
         <div className="mb-md-1 pb-md-3"></div>
         <SingleProduct2 product={product} />
         <RelatedSlider />
       </main>
-      <Footer1 />
     </>
   );
 }

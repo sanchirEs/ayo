@@ -7,7 +7,6 @@ import React from "react";
 export default function () {
   return (
     <>
-      <Header1 />
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <section className="shop-checkout container">
@@ -17,7 +16,6 @@ export default function () {
         </section>
       </main>
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
     </>
   );
 }

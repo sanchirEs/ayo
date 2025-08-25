@@ -14,6 +14,8 @@ import CartDrawer from "@/components/shopCartandCheckout/CartDrawer";
 import SiteMap from "@/components/modals/SiteMap";
 import NewsLetter from "@/components/modals/NewsLetter";
 import CookieContainer from "@/components/common/CookieContainer";
+import Header14 from "@/components/headers/Header14";
+import Footer1 from "@/components/footers/Footer1";
 import MobileHeader from "@/components/headers/MobileHeader";
 import SizeGuide from "@/components/modals/SizeGuide";
 import Delivery from "@/components/modals/Delivery";
@@ -26,6 +28,7 @@ import MobileFooter1 from "@/components/footers/MobileFooter1";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
+import Footer14 from "@/components/footers/Footer14";
 
 export default function RootLayout({ children }) {
   useEffect(() => {
@@ -110,9 +113,15 @@ export default function RootLayout({ children }) {
           <AuthProvider>
         <Svgs />
         <Context>
+         
+          <main className="page-wrapper">
+          <Header14 />
           <MobileHeader />
-          {children}
-          <MobileFooter1 />
+            {children}
+            <Footer14 />
+            <MobileFooter1 />
+          </main>
+        
           {/* //modals and asides */}
           <LoginFormPopup />
           <QuickView />

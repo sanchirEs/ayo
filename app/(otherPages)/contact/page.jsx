@@ -13,7 +13,6 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <>
-      <Header1 />
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <section className="contact-us container">
@@ -31,7 +30,6 @@ export default function ContactPage() {
         <Contact />
       </main>
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
     </>
   );
 }

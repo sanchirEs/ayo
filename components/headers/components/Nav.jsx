@@ -141,6 +141,12 @@ export default function Nav() {
     };
   }, []);
 
+  // Function to close mega menu
+  const closeMegaMenu = () => {
+    setIsAllCatsOpen(false);
+    setIsAllCatsHovered(false);
+  };
+
   // Recursive nested list for unlimited depth
   function CategoryList({ nodes, linkClassName = "" }) {
     if (!nodes || nodes.length === 0) return null;
@@ -155,6 +161,7 @@ export default function Nav() {
                 className={`menu-link menu-link_us-s ${
                   isMenuActive(href) ? "menu-active" : ""
                 } ${linkClassName}`}
+                onClick={closeMegaMenu}
               >
                 {n.name}
               </Link>
@@ -216,6 +223,7 @@ export default function Nav() {
                           <Link
                             href={`/shop-4/${root.id}`}
                             className="menu-link  sub-menu__title"
+                            onClick={closeMegaMenu}
                           >
                             {/* {getCategoryIcon(root.name)} */}
 
@@ -248,7 +256,11 @@ export default function Nav() {
                                       <ul className="sub-menu__list list-unstyled">
                                         {withoutKids.map((leaf) => (
                                           <li key={leaf.id} className="sub-menu__item">
-                                            <Link href={`/shop-4/${leaf.id}`} className="menu-link menu-link_us-s sub-menu__title allcats__leaf-bold">
+                                            <Link 
+                                              href={`/shop-4/${leaf.id}`} 
+                                              className="menu-link menu-link_us-s sub-menu__title allcats__leaf-bold"
+                                              onClick={closeMegaMenu}
+                                            >
                                               {leaf.name}
                                             </Link>
                                           </li>
@@ -260,7 +272,11 @@ export default function Nav() {
                                   {/* Each item with children goes to its own column with its children below */}
                                   {withKids.map((child) => (
                                     <div key={child.id} className="col pe-4 mb-4">
-                                      <Link href={`/shop-4/${child.id}`} className="sub-menu__title allcats__leaf-bold">
+                                      <Link 
+                                        href={`/shop-4/${child.id}`} 
+                                        className="sub-menu__title allcats__leaf-bold"
+                                        onClick={closeMegaMenu}
+                                      >
                                         {child.name}
                                       </Link>
                                       <CategoryList nodes={child.children} linkClassName="allcats__nested-link" />
@@ -282,7 +298,11 @@ export default function Nav() {
           {/* First 6 root categories as regular nav items */}
           {catTree.slice(0, 6).map((root) => (
             <li key={root.id} className="navigation__item">
-              <Link href={`/shop-4/${root.id}`} className="navigation__link">
+              <Link 
+                href={`/shop-4/${root.id}`} 
+                className="navigation__link"
+                onClick={closeMegaMenu}
+              >
                 {root.name}
               </Link>
 

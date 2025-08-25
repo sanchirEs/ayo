@@ -22,7 +22,6 @@ export default function HomePage15() {
   return (
     <>
       <div className="theme-15">
-        <Header14 />
         <main>
           <Hero />
           <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
@@ -46,7 +45,6 @@ export default function HomePage15() {
           <Instagram /> */}
              <div className="mb-3 mb-xl-5 pb-3 pt-1 pb-xl-5"></div>
         </main>
-        <Footer14 />
       </div>
     </>
   );

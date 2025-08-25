@@ -12,12 +12,12 @@ export const metadata = {
 export default function BlogPage3() {
   return (
     <>
-              <Header14 />
+    
       <main className="page-wrapper">
         <Blog3 />
       </main>
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
+    
     </>
   );
 }

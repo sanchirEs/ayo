@@ -20,14 +20,12 @@ export default async function ProductDetailsPage10(props) {
   return (
     <>
       <div className="header_dark">
-        <Header14 />
       </div>
       <main className="page-wrapper">
         {/* <div className="mb-md-1 pb-md-3"></div> */}
         <SingleProduct5 product={product} />
         <RelatedSlider />
       </main>
-      <Footer1 />
     </>
   );
 }

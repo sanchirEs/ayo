@@ -12,14 +12,12 @@ export const metadata = {
 export default function CommingSoonPage() {
   return (
     <>
-      <Header1 />
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <CommingSoon />
       </main>
 
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
     </>
   );
 }

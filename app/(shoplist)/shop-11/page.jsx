@@ -1,6 +1,3 @@
-import Footer1 from "@/components/footers/Footer1";
-
-import Header14 from "@/components/headers/Header14";
 import Shop11 from "@/components/shoplist/Shop11";
 import React from "react";
 
@@ -11,12 +8,7 @@ export const metadata = {
 export default function ShopPage11() {
   return (
     <>
-              <Header14 />
-      <main className="page-wrapper">
-        <Shop11 />
-      </main>
-      <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
+      <Shop11 />
     </>
   );
 }

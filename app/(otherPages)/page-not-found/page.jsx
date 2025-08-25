@@ -10,14 +10,12 @@ export const metadata = {
 export default function PageNotFound() {
   return (
     <>
-      <Header1 />
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <Notfound />
       </main>
 
       <div className="mb-5 pb-xl-5"></div>
-      <Footer1 />
     </>
   );
 }
