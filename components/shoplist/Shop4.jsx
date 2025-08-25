@@ -593,8 +593,14 @@ export default function Shop4({
                         }`}
                         onClick={() => toggleWishlist(id)}
                         title="Add To Wishlist"
+                        style={{
+                          background: 'transparent',
+                          border: 'none'
+                        }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 20 20"><use href="#icon_heart" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 20 20">
+                          <use href="#icon_heart" />
+                        </svg>
                       </button>
                     </div>
 

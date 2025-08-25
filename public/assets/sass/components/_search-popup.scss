@@ -29,15 +29,15 @@
 .search-popup {
   top: 100%;
   left: 0;
-  padding-top: $search-popup-padding-top * 0.7;
-  padding-bottom: $search-popup-padding-bottom * 0.7;;
+  padding-top: $search-popup-padding-top * 0.4;
+  padding-bottom: $search-popup-padding-bottom * 0.4;
   border-top: $mega-menu-border;
   background-color: $header-background;
   box-shadow: $box-shadow;
 
   @include media-breakpoint-up(xl) {
-    padding-top: $search-popup-padding-top;
-    padding-bottom: $search-popup-padding-bottom;
+    // padding-top: $search-popup-padding-top;
+    // padding-bottom: $search-popup-padding-bottom;
   }
 
   .search-suggestion {

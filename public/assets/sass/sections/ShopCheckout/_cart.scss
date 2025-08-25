@@ -8,7 +8,7 @@
   }
 
   .cart-table__wrapper {
-    padding-top: 3.125rem;
+    padding-top: 2.125rem;
     flex-grow: 1;
   }
 
@@ -87,10 +87,14 @@
 
   .cart-table {
     width: 100%;
+    background: transparent;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
 
     th, td {
       @include media-breakpoint-up(md) {
-        border-bottom: 1px solid $border-color;
+        border-bottom: none;
+        background: transparent;
       }
     }
 
@@ -99,13 +103,19 @@
 
       @include media-breakpoint-up(md) {
         display: table-header-group;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 1rem;
       }
 
       th {
         font-size: 0.875rem;
         text-transform: uppercase;
-        font-weight: 500;
-        padding: 0 0 0.625rem;
+        font-weight: 600;
+        padding: 1rem 1.875rem;
+        color: #495057;
+        border: none;
+        background: #f8f9fa;
       }
     }
 
@@ -113,21 +123,34 @@
       tr {
         position: relative;
         display: block;
-        padding: 1.25rem 0;
-        border-bottom: 1px solid $border-color;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f0f0f0;
         transition: all .3s ease;
 
         @include media-breakpoint-up(md) {
           display: table-row;
-          padding: 0;
-          border: 0;
+          padding: 1.875rem;
+          margin-bottom: 1rem;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          border: 1px solid #f0f0f0;
+        }
+
+        &:hover {
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+          transform: translateY(-2px);
         }
 
         &:first-child {
-          border-top: 1px solid $border-color;
+          border-top: 1px solid #f0f0f0;
 
           @include media-breakpoint-up(md) {
-            border: 0;
+            border: 1px solid #f0f0f0;
           }
         }
 
@@ -204,11 +227,12 @@
 
         .remove-cart {
           position: absolute;
-          right: 0;
+          right: 1rem;
           top: 1rem;
 
           @include media-breakpoint-up(md) {
             position: static;
+            right: auto;
           }
         }
       }
@@ -226,10 +250,19 @@
         border: 0;
 
         @include media-breakpoint-up(md) {
-          border: 2px solid $border-color;
+          border: 2px solid #e9ecef;
+          border-radius: 8px;
           height: 3.125rem;
           padding: 0 2rem;
           min-width: 6.875rem;
+          background: #fff;
+          font-weight: 500;
+          
+          &:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+          }
         }
       }
 
@@ -238,6 +271,13 @@
         text-align: center;
         top: 50%;
         transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: #007bff;
+        }
       }
 
       &__reduce {
@@ -288,14 +328,17 @@
 
       img {
         width: 7.5rem;
-        height: auto;
+        height: 7.5rem;
+        border-radius: 8px;
+        object-fit: cover;
       }
 
       &__detail {
         h4 {
-          font-size: 1rem;
-          font-weight: 400;
-          margin-bottom: 0;
+          font-size: 1.125rem;
+          font-weight: 500;
+          margin-bottom: 0.5rem;
+          color: #212529;
         }
       }
 
@@ -307,19 +350,28 @@
 
         li {
           font-size: 0.875rem;
-          color: $secondary;
+          color: #6c757d;
+          padding: 0.25rem 0;
+          
+          &:before {
+            content: '•';
+            color: #dee2e6;
+            margin-right: 0.5rem;
+          }
         }
       }
     }
 
     &-price {
-      font-size: 1rem;
-      color: $secondary;
+      font-size: 1.1rem;
+      color: #495057;
+      font-weight: 500;
     }
   }
 
   &__subtotal {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
   }
 }

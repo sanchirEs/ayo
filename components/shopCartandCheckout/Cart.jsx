@@ -81,7 +81,7 @@ const setQuantity = (id, q) => {
                   return (
                     <tr key={`${elm.id}-${i}`}>
                       <td>
-                        <div className="shopping-cart__product-item">
+                        <div className="px-4 shopping-cart__product-item">
                           <Image
                             loading="lazy"
                             src={elm.image || "/images/placeholder-330x400.png"}
@@ -143,12 +143,37 @@ const setQuantity = (id, q) => {
                         </span>
                       </td>
                       <td>
-                        <a onClick={() => removeItem(elm.id)} className="remove-cart">
+                        <a 
+                          onClick={() => removeItem(elm.id)} 
+                          className="remove-cart"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            background: '#f8f9fa',
+                            border: '1px solid #e9ecef',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#dc3545';
+                            e.currentTarget.style.borderColor = '#dc3545';
+                            e.currentTarget.style.color = '#fff';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#f8f9fa';
+                            e.currentTarget.style.borderColor = '#e9ecef';
+                            e.currentTarget.style.color = '#6c757d';
+                          }}
+                        >
                           <svg
-                            width="10"
-                            height="10"
+                            width="12"
+                            height="12"
                             viewBox="0 0 10 10"
-                            fill="#767676"
+                            fill="currentColor"
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <path d="M0.259435 8.85506L9.11449 0L10 0.885506L1.14494 9.74056L0.259435 8.85506Z" />

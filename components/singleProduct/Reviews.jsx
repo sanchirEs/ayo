@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import api from "@/lib/api";
 
 /** Small star */
@@ -110,7 +111,13 @@ const cancelEdit = () => {
         Array.isArray(res) ? res : [];
       setReviews(list);
     } catch (e) {
-      setLoadErr(e.message || "Сэтгэгдэл ачааллахад алдаа гарлаа.");
+      // Authentication required error-ийг харуулахгүй
+      if (e.message?.includes('Authentication required') || e.message?.includes('401')) {
+        console.log('Authentication required for reviews, but not showing error');
+        setReviews([]);
+      } else {
+        setLoadErr(e.message || "Сэтгэгдэл ачааллахад алдаа гарлаа.");
+      }
     } finally {
       setLoading(false);
     }
@@ -148,7 +155,12 @@ const cancelEdit = () => {
     setMyRating(0);
     setMyText("");
   } catch (err) {
-    setSubmitErr(err.message || "Үнэлгээ илгээх үед алдаа гарлаа.");
+    // Authentication required error-ийг харуулахгүй
+    if (err.message?.includes('Authentication required') || err.message?.includes('401')) {
+      setSubmitErr("Нэвтэрч орно уу.");
+    } else {
+      setSubmitErr(err.message || "Үнэлгээ илгээх үед алдаа гарлаа.");
+    }
   } finally {
     setSubmitting(false);
   }
@@ -163,7 +175,12 @@ const cancelEdit = () => {
       await api.reviews.deleteMy(productId);
       await loadReviews();
     } catch (e) {
-      alert(e.message || "Устгах үед алдаа гарлаа.");
+      // Authentication required error-ийг харуулахгүй
+      if (e.message?.includes('Authentication required') || e.message?.includes('401')) {
+        console.log('Authentication required for delete, but not showing error');
+      } else {
+        alert(e.message || "Устгах үед алдаа гарлаа.");
+      }
     } finally {
       setDeleting(false);
       setEditing(false)
@@ -249,7 +266,12 @@ const cancelEdit = () => {
         {!authChecked ? (
           <div className="text-secondary">Шалгаж байна…</div>
         ) : !me ? (
-          <div className="alert alert-warning">Та нэвтэрч орж байж үнэлгээ өгнө үү.</div>
+          <div className="alert alert-warning">
+            Та нэвтэрч орж байж үнэлгээ өгнө үү.{" "}
+            <Link href={`/login_register?redirect=${encodeURIComponent(window.location.pathname)}`} className="text-decoration-underline">
+              Нэвтрэх
+            </Link>
+          </div>
         ) : myExistingReview && !editing ? (
           <div className="d-flex align-items-center gap-3 flex-wrap">
             <div className="alert alert-info mb-0">

@@ -95,6 +95,28 @@ a {
   //   padding-top: 60px;
   // }
 }
+
+// SearchPopup width override
+.search-popup.js-hidden-content {
+  width: 55vw !important;
+  // max-width: 1600px !important;
+  left: 50% !important;
+  transform: translateX(-100%) !important;
+  margin: 0 10px !important;
+  max-height: 350px !important;
+  // overflow-y: auto !important;
+}
+
+// Wishlist button styling
+.pc__btn-wl.js-add-wishlist {
+  width: auto !important;
+  height: auto !important;
+  padding: 4px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
 .page-wrapper-3 {
   @media (max-width: 991px) {
     padding-top: 60px;

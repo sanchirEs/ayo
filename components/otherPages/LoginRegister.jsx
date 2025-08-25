@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/lib/api";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -9,14 +9,23 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function LoginRegister() {
   const router = useRouter();
-   const { login } = useAuth();
+  const searchParams = useSearchParams();
+  const { login } = useAuth();
 
   // ---- Login form state ----
   const [identifier, setIdentifier] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginErr, setLoginErr] = useState("");
+  const [redirectUrl, setRedirectUrl] = useState("");
 
+  // URL-аас redirect parameter-ийг авах
+  useEffect(() => {
+    const redirect = searchParams.get('redirect');
+    if (redirect) {
+      setRedirectUrl(decodeURIComponent(redirect));
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,14 +35,21 @@ export default function LoginRegister() {
       // await api.auth.login({ identifier, password: loginPassword });
       await login({ identifier, password: loginPassword });
       
-       const prev = document.referrer;
-    const sameOrigin = prev && (() => {
-      try { return new URL(prev).origin === window.location.origin; }
-      catch { return false; }
-    })();
+      // Redirect logic
+      if (redirectUrl) {
+        // URL-аас ирсэн redirect parameter байвал тэр хуудас руу шилжих
+        router.push(redirectUrl);
+      } else {
+        // Redirect parameter байхгүй бол өмнөх хуудас руу буцах
+        const prev = document.referrer;
+        const sameOrigin = prev && (() => {
+          try { return new URL(prev).origin === window.location.origin; }
+          catch { return false; }
+        })();
 
-    if (sameOrigin) router.back();
-    else router.push('/');
+        if (sameOrigin) router.back();
+        else router.push('/');
+      }
     } catch (err) {
       setLoginErr(err.message || "Нэвтрэхэд алдаа гарлаа.");
     } finally {
