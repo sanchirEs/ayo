@@ -4,9 +4,11 @@ import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Cart() {
   const { cartProducts, setCartProducts, totalPrice } = useContextElement();
+  const router = useRouter();
 
 const setQuantity = (id, q) => {
   setCartProducts(prev =>
@@ -57,6 +59,13 @@ const setQuantity = (id, q) => {
     (checkboxes.flat_rate ? 49 : 0) + (checkboxes.local_pickup ? 8 : 0);
   const vat = 19;
   const grandTotal = computedSubtotal + shippingFee + vat;
+
+  // Захиалга өгөх товчийг дарахад дараагийн step рүү шилжих
+  const handleCheckout = () => {
+    if (cartProducts.length > 0) {
+      router.push('/shop_checkout');
+    }
+  };
 
   return (
     <div className="shopping-cart" style={{ minHeight: "calc(100vh - 300px)" }}>
@@ -289,7 +298,10 @@ const setQuantity = (id, q) => {
 
             <div className="mobile_fixed-btn_wrapper">
               <div className="button-wrapper container">
-                <button className="btn btn-primary btn-checkout">
+                <button 
+                  className="btn btn-primary btn-checkout"
+                  onClick={handleCheckout}
+                >
                   Захиалга өгөх хаягаа оруулах
                 </button>
               </div>

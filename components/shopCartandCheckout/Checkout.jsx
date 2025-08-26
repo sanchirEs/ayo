@@ -5,109 +5,162 @@ const countries = [
   "United Kingdom",
   "United States",
   "Turkey",
+  "Mongolia",
 ];
+
+// Mongolian provinces/cities
+const mongolianProvinces = [
+  "Улаанбаатар",
+  "Архангай",
+  "Баян-Өлгий",
+  "Баянхонгор",
+  "Булган",
+  "Говь-Алтай",
+  "Говьсүмбэр",
+  "Дархан-Уул",
+  "Дорноговь",
+  "Дорнод",
+  "Дундговь",
+  "Завхан",
+  "Орхон",
+  "Өвөрхангай",
+  "Өмнөговь",
+  "Сүхбаатар",
+  "Сэлэнгэ",
+  "Төв",
+  "Увс",
+  "Ховд",
+  "Хөвсгөл",
+  "Хэнтий"
+];
+
 import { useContextElement } from "@/context/Context";
 import { useState } from "react";
 import Link from "next/link";
+import { useUserAddresses } from "@/hooks/useUserAddresses";
+import { useSession } from "next-auth/react";
+
 export default function Checkout() {
   const { cartProducts, totalPrice } = useContextElement();
+  const { data: session, status } = useSession();
+  const { addresses, loading: addressesLoading, createAddress, updateAddress } = useUserAddresses();
   const [selectedRegion, setSelectedRegion] = useState("");
   const [idDDActive, setIdDDActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [addressMode, setAddressMode] = useState('new'); // 'new' or 'existing'
+  const [hasSelectedExistingAddress, setHasSelectedExistingAddress] = useState(false);
+  const [justSavedAddress, setJustSavedAddress] = useState(false);
+  
+  // Form states
+  const [formData, setFormData] = useState({
+    country: "Mongolia",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    postalCode: "",
+    phone: "",
+    userId: session?.user?.userId
+  });
+
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <div className="checkout-form">
+    <>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <div className="checkout-form">
         <div className="billing-info__wrapper">
-          <h4>BILLING DETAILS</h4>
-          <div className="row">
-            <div className="col-md-6">
-              <div className="form-floating my-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="checkout_first_name"
-                  placeholder="First Name"
-                />
-                <label htmlFor="checkout_first_name">First Name</label>
+          <h4>ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
+          
+          {/* Address Selection Buttons */}
+          <div className="address-selection__wrapper mb-4">
+            {/* Current Selection Indicator */}
+            {addressMode === 'existing' && hasSelectedExistingAddress && (
+              <div className={`alert mb-3 ${justSavedAddress ? 'alert-success' : 'alert-info'}`}>
+                <i className={`me-2 ${justSavedAddress ? 'fas fa-check-circle' : 'fas fa-map-marker-alt'}`}></i>
+                <strong>
+                  {justSavedAddress ? 'Шинээр хадгалсан хаяг:' : 'Сонгосон хаяг:'}
+                </strong> {selectedAddress?.addressLine1}, {selectedAddress?.city}
+                {justSavedAddress && (
+                  <span className="ms-2 badge bg-success">Шинэ</span>
+                )}
               </div>
-            </div>
-            <div className="col-md-6">
-              <div className="form-floating my-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="checkout_last_name"
-                  placeholder="Last Name"
-                />
-                <label htmlFor="checkout_last_name">Last Name</label>
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="form-floating my-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="checkout_company_name"
-                  placeholder="Company Name (optional)"
-                />
-                <label htmlFor="checkout_company_name">
-                  Company Name (optional)
-                </label>
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="search-field my-3">
-                <div
-                  className={`form-label-fixed hover-container ${
-                    idDDActive ? "js-content_visible" : ""
+            )}
+            
+            <div className="row">
+              <div className="col-md-6">
+                <button
+                  type="button"
+                  className={`btn w-100 ${
+                    addressMode === 'existing' 
+                      ? 'btn-primary' 
+                      : 'btn-outline-primary'
                   }`}
+                  onClick={() => setShowAddressModal(true)}
+                  disabled={!session?.user || addresses.length === 0}
                 >
-                  <label htmlFor="search-dropdown" className="form-label">
-                    Country / Region*
-                  </label>
-                  <div className="js-hover__open">
-                    <input
-                      type="text"
-                      className="form-control form-control-lg search-field__actor search-field__arrow-down"
-                      id="search-dropdown"
-                      name="search-keyword"
-                      value={selectedRegion}
-                      readOnly
-                      placeholder="Choose a location..."
-                      onClick={() => setIdDDActive((pre) => !pre)}
-                    />
-                  </div>
-                  <div className="filters-container js-hidden-content mt-2">
-                    <div className="search-field__input-wrapper">
-                      <input
-                        type="text"
-                        className="search-field__input form-control form-control-sm bg-lighter border-lighter"
-                        placeholder="Search"
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value);
-                        }}
-                      />
-                    </div>
-                    <ul className="search-suggestion list-unstyled">
-                      {countries
-                        .filter((elm) =>
-                          elm.toLowerCase().includes(searchQuery.toLowerCase())
-                        )
-                        .map((elm, i) => (
-                          <li
-                            onClick={() => {
-                              setSelectedRegion(elm);
-                              setIdDDActive(false);
-                            }}
-                            key={i}
-                            className="search-suggestion__item js-search-select"
-                          >
-                            {elm}
-                          </li>
-                        ))}
-                    </ul>
-                  </div>
-                </div>
+                  <i className="fas fa-map-marker-alt me-2"></i>
+                  Өмнө оруулсан хаягаасаа сонгох
+                  {addresses.length > 0 && (
+                    <span className={`badge ms-2 ${
+                      addressMode === 'existing' ? 'bg-light text-primary' : 'bg-primary'
+                    }`}>{addresses.length}</span>
+                  )}
+                </button>
+                {!session?.user && (
+                  <small className="text-muted d-block mt-1">Нэвтэрсэн хэрэглэгч л ашиглах боломжтой</small>
+                )}
+                {session?.user && addresses.length === 0 && (
+                  <small className="text-muted d-block mt-1">Хадгалсан хаяг байхгүй байна</small>
+                )}
+              </div>
+              <div className="col-md-6">
+                <button
+                  type="button"
+                  className={`btn w-100 ${
+                    addressMode === 'new' 
+                      ? 'btn-primary' 
+                      : 'btn-outline-primary'
+                  }`}
+                  onClick={() => {
+                    setFormData({
+                      country: "Mongolia",
+                      addressLine1: "",
+                      addressLine2: "",
+                      city: "",
+                      postalCode: "",
+                      phone: "",
+                      userId: session?.user?.userId
+                    });
+                    setIsEditingAddress(false);
+                    setSelectedAddress(null);
+                    setAddressMode('new');
+                    setHasSelectedExistingAddress(false);
+                    setJustSavedAddress(false);
+                  }}
+                >
+                  <i className="fas fa-plus me-2"></i>
+                  Шинэ хаяг оруулах
+                </button>
+                {/* <small className="text-muted d-block mt-1">Шинэ хаягийн мэдээлэл оруулна уу</small> */}
+              </div>
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-12">
+              <div className="form-floating my-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="checkout_phone"
+                  placeholder="Утасны дугаар *"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                />
+                <label htmlFor="checkout_phone">Утасны дугаар *</label>
               </div>
             </div>
             <div className="col-md-12">
@@ -116,27 +169,78 @@ export default function Checkout() {
                   type="text"
                   className="form-control"
                   id="checkout_street_address"
-                  placeholder="Street Address *"
+                  placeholder="Гудамж, байрны хаяг *"
+                  value={formData.addressLine1}
+                  onChange={(e) => setFormData({...formData, addressLine1: e.target.value})}
                 />
-                <label htmlFor="checkout_company_name">Street Address *</label>
+                <label htmlFor="checkout_street_address">Гудамж, байрны хаяг *</label>
               </div>
               <div className="form-floating mt-3 mb-3">
                 <input
                   type="text"
                   className="form-control"
                   id="checkout_street_address_2"
+                  placeholder="Нэмэлт мэдээлэл (Хаягийн талаар өөр бусад мэдээлэл оруулах боломжтой)"
+                  value={formData.addressLine2}
+                  onChange={(e) => setFormData({...formData, addressLine2: e.target.value})}
                 />
+                <label htmlFor="checkout_street_address_2">Нэмэлт мэдээлэл (Хаягийн талаар өөр бусад мэдээлэл оруулах боломжтой)</label>
               </div>
             </div>
             <div className="col-md-12">
               <div className="form-floating my-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="checkout_city"
-                  placeholder="Town / City *"
-                />
-                <label htmlFor="checkout_city">Town / City *</label>
+                <div className={`form-label-fixed hover-container ${
+                  showProvinceDropdown ? "js-content_visible" : ""
+                }`}>
+                  <label htmlFor="checkout_city" className="form-label">
+                    Аймаг / Хот *
+                  </label>
+                  <div className="js-hover__open">
+                    <input
+                      type="text"
+                      className="form-control form-control-lg search-field__actor search-field__arrow-down"
+                      id="checkout_city"
+                      value={formData.city}
+                      readOnly
+                      placeholder="Аймаг эсвэл хот сонгоно уу..."
+                      onClick={() => setShowProvinceDropdown((prev) => !prev)}
+                    />
+                  </div>
+                  {showProvinceDropdown && (
+                    <div className="filters-container js-hidden-content mt-2">
+                      <div className="search-field__input-wrapper">
+                        <input
+                          type="text"
+                          className="search-field__input form-control form-control-sm bg-lighter border-lighter"
+                          placeholder="Хайх..."
+                          onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <ul className="search-suggestion list-unstyled">
+                        {mongolianProvinces
+                          .filter((province) =>
+                            province.toLowerCase().includes(searchQuery.toLowerCase())
+                          )
+                          .map((province, i) => (
+                            <li
+                              onClick={() => {
+                                setFormData({...formData, city: province});
+                                setShowProvinceDropdown(false);
+                                setSearchQuery("");
+                              }}
+                              key={i}
+                              className="search-suggestion__item js-search-select"
+                              style={{ cursor: 'pointer', padding: '8px 12px' }}
+                            >
+                              {province}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="col-md-12">
@@ -145,92 +249,121 @@ export default function Checkout() {
                   type="text"
                   className="form-control"
                   id="checkout_zipcode"
-                  placeholder="Postcode / ZIP *"
+                  placeholder="Шуудангийн код *"
+                  value={formData.postalCode}
+                  onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                 />
-                <label htmlFor="checkout_zipcode">Postcode / ZIP *</label>
+                <label htmlFor="checkout_zipcode">Шуудангийн код *</label>
               </div>
             </div>
-            <div className="col-md-12">
+            {/* <div className="col-md-12">
               <div className="form-floating my-3">
                 <input
                   type="text"
                   className="form-control"
                   id="checkout_province"
-                  placeholder="Province *"
+                  placeholder="Дүүрэг *"
+                  value={formData.province}
+                  onChange={(e) => setFormData({...formData, province: e.target.value})}
                 />
-                <label htmlFor="checkout_province">Province *</label>
+                <label htmlFor="checkout_province">Дүүрэг *</label>
               </div>
-            </div>
-            <div className="col-md-12">
-              <div className="form-floating my-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="checkout_phone"
-                  placeholder="Phone *"
-                />
-                <label htmlFor="checkout_phone">Phone *</label>
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="form-floating my-3">
-                <input
-                  type="email"
-                  className="form-control"
-                  id="checkout_email"
-                  placeholder="Your Mail *"
-                />
-                <label htmlFor="checkout_email">Your Mail *</label>
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="form-check mt-3">
-                <input
-                  className="form-check-input form-check-input_fill"
-                  type="checkbox"
-                  defaultValue=""
-                  id="create_account"
-                />
-                <label className="form-check-label" htmlFor="create_account">
-                  CREATE AN ACCOUNT?
-                </label>
-              </div>
-              <div className="form-check mb-3">
-                <input
-                  className="form-check-input form-check-input_fill"
-                  type="checkbox"
-                  defaultValue=""
-                  id="ship_different_address"
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="ship_different_address"
+            </div> */}
+          
+            {/* Save Address Button */}
+            {session?.user && (
+              <div className="col-md-12">
+                <button
+                  type="button"
+                  className="btn btn-outline-success mt-3"
+                  disabled={isSavingAddress}
+                  onClick={async () => {
+                    try {
+                      setIsSavingAddress(true);
+                      
+                      // Check if user is properly authenticated
+                      if (!session?.user?.userId) {
+                        alert('Та эхлээд нэвтэрнэ үү!');
+                        return;
+                      }
+
+                      // Validate required fields
+                      if (!formData.addressLine1 || !formData.city || !formData.phone) {
+                        alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
+                        return;
+                      }
+
+                      if (isEditingAddress && selectedAddress) {
+                        // Update existing address
+                        await updateAddress(selectedAddress.id, {
+                          addressLine1: formData.addressLine1,
+                          addressLine2: formData.addressLine2,
+                          city: formData.city,
+                          postalCode: formData.postalCode,
+                          country: formData.country,
+                          mobile: formData.phone
+                        });
+                      } else {
+                        // Create new address
+                        const newAddress = await createAddress({
+                          addressLine1: formData.addressLine1,
+                          addressLine2: formData.addressLine2,
+                          city: formData.city,
+                          postalCode: formData.postalCode,
+                          country: formData.country,
+                          mobile: formData.phone
+                        });
+                        
+                        // After creating new address, select it and switch to existing mode
+                        if (newAddress) {
+                          setSelectedAddress(newAddress);
+                          setAddressMode('existing');
+                          setHasSelectedExistingAddress(true);
+                          setIsEditingAddress(true);
+                          setJustSavedAddress(true);
+                          
+                          // Reset the flag after 3 seconds
+                          setTimeout(() => {
+                            setJustSavedAddress(false);
+                          }, 3000);
+                        }
+                      }
+                      alert('Хаяг амжилттай хадгалагдлаа!');
+                    } catch (error) {
+                      console.error('Address save error:', error);
+                      if (error.message.includes('not authenticated') || error.message.includes('Authentication required')) {
+                        alert('Та эхлээд нэвтэрнэ үү!');
+                      } else {
+                        alert('Алдаа гарлаа: ' + error.message);
+                      }
+                    } finally {
+                      setIsSavingAddress(false);
+                    }
+                  }}
                 >
-                  SHIP TO A DIFFERENT ADDRESS?
-                </label>
+                  {isSavingAddress ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Хадгалж байна...
+                    </>
+                  ) : (
+                    isEditingAddress ? 'Хаяг шинэчлэх' : 'Хаяг хадгалах'
+                  )}
+                </button>
               </div>
-            </div>
+            )}
           </div>
-          <div className="col-md-12">
-            <div className="mt-3">
-              <textarea
-                className="form-control form-control_gray"
-                placeholder="Order Notes (optional)"
-                cols="30"
-                rows="8"
-              ></textarea>
-            </div>
-          </div>
+         
         </div>
         <div className="checkout__totals-wrapper">
           <div className="sticky-content">
             <div className="checkout__totals">
-              <h3>Your Order</h3>
+              <h3>Таны захиалга</h3>
               <table className="checkout-cart-items">
                 <thead>
                   <tr>
-                    <th>PRODUCT</th>
-                    <th>SUBTOTAL</th>
+                    <th>БҮТЭЭГДЭХҮҮН</th>
+                    <th>НИЙТ</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -247,19 +380,19 @@ export default function Checkout() {
               <table className="checkout-totals">
                 <tbody>
                   <tr>
-                    <th>SUBTOTAL</th>
+                    <th>НИЙТ</th>
                     <td>${totalPrice}</td>
                   </tr>
                   <tr>
-                    <th>SHIPPING</th>
-                    <td>Free shipping</td>
+                    <th>ХҮРГЭЛТ</th>
+                    <td>Үнэгүй</td>
                   </tr>
                   <tr>
-                    <th>VAT</th>
+                    <th>НӨАТ</th>
                     <td>${totalPrice && 19}</td>
                   </tr>
                   <tr>
-                    <th>TOTAL</th>
+                    <th>НИЙТ ДҮН</th>
                     <td>${totalPrice && totalPrice + 19}</td>
                   </tr>
                 </tbody>
@@ -278,11 +411,10 @@ export default function Checkout() {
                   className="form-check-label"
                   htmlFor="checkout_payment_method_1"
                 >
-                  Direct bank transfer
+                  Банкны шилжүүлэг
                   <span className="option-detail d-block">
-                    Make your payment directly into our bank account. Please use
-                    your Order ID as the payment reference.Your order will not
-                    be shipped until the funds have cleared in our account.
+                    Банкны данс руу шууд төлбөр хийх. Захиалгын дугаараа төлбөрийн утгаар ашиглана уу. 
+                    Төлбөр бүрэн төлөгдөх хүртэл захиалга илгээгдэхгүй.
                   </span>
                 </label>
               </div>
@@ -297,12 +429,9 @@ export default function Checkout() {
                   className="form-check-label"
                   htmlFor="checkout_payment_method_2"
                 >
-                  Check payments
+                  Чекээр төлөх
                   <span className="option-detail d-block">
-                    Phasellus sed volutpat orci. Fusce eget lore mauris vehicula
-                    elementum gravida nec dui. Aenean aliquam varius ipsum, non
-                    ultricies tellus sodales eu. Donec dignissim viverra nunc,
-                    ut aliquet magna posuere eget.
+                    Чекээр төлбөр хийх боломжтой. Чекээ хүлээн авсны дараа захиалга боловсруулагдана.
                   </span>
                 </label>
               </div>
@@ -317,12 +446,10 @@ export default function Checkout() {
                   className="form-check-label"
                   htmlFor="checkout_payment_method_3"
                 >
-                  Cash on delivery
+                  Хүргэлтийн үед төлөх
                   <span className="option-detail d-block">
-                    Phasellus sed volutpat orci. Fusce eget lore mauris vehicula
-                    elementum gravida nec dui. Aenean aliquam varius ipsum, non
-                    ultricies tellus sodales eu. Donec dignissim viverra nunc,
-                    ut aliquet magna posuere eget.
+                    Бүтээгдэхүүн хүрэх үед бэлнээр төлбөр хийх боломжтой. 
+                    Хүргэлтийн үед мөнгө төлөх шаардлагатай.
                   </span>
                 </label>
               </div>
@@ -339,29 +466,166 @@ export default function Checkout() {
                 >
                   Paypal
                   <span className="option-detail d-block">
-                    Phasellus sed volutpat orci. Fusce eget lore mauris vehicula
-                    elementum gravida nec dui. Aenean aliquam varius ipsum, non
-                    ultricies tellus sodales eu. Donec dignissim viverra nunc,
-                    ut aliquet magna posuere eget.
+                    Paypal-аар аюулгүй төлбөр хийх боломжтой. 
+                    Олон улсын төлбөрийн систем ашиглана.
                   </span>
                 </label>
               </div>
               <div className="policy-text">
-                Your personal data will be used to process your order, support
-                your experience throughout this website, and for other purposes
-                described in our
+                Таны хувийн мэдээллийг захиалга боловсруулах, вэбсайтын туршлагыг дэмжих, 
+                болон бусад зорилгоор ашиглана. Дэлгэрэнгүй мэдээллийг
                 <Link href="/terms" target="_blank">
-                  privacy policy
+                  нууцлалын бодлогоос
                 </Link>
-                .
+                уншина уу.
               </div>
             </div>
             <button className="btn btn-primary btn-checkout">
-              PLACE ORDER
+              ЗАХИАЛГА ХИЙХ
             </button>
           </div>
         </div>
       </div>
     </form>
-  );
-}
+
+     {/* Address Selection Modal */}
+     {showAddressModal && (
+       <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+         <div className="modal-dialog modal-lg" style={{ 
+           maxHeight: '90vh', 
+           margin: '1.75rem auto',
+           maxWidth: '600px'
+         }}>
+           <div className="modal-content" style={{ 
+             maxHeight: '90vh',
+             borderRadius: '8px'
+           }}>
+             <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
+               <h5 className="modal-title">Хаяг сонгох</h5>
+               <button
+                 type="button"
+                 className="btn-close"
+                 onClick={() => setShowAddressModal(false)}
+               ></button>
+             </div>
+             <div className="modal-body" style={{ 
+               maxHeight: '80vh', 
+               overflowY: 'auto',
+               padding: '1rem'
+             }}>
+               {addressesLoading ? (
+                 <div className="text-center py-3">
+                   <div className="spinner-border" role="status">
+                     <span className="visually-hidden">Уншиж байна...</span>
+                   </div>
+                 </div>
+               ) : addresses.length > 0 ? (
+                 <div className="address-list">
+                   {addresses.map((address) => (
+                     <div 
+                       key={address.id} 
+                       className={`address-item p-3 border rounded mb-2 cursor-pointer transition-all ${
+                         selectedAddress?.id === address.id ? 'border-primary bg-light' : 'border-light'
+                       }`}
+                       onClick={() => setSelectedAddress(address)}
+                       style={{ 
+                         cursor: 'pointer',
+                         transition: 'all 0.2s ease'
+                       }}
+                       onMouseEnter={(e) => {
+                         if (selectedAddress?.id !== address.id) {
+                           e.target.style.backgroundColor = '#f8f9fa';
+                         }
+                       }}
+                       onMouseLeave={(e) => {
+                         if (selectedAddress?.id !== address.id) {
+                           e.target.style.backgroundColor = '';
+                         }
+                       }}
+                     >
+                       <div className="d-flex justify-content-between align-items-start">
+                         <div style={{ flex: 1 }}>
+                           <strong className="d-block mb-1">{address.addressLine1}</strong>
+                           {address.addressLine2 && (
+                             <div className="text-muted small mb-1">{address.addressLine2}</div>
+                           )}
+                           <div className="text-muted small mb-1">
+                             {address.city}, {address.postalCode}
+                           </div>
+                           <div className="text-muted small mb-1">{address.country}</div>
+                           <div className="text-muted small">Утас: {address.mobile}</div>
+                         </div>
+                         <div className="form-check ms-3">
+                           <input
+                             className="form-check-input"
+                             type="radio"
+                             name="selectedAddress"
+                             id={`address-${address.id}`}
+                             checked={selectedAddress?.id === address.id}
+                             onChange={() => setSelectedAddress(address)}
+                           />
+                         </div>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <div className="text-center py-4 text-muted">
+                   <i className="fas fa-map-marker-alt fa-2x mb-3 text-muted"></i>
+                   <div>Хадгалсан хаяг байхгүй байна</div>
+                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small>
+                 </div>
+               )}
+             </div>
+             <div className="modal-footer" style={{ borderTop: '1px solid #dee2e6' }}>
+               <button
+                 type="button"
+                 className="btn btn-secondary"
+                 onClick={() => setShowAddressModal(false)}
+               >
+                 Хаах
+               </button>
+               {selectedAddress && (
+                 <button
+                   type="button"
+                   className="btn btn-primary"
+                   onClick={() => {
+                     // Fill form with selected address
+                     setFormData({
+                       firstName: selectedAddress.firstName || "",
+                       lastName: selectedAddress.lastName || "",
+                       companyName: selectedAddress.companyName || "",
+                       country: selectedAddress.country,
+                       addressLine1: selectedAddress.addressLine1,
+                       addressLine2: selectedAddress.addressLine2 || "",
+                       city: selectedAddress.city,
+                       postalCode: selectedAddress.postalCode,
+                       province: selectedAddress.province || "",
+                       phone: selectedAddress.mobile,
+                       email: formData.email
+                     });
+                     setIsEditingAddress(true);
+                     setAddressMode('existing');
+                     setHasSelectedExistingAddress(true);
+                     setShowAddressModal(false);
+                   }}
+                 >
+                   Энэ хаягийг ашиглах
+                 </button>
+               )}
+             </div>
+           </div>
+         </div>
+       </div>
+     )}
+
+     {/* Modal Backdrop */}
+     {showAddressModal && (
+       <div 
+         className="modal-backdrop fade show" 
+         onClick={() => setShowAddressModal(false)}
+       ></div>
+     )}
+     </>
+   );
+ }

@@ -115,13 +115,13 @@ export default function SearchPopup() {
     setSearchResults([]);
   };
   return (
-                <div
-         ref={containerRef}
-         className={`header-tools__item hover-container ${
-           isPopupOpen ? "js-content_visible" : ""
-         }`}
+    <div
+      ref={containerRef}
+      className={`header-tools__item hover-container ${
+        isPopupOpen ? "js-content_visible" : ""
+      }`}
          style={{ position: 'relative', overflow: 'visible' }}
-       >
+    >
       <div className="js-hover__open position-relative">
         <a
           onClick={() => {
@@ -161,10 +161,10 @@ export default function SearchPopup() {
          overflowY: 'auto',
 
        }}>
-         <form
+        <form
            onSubmit={handleSearchSubmit}
            className="search-field container-fluid px-3"
-         >
+        >
           <p className="text-uppercase text-secondary fw-medium mb-4">
             Юу хайж байна вэ?
           </p>
@@ -192,38 +192,38 @@ export default function SearchPopup() {
               </svg>
             </button>
             {searchQuery && (
-              <button
-                className="btn-icon btn-close-lg search-popup__reset"
+            <button
+              className="btn-icon btn-close-lg search-popup__reset"
                 type="button"
                 onClick={() => {
                   setSearchQuery("");
                   setSearchResults([]);
                   searchInputRef.current?.focus();
                 }}
-              ></button>
+            ></button>
             )}
           </div>
 
-                     <div className="search-popup__results">
+          <div className="search-popup__results">
              {/* Recent Searches */}
              {!searchQuery && recentSearches.length > 0 && (
                <div className="row">
                  <div className="col-md-8">
                    {/* Quicklinks when no search */}
-                   <div className="sub-menu search-suggestion">
+            <div className="sub-menu search-suggestion">
                      <h6 className="sub-menu__title fs-base">Шуурхай холбоосууд</h6>
-                     <ul className="sub-menu__list list-unstyled">
-                       <li className="sub-menu__item">
+              <ul className="sub-menu__list list-unstyled">
+                <li className="sub-menu__item">
                          <Link href="/shop-4" className="menu-link menu-link_us-s">
                            Шинэ бүтээгдэхүүн
-                         </Link>
-                       </li>
-                       <li className="sub-menu__item">
+                  </Link>
+                </li>
+                <li className="sub-menu__item">
                          <Link href="/shop-4" className="menu-link menu-link_us-s">
                            Хямдралтай
                          </Link>
-                       </li>
-                       <li className="sub-menu__item">
+                </li>
+                <li className="sub-menu__item">
                          <Link href="/shop-4" className="menu-link menu-link_us-s">
                            Хамгийн их зарагдсан
                          </Link>
@@ -360,20 +360,20 @@ export default function SearchPopup() {
                    <li className="sub-menu__item">
                      <Link href="/shop-4" className="menu-link menu-link_us-s">
                        Шинэ бүтээгдэхүүн
-                     </Link>
-                   </li>
-                   <li className="sub-menu__item">
+                  </Link>
+                </li>
+                <li className="sub-menu__item">
                      <Link href="/shop-4" className="menu-link menu-link_us-s">
                        Хямдралтай
                      </Link>
-                   </li>
-                   <li className="sub-menu__item">
+                </li>
+                <li className="sub-menu__item">
                      <Link href="/shop-4" className="menu-link menu-link_us-s">
                        Хамгийн их зарагдсан
                      </Link>
-                   </li>
-                 </ul>
-               </div>
+                </li>
+              </ul>
+            </div>
              )}
           </div>
         </form>
