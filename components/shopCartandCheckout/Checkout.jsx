@@ -39,6 +39,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useUserAddresses } from "@/hooks/useUserAddresses";
 import { useSession } from "next-auth/react";
+import api from "@/lib/api";
 
 export default function Checkout() {
   const { cartProducts, totalPrice } = useContextElement();
@@ -55,6 +56,9 @@ export default function Checkout() {
   const [addressMode, setAddressMode] = useState('new'); // 'new' or 'existing'
   const [hasSelectedExistingAddress, setHasSelectedExistingAddress] = useState(false);
   const [justSavedAddress, setJustSavedAddress] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('QPAY');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentData, setPaymentData] = useState(null);
   
   // Form states
   const [formData, setFormData] = useState({
@@ -413,7 +417,7 @@ export default function Checkout() {
                     htmlFor="checkout_payment_method_1"
                     style={{ cursor: 'pointer' }}
                   >
-                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center position-relative" style={{ 
+                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center" style={{ 
                       width: '50px', 
                       height: '50px', 
                       backgroundColor: '#fff',
@@ -431,7 +435,8 @@ export default function Checkout() {
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_1"
-                      defaultChecked
+                      checked={selectedPaymentMethod === 'QPAY'}
+                      onChange={() => setSelectedPaymentMethod('QPAY')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -477,6 +482,8 @@ export default function Checkout() {
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_2"
+                      checked={selectedPaymentMethod === 'QPAY_QR'}
+                      onChange={() => setSelectedPaymentMethod('QPAY_QR')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -522,6 +529,8 @@ export default function Checkout() {
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_3"
+                      checked={selectedPaymentMethod === 'STOREPAY'}
+                      onChange={() => setSelectedPaymentMethod('STOREPAY')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -567,6 +576,8 @@ export default function Checkout() {
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_4"
+                      checked={selectedPaymentMethod === 'STOREPAY'}
+                      onChange={() => setSelectedPaymentMethod('STOREPAY')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -585,8 +596,98 @@ export default function Checkout() {
                 уншина уу.
               </div>
             </div>
-            <button className="btn btn-primary btn-checkout">
-              ЗАХИАЛГА ХИЙХ
+            <button 
+              className="btn btn-primary btn-checkout"
+              disabled={isProcessingPayment}
+              onClick={async () => {
+                try {
+                  setIsProcessingPayment(true);
+                  
+                  // Validate required fields
+                  if (!formData.addressLine1 || !formData.city || !formData.phone) {
+                    alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
+                    return;
+                  }
+
+                  // Create order with payment
+                  const orderData = {
+                    items: cartProducts.map(item => ({
+                      productId: item.id,
+                      quantity: item.quantity
+                    })),
+                    provider: selectedPaymentMethod === 'QPAY_QR' ? 'QPAY' : 
+                             selectedPaymentMethod === 'STOREPAY' ? 'STOREPAY' : 'QPAY',
+                    shippingAddress: {
+                      addressLine1: formData.addressLine1,
+                      addressLine2: formData.addressLine2,
+                      city: formData.city,
+                      postalCode: formData.postalCode,
+                      country: formData.country,
+                      mobile: formData.phone
+                    }
+                  };
+
+                  console.log('Creating order with payment:', orderData);
+
+                  // First create order, then handle payment separately
+                  const orderResponse = await api.orders.createSimple({
+                    items: orderData.items,
+                    shippingAddress: orderData.shippingAddress
+                  });
+                  
+                  console.log('Order creation response:', orderResponse);
+                  
+                  if (orderResponse.success) {
+                    // Now create payment for the order
+                    try {
+                      const paymentResponse = await api.payments.create({
+                        orderId: orderResponse.data.order.id,
+                        provider: orderData.provider
+                      });
+                      
+                      console.log('Payment creation response:', paymentResponse);
+                      
+                      if (paymentResponse.success) {
+                        setPaymentData(paymentResponse.data);
+                        
+                        // Handle different payment methods
+                        if (selectedPaymentMethod === 'QPAY_QR' && paymentResponse.data.qrImage) {
+                          // Show QR code modal
+                          alert('QR код амжилттай үүслээ! QR кодыг уншуулж төлбөр хийгнэ үү.');
+                          console.log('QR Image:', paymentResponse.data.qrImage);
+                        } else if (paymentResponse.data.paymentUrl) {
+                          // Redirect to payment URL
+                          window.open(paymentResponse.data.paymentUrl, '_blank');
+                        }
+                        
+                        alert('Захиалга амжилттай үүслээ! Төлбөр хийх хуудас руу шилжиж байна.');
+                      }
+                    } catch (paymentError) {
+                      console.error('Payment creation error:', paymentError);
+                      alert('Захиалга үүслээ, гэхдээ төлбөр үүсгэхэд алдаа гарлаа: ' + paymentError.message);
+                    }
+                  }
+                } catch (error) {
+                  console.error('Payment error details:', {
+                    message: error.message,
+                    status: error.status,
+                    response: error.response,
+                    stack: error.stack
+                  });
+                  alert('Алдаа гарлаа: ' + (error.message || 'Төлбөр хийхэд алдаа гарлаа'));
+                } finally {
+                  setIsProcessingPayment(false);
+                }
+              }}
+            >
+              {isProcessingPayment ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Төлбөр хийж байна...
+                </>
+              ) : (
+                'ЗАХИАЛГА ХИЙХ'
+              )}
             </button>
           </div>
         </div>
@@ -715,6 +816,69 @@ export default function Checkout() {
        <div 
          className="modal-backdrop fade show" 
          onClick={() => setShowAddressModal(false)}
+       ></div>
+     )}
+
+     {/* QR Code Payment Modal */}
+     {paymentData && selectedPaymentMethod === 'QPAY_QR' && paymentData.qrImage && (
+       <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+         <div className="modal-dialog modal-sm">
+           <div className="modal-content">
+             <div className="modal-header">
+               <h5 className="modal-title">QR Кодоор төлөх</h5>
+               <button
+                 type="button"
+                 className="btn-close"
+                 onClick={() => setPaymentData(null)}
+               ></button>
+             </div>
+             <div className="modal-body text-center">
+               <div className="mb-3">
+                 <strong>Төлбөрийн дүн: {paymentData.amount} {paymentData.currency}</strong>
+               </div>
+               <div className="mb-3">
+                 <img 
+                   src={paymentData.qrImage} 
+                   alt="QR Code" 
+                   style={{ maxWidth: '200px', height: 'auto' }}
+                 />
+               </div>
+               <div className="mb-3">
+                 <small className="text-muted">
+                   QPay апп-аа нээж QR кодыг уншуулна уу
+                 </small>
+               </div>
+               <div className="d-grid gap-2">
+                 <button
+                   type="button"
+                   className="btn btn-primary"
+                   onClick={() => {
+                     if (paymentData.paymentUrl) {
+                       window.open(paymentData.paymentUrl, '_blank');
+                     }
+                   }}
+                 >
+                   Веб хуудас руу орох
+                 </button>
+                 <button
+                   type="button"
+                   className="btn btn-outline-secondary"
+                   onClick={() => setPaymentData(null)}
+                 >
+                   Хаах
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     )}
+
+     {/* QR Modal Backdrop */}
+     {paymentData && selectedPaymentMethod === 'QPAY_QR' && paymentData.qrImage && (
+       <div 
+         className="modal-backdrop fade show" 
+         onClick={() => setPaymentData(null)}
        ></div>
      )}
      </>

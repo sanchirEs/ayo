@@ -201,7 +201,10 @@ export default function Shop4({
       const list =
         Array.isArray(payload?.data) ? payload.data :
         Array.isArray(payload?.products) ? payload.products :
-        Array.isArray(payload) ? payload : [];
+        Array.isArray(payload) ? payload : 
+        Array.isArray(res?.data) ? res.data :
+        Array.isArray(res?.products) ? res.products :
+        Array.isArray(res) ? res : [];
 
       const pg = payload?.pagination || res?.pagination || {
         total: list.length,
@@ -501,7 +504,15 @@ export default function Shop4({
               </div>
             </div>
           ) : products.length === 0 ? (
-            <div className="text-secondary p-3">No products.</div>
+            <div className="col-12 text-center py-5">
+              <div className="d-flex flex-column align-items-center">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-muted mb-3">
+                  <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+                <h5 className="text-muted mb-2">Бүтээгдэхүүн олдсонгүй</h5>
+                <p className="text-muted mb-0">Одоогоор энэ ангилалд бүтээгдэхүүн байхгүй байна.</p>
+              </div>
+            </div>
           ) : (
             products.map((p) => {
               const id = p.id;
