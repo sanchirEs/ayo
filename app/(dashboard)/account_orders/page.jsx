@@ -4,15 +4,15 @@ import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import React from "react";
 
 export const metadata = {
-  title: "Dashboard Account Orders || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Миний захиалгууд || Uomo eCommerce",
+  description: "Хэрэглэгчийн захиалгын жагсаалт",
 };
 export default function AccountOrderPage() {
   return (
     <>
       <div className="mb-4 pb-4"></div>
       <section className="my-account container">
-        <h2 className="page-title">Orders</h2>
+        <h2 className="page-title">Миний захиалгууд</h2>
         <div className="row">
           <DashboardSidebar />
           <AccountOrders />
