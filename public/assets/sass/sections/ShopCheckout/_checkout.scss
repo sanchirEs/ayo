@@ -17,7 +17,11 @@
 
   .checkout__totals-wrapper {
     .sticky-content {
-      padding-top: 3.125rem;
+      padding-top: 0; // Mobile default
+      
+      @media (min-width: 1196px) {
+        padding-top: 3.125rem; // Desktop
+      }
     }
 
     .btn-checkout {

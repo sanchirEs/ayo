@@ -275,7 +275,7 @@ export default function Checkout() {
               <div className="col-md-12">
                 <button
                   type="button"
-                  className="btn btn-outline-success mt-3"
+                  className="btn btn-primary btn-checkout mt-3"
                   disabled={isSavingAddress}
                   onClick={async () => {
                     try {
@@ -379,18 +379,19 @@ export default function Checkout() {
               </table>
               <table className="checkout-totals">
                 <tbody>
-                  <tr>
+                  {/* <tr>
                     <th>НИЙТ</th>
                     <td>${totalPrice}</td>
-                  </tr>
+                  </tr> */}
                   <tr>
                     <th>ХҮРГЭЛТ</th>
-                    <td>Үнэгүй</td>
+                    <td>${totalPrice && 19}</td>
+                    {/* <td>Үнэгүй</td> */}
                   </tr>
-                  <tr>
+                  {/* <tr>
                     <th>НӨАТ</th>
                     <td>${totalPrice && 19}</td>
-                  </tr>
+                  </tr> */}
                   <tr>
                     <th>НИЙТ ДҮН</th>
                     <td>${totalPrice && totalPrice + 19}</td>
@@ -399,82 +400,186 @@ export default function Checkout() {
               </table>
             </div>
             <div className="checkout__payment-methods">
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-input_fill"
-                  type="radio"
-                  name="checkout_payment_method"
-                  id="checkout_payment_method_1"
-                  defaultChecked
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkout_payment_method_1"
-                >
-                  Банкны шилжүүлэг
-                  <span className="option-detail d-block">
-                    Банкны данс руу шууд төлбөр хийх. Захиалгын дугаараа төлбөрийн утгаар ашиглана уу. 
-                    Төлбөр бүрэн төлөгдөх хүртэл захиалга илгээгдэхгүй.
-                  </span>
-                </label>
+              <h4 className="mb-3">Төлбөрийн нөхцөл</h4>
+              
+              <div className="payment-options">
+                <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}>
+                  <label
+                    className="form-check-label d-flex align-items-center w-100"
+                    htmlFor="checkout_payment_method_1"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center position-relative" style={{ 
+                      width: '50px', 
+                      height: '50px', 
+                      backgroundColor: '#fff',
+                      borderRadius: '8px',
+                      border: '1px solid #dee2e6'
+                    }}>
+                      <i className="fas fa-university fa-2x text-primary"></i>
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="fw-medium">Дансаар шилжүүлэх</div>
+                      <small className="text-muted">Банкны данс руу төлбөр хийх</small>
+                    </div>
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="checkout_payment_method"
+                      id="checkout_payment_method_1"
+                      defaultChecked
+                      style={{ 
+                        marginLeft: '10px',
+                        transform: 'scale(1.2)'
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}>
+                  <label
+                    className="form-check-label d-flex align-items-center w-100"
+                    htmlFor="checkout_payment_method_2"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center" style={{ 
+                      width: '50px', 
+                      height: '50px', 
+                      backgroundColor: '#fff',
+                      borderRadius: '8px',
+                      border: '1px solid #dee2e6'
+                    }}>
+                      <img 
+                        src="/assets/images/payment/qr.png" 
+                        alt="QR Code" 
+                        style={{ width: '35px', height: '35px', objectFit: 'contain' }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                      <i className="fas fa-qrcode fa-2x text-primary" style={{ display: 'none' }}></i>
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="fw-medium">QR Кодоор төлөх</div>
+                      <small className="text-muted">QR кодыг уншуулж төлбөр хийх</small>
+                    </div>
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="checkout_payment_method"
+                      id="checkout_payment_method_2"
+                      style={{ 
+                        marginLeft: '10px',
+                        transform: 'scale(1.2)'
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}>
+                  <label
+                    className="form-check-label d-flex align-items-center w-100"
+                    htmlFor="checkout_payment_method_3"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center" style={{ 
+                      width: '50px', 
+                      height: '50px', 
+                      backgroundColor: '#fff',
+                      borderRadius: '8px',
+                      border: '1px solid #dee2e6'
+                    }}>
+                      <img 
+                        src="/assets/images/payment/pocket.png" 
+                        alt="Pocket" 
+                        style={{ width: '35px', height: '35px', objectFit: 'contain' }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                      <i className="fas fa-wallet fa-2x text-primary" style={{ display: 'none' }}></i>
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="fw-medium">Pocket</div>
+                      <small className="text-muted">Pocket-аар төлбөр хийх</small>
+                    </div>
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="checkout_payment_method"
+                      id="checkout_payment_method_3"
+                      style={{ 
+                        marginLeft: '10px',
+                        transform: 'scale(1.2)'
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
+                  backgroundColor: '#f8f9fa',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}>
+                  <label
+                    className="form-check-label d-flex align-items-center w-100"
+                    htmlFor="checkout_payment_method_4"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center" style={{ 
+                      width: '50px', 
+                      height: '50px', 
+                      backgroundColor: '#fff',
+                      borderRadius: '8px',
+                      border: '1px solid #dee2e6'
+                    }}>
+                      <img 
+                        src="/assets/images/payment/storepay.png" 
+                        alt="Storepay" 
+                        style={{ width: '35px', height: '35px', objectFit: 'contain' }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                      <i className="fas fa-credit-card fa-2x text-primary" style={{ display: 'none' }}></i>
+                    </div>
+                    <div className="flex-grow-1">
+                      <div className="fw-medium">Storepay</div>
+                      <small className="text-muted">Storepay-аар төлбөр хийх</small>
+                    </div>
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="checkout_payment_method"
+                      id="checkout_payment_method_4"
+                      style={{ 
+                        marginLeft: '10px',
+                        transform: 'scale(1.2)'
+                      }}
+                    />
+                  </label>
+                </div>
               </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-input_fill"
-                  type="radio"
-                  name="checkout_payment_method"
-                  id="checkout_payment_method_2"
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkout_payment_method_2"
-                >
-                  Чекээр төлөх
-                  <span className="option-detail d-block">
-                    Чекээр төлбөр хийх боломжтой. Чекээ хүлээн авсны дараа захиалга боловсруулагдана.
-                  </span>
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-input_fill"
-                  type="radio"
-                  name="checkout_payment_method"
-                  id="checkout_payment_method_3"
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkout_payment_method_3"
-                >
-                  Хүргэлтийн үед төлөх
-                  <span className="option-detail d-block">
-                    Бүтээгдэхүүн хүрэх үед бэлнээр төлбөр хийх боломжтой. 
-                    Хүргэлтийн үед мөнгө төлөх шаардлагатай.
-                  </span>
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-input_fill"
-                  type="radio"
-                  name="checkout_payment_method"
-                  id="checkout_payment_method_4"
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="checkout_payment_method_4"
-                >
-                  Paypal
-                  <span className="option-detail d-block">
-                    Paypal-аар аюулгүй төлбөр хийх боломжтой. 
-                    Олон улсын төлбөрийн систем ашиглана.
-                  </span>
-                </label>
-              </div>
-              <div className="policy-text">
+
+              <div className="policy-text mt-3">
                 Таны хувийн мэдээллийг захиалга боловсруулах, вэбсайтын туршлагыг дэмжих, 
                 болон бусад зорилгоор ашиглана. Дэлгэрэнгүй мэдээллийг
-                <Link href="/terms" target="_blank">
+                <Link href="/terms" target="_blank" className="mx-1">
                   нууцлалын бодлогоос
                 </Link>
                 уншина уу.
@@ -525,23 +630,9 @@ export default function Checkout() {
                      <div 
                        key={address.id} 
                        className={`address-item p-3 border rounded mb-2 cursor-pointer transition-all ${
-                         selectedAddress?.id === address.id ? 'border-primary bg-light' : 'border-light'
+                         selectedAddress?.id === address.id ? 'border-primary' : 'border-light'
                        }`}
                        onClick={() => setSelectedAddress(address)}
-                       style={{ 
-                         cursor: 'pointer',
-                         transition: 'all 0.2s ease'
-                       }}
-                       onMouseEnter={(e) => {
-                         if (selectedAddress?.id !== address.id) {
-                           e.target.style.backgroundColor = '#f8f9fa';
-                         }
-                       }}
-                       onMouseLeave={(e) => {
-                         if (selectedAddress?.id !== address.id) {
-                           e.target.style.backgroundColor = '';
-                         }
-                       }}
                      >
                        <div className="d-flex justify-content-between align-items-start">
                          <div style={{ flex: 1 }}>
