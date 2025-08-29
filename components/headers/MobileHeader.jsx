@@ -66,7 +66,7 @@ export default function MobileHeader() {
         <div className="logo">
           <a href="/">
             <Image
-              src="/assets/images/logoAyo.png"
+              src="/assets/images/logoReal.png"
               width={112}
               height={28}
               alt="Uomo"

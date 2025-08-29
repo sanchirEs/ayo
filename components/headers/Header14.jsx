@@ -111,12 +111,12 @@ export default function Header14() {
                 </p>
               </div>
             </div>
-            <div className="logo">
+            <div className="">
               <Link href="/">
                 <Image
-                  src="/assets/images/logoAyo.png"
+                  src="/assets/images/logoReal.png"
                   width={112}
-                  height={28}
+                  height={35}
                   alt="Uomo"
                   className="logo__image"
                 />
