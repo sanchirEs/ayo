@@ -1,5 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
-import Header1 from "@/components/headers/Header14";
+
 import Cart from "@/components/shopCartandCheckout/Cart";
 import ChectoutSteps from "@/components/shopCartandCheckout/ChectoutSteps";
 import React from "react";

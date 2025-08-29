@@ -1,4 +1,5 @@
 import Shop4 from "@/components/shoplist/Shop4";
+import React, { Suspense } from "react";
 
 export const metadata = {
   title: "Shop 4 || Uomo eCommerce React Nextjs Template",
@@ -18,12 +19,14 @@ export default async function ShopPage4WithCategory({ params, searchParams }) {
   
   return (
     <>
-      <Shop4 
-        categoryId={categoryId}
-        initialPage={page}
-        initialLimit={limit}
-        initialSort={sort}
-      />
+      <Suspense fallback={<div>Loading shop...</div>}>
+        <Shop4 
+          categoryId={categoryId}
+          initialPage={page}
+          initialLimit={limit}
+          initialSort={sort}
+        />
+      </Suspense>
       <div className="mb-5 pb-xl-5"></div>
     </>
   );

@@ -1,8 +1,6 @@
 import Blog3 from "@/components/blogs/Blog3";
 import BlogDetails from "@/components/blogs/BlogDetails";
-import Footer1 from "@/components/footers/Footer1";
 
-import Header14 from "@/components/headers/Header14";
 import { allBlogs } from "@/data/blogs";
 import React from "react";
 

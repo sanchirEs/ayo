@@ -1,6 +1,4 @@
 import Brands from "@/components/common/brands/Brands";
-import Footer14 from "@/components/footers/Footer14";
-import Header14 from "@/components/headers/Header14";
 import Blogs from "@/components/homes/home-15/Blogs";
 import Categories from "@/components/homes/home-15/Categories";
 import Featured from "@/components/homes/home-15/NewProducts";

@@ -1,6 +1,3 @@
-import Footer1 from "@/components/footers/Footer1";
-
-import Header1 from "@/components/headers/Header14";
 
 import StoreLocator from "@/components/otherPages/StoreLocator";
 import React from "react";

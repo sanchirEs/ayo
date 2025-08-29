@@ -1,6 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
 
-import Header14 from "@/components/headers/Header14";
 import RelatedSlider from "@/components/singleProduct/RelatedSlider";
 import SingleProduct13 from "@/components/singleProduct/SingleProduct13";
 import React from "react";

@@ -3,7 +3,7 @@ import Pagination2 from "../common/Pagination2";
 import { blogs14, categories } from "@/data/blogs";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 export default function Blog3() {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
@@ -85,7 +85,9 @@ export default function Blog3() {
           ))}
         </div>
 
-        <Pagination2 />
+        <Suspense fallback={<div>Loading pagination...</div>}>
+          <Pagination2 />
+        </Suspense>
       </section>{" "}
     </>
   );

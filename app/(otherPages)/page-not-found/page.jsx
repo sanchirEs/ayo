@@ -1,6 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header14";
 import Notfound from "@/components/otherPages/Notfound";
 
 export const metadata = {

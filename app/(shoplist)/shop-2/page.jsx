@@ -1,5 +1,5 @@
 import Shop2 from "@/components/shoplist/Shop2";
-import React from "react";
+import React, { Suspense } from "react";
 
 export const metadata = {
   title: "Shop 2 || Uomo eCommerce React Nextjs Template",
@@ -8,7 +8,9 @@ export const metadata = {
 export default function ShopPage2() {
   return (
     <>
-      <Shop2 />
+      <Suspense fallback={<div>Loading shop...</div>}>
+        <Shop2 />
+      </Suspense>
     </>
   );
 }

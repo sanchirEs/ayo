@@ -1,4 +1,5 @@
 import Shop4 from "@/components/shoplist/Shop4";
+import React, { Suspense } from "react";
 
 export const metadata = {
   title: "Shop 4 || Uomo eCommerce React Nextjs Template",
@@ -7,7 +8,9 @@ export const metadata = {
 export default function ShopPage4() {
   return (
     <>
-      <Shop4 />
+      <Suspense fallback={<div>Loading shop...</div>}>
+        <Shop4 />
+      </Suspense>
     </>
   );
 }

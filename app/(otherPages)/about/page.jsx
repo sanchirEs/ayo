@@ -1,6 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header14";
 import About from "@/components/otherPages/about/About";
 import Clients from "@/components/otherPages/about/Clients";
 import Services from "@/components/otherPages/about/Services";

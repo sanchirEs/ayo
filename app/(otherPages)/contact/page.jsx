@@ -1,6 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header14";
 import Contact from "@/components/otherPages/Contact/Contact";
 import LocationMap from "@/components/otherPages/Contact/LocationMap";
 

@@ -1,6 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header14";
 import CommingSoon from "@/components/otherPages/CommingSoon";
 import Faq from "@/components/otherPages/Faq";
 import React from "react";

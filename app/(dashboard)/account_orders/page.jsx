@@ -1,7 +1,7 @@
 import Footer1 from "@/components/footers/Footer1";
 import AccountOrders from "@/components/otherPages/AccountOrders";
 import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
-import React from "react";
+import React, { Suspense } from "react";
 
 export const metadata = {
   title: "Миний захиалгууд || Uomo eCommerce",
@@ -15,7 +15,9 @@ export default function AccountOrderPage() {
         <h2 className="page-title">Миний захиалгууд</h2>
         <div className="row">
           <DashboardSidebar />
-          <AccountOrders />
+          <Suspense fallback={<div>Loading orders...</div>}>
+            <AccountOrders />
+          </Suspense>
         </div>
       </section>
       <div className="mb-5 pb-xl-5"></div>

@@ -1,5 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
-import Header14 from "@/components/headers/Header14";
+
 import OrderTrack from "@/components/shopCartandCheckout/OrderTrack";
 import React from "react";
 

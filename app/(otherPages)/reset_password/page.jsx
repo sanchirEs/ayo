@@ -1,6 +1,4 @@
-import Footer1 from "@/components/footers/Footer1";
 
-import Header1 from "@/components/headers/Header14";
 import ResetPassword from "@/components/otherPages/ResetPassword";
 import React from "react";
 
