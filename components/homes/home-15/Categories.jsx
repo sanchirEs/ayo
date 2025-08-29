@@ -94,7 +94,7 @@ export default function Categories() {
         Онцлох ангиллууд
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
-        The World's Premium Brands In One Destination.
+        Бүх захиалгыг нэг дороос
       </p>
 
       <div id="category_1" className="position-relative">

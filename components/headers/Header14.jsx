@@ -29,11 +29,24 @@ export default function Header14() {
         <div className="container d-flex container color-white align-items-center">
           <ul className="list-unstyled d-flex flex-1 gap-3 m-0">
             <li>
-              <a href="#" className="menu-link menu-link_us-s color-white">
-                Shipping
+              <a href="#" className="menu-link menu-link_us-s color-white d-flex align-items-center gap-2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="color-white"
+                >
+                  <path
+                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Салбаруудын байршил харах
               </a>
             </li>
-            <li>
+            {/* <li>
               <a href="#" className="menu-link menu-link_us-s color-white">
                 FAQ
               </a>
@@ -47,7 +60,7 @@ export default function Header14() {
               <a href="#" className="menu-link menu-link_us-s color-white">
                 Track Order
               </a>
-            </li>
+            </li> */}
           </ul>
           <ul className="social-links list-unstyled d-flex flex-wrap mx-auto mb-0">
             {socialLinks.map((link, index) => (
@@ -70,30 +83,7 @@ export default function Header14() {
             ))}
           </ul>
           <div className="heeader-top__right flex-1 d-flex gap-1 justify-content-end">
-            <select
-              className="form-select form-select-sm bg-transparent color-white"
-              name="store-language"
-            >
-              {languageOptions2.map((option, index) => (
-                <option key={index} value={option.value}>
-                  {option.text}
-                </option>
-              ))}
-            </select>
-            <select
-              className="form-select form-select-sm bg-transparent color-white"
-              name="store-currency"
-            >
-              {currencyOptions.map((option, index) => (
-                <option
-                  key={index}
-                  className="footer-select__option"
-                  value={option.value}
-                >
-                  {option.text}
-                </option>
-              ))}
-            </select>
+          Хүргэлтийн ачааллаас хамааран онлайн захиалга 24-48 цагт хүргэгдэж байна.
           </div>
         </div>
       </div>

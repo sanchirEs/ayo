@@ -81,19 +81,19 @@ export default function Featured() {
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Шинээр нэмэгдсэн бүтээгдэхүүнүүд
+      Шинээр нэмэгдсэн бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
-        The World's Premium Brands In One Destination.
+        Хамгийн сүүлийн үеийн шинэ бүтээгдэхүүнүүд
       </p>
 
       <div className="position-relative">
         <Swiper className="swiper-container js-swiper-slider" {...swiperOptions}>
-          {products.map((product) => (
-            <SwiperSlide key={product.id}>
-              <ProductCard product={product} />
-            </SwiperSlide>
-          ))}
+                        {products.map((product) => (
+                <SwiperSlide key={product.id}>
+                  <ProductCard product={product} showNewBadge={true} />
+                </SwiperSlide>
+              ))}
         </Swiper>
 
         <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">

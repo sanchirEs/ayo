@@ -91,10 +91,10 @@ export default function PopulerProducts() {
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Онцлох бүтээгдэхүүнүүд
+         Онцлох бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-2 pb-xl-2 text-secondary text-center">
-        The World's Premium Brands In One Destination.
+        Хамгийн их захиалагдсан бараанууд
       </p>
 
       <div className="tab-content pt-2" id="collections-tab-content">

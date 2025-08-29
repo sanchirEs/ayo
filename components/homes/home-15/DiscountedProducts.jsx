@@ -96,10 +96,10 @@ export default function DiscountedProducts() {
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Хямдралтай бүтээгдэхүүнүүд
+      Хямдралтай бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-2 pb-xl-2 text-secondary text-center">
-        Great Deals on Premium Products.
+        Чанартай бүтээгдэхүүнийг хямд үнээр
       </p>
 
       <div className="tab-content pt-2" id="collections-tab-content">

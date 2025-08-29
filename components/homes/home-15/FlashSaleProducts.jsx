@@ -175,10 +175,10 @@ export default function FlashSaleProducts() {
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Flash Sale
+       Flash Sale
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
-        Limited Time Offers - Don't Miss Out!
+        Хязгаарлагдмал хугацааны хямдрал - Амжиж захиалаарай!
       </p>
 
       <div className="position-relative">
@@ -234,17 +234,7 @@ export default function FlashSaleProducts() {
                       </svg>
                     </button>
 
-                    <button
-                      className="btn btn-square btn-hover-primary d-block border-1 text-uppercase js-quick-view"
-                      data-bs-toggle="modal"
-                      data-bs-target="#quickView"
-                      onClick={() => setQuickViewItem(p)}
-                      title="Quick view"
-                    >
-                      <svg className="d-inline-block" width="14" height="14" viewBox="0 0 18 18">
-                        <use href="#icon_view"></use>
-                      </svg>
-                    </button>
+                  
                   </div>
                 </div>
 

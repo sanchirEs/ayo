@@ -1,0 +1,479 @@
+/* Converse Brand Section Styles - Updated 2024 */
+.converse-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hero-style banner for desktop */
+.converse-brand-section .slideshow-bg {
+  position: relative;
+  height: 600px;
+  overflow: hidden;
+}
+
+.converse-brand-section .slideshow-bg__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.converse-brand-section .slideshow-text {
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 0;
+}
+
+.converse-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(220, 53, 69, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(220, 53, 69, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(220, 53, 69, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.converse-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+.converse-brand-section .container {
+  position: relative;
+  z-index: 3;
+}
+
+.converse-brand-logo {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.converse-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+.converse-carousel {
+  margin: 60px 0 40px 0;
+  position: relative;
+  z-index: 15;
+  padding-left: 100px; /* Зүүн талаас их зай */
+}
+
+.converse-product-card {
+  padding: 20px;
+  margin: 20px 0;
+}
+
+/* Swiper container-т зүүн талаас зай */
+.converse-carousel .swiper-container {
+  padding-left: 50px;
+}
+
+.converse-product-wrapper {
+  background: #ffffff !important;
+  border-radius: 15px !important;
+  padding: 25px !important;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3) !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid #e9ecef !important;
+  min-height: 450px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 15px 0;
+}
+
+.converse-product-wrapper:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2) !important;
+  border-color: #ff6b6b !important;
+}
+
+.converse-product-logo {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+}
+
+.converse-star-logo {
+  width: 45px;
+  height: 45px;
+  background: #495057;
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.converse-star-logo svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+
+.converse-discount-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #ff6b6b;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 10;
+  animation: pulse 2s infinite;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  min-width: 50px;
+  text-align: center;
+}
+
+.converse-product-image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.converse-product-img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+  max-height: 250px;
+}
+
+.converse-product-nav-arrow {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  width: 45px;
+  height: 45px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.converse-product-nav-arrow:hover {
+  background: #ff5252;
+  transform: scale(1.1);
+}
+
+.converse-product-nav-arrow svg {
+  fill: white;
+}
+
+.converse-countdown {
+  background: #ff6b6b;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.converse-product-info {
+  text-align: center;
+  margin-top: auto;
+}
+
+.converse-product-title {
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: #000;
+  line-height: 1.2;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.converse-product-title a {
+  color: #000;
+  text-decoration: none;
+}
+
+.converse-product-title a:hover {
+  color: #ff6b6b;
+}
+
+.converse-product-category {
+  color: #6c757d;
+  font-size: 13px;
+  margin-bottom: 12px;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.converse-price-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.converse-current-price {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ff4757;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.converse-original-price {
+  font-size: 15px;
+  color: #6c757d;
+  text-decoration: line-through;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.converse-carousel__prev,
+.converse-carousel__next {
+  width: 60px !important;
+  height: 60px !important;
+  background: #ff6b6b !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3) !important;
+  transition: all 0.3s ease !important;
+  z-index: 10 !important;
+  border: none !important;
+}
+
+/* Зүүн талын arrow-г зүүн талаас зай авч байрлуулах */
+.converse-carousel__prev {
+  left: 120px;
+}
+
+/* Баруун талын arrow-г баруун талаас зай авч байрлуулах */
+.converse-carousel__next {
+  right: 20px;
+}
+
+.converse-carousel__prev:hover,
+.converse-carousel__next:hover {
+  background: #ff5252;
+  transform: scale(1.1);
+}
+
+.converse-carousel__prev svg,
+.converse-carousel__next svg {
+  fill: white;
+}
+
+.converse-view-all {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.converse-view-all .btn {
+  background: #ffffff !important;
+  color: #333 !important;
+  border: 2px solid #333 !important;
+  padding: 15px 40px !important;
+  font-weight: 700 !important;
+  border-radius: 30px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+  font-size: 16px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.converse-view-all .btn:hover {
+  background: #333;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Mobile Banner Styles */
+.converse-mobile-banner {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  margin: 20px 0;
+}
+
+.converse-mobile-bg {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  background: white;
+  padding: 20px;
+}
+
+.converse-mobile-bg:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.converse-mobile-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .converse-logo-text {
+    font-size: 2rem;
+    letter-spacing: 4px;
+  }
+  
+  .converse-product-wrapper {
+    padding: 15px;
+  }
+  
+  .converse-carousel__prev,
+  .converse-carousel__next {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .converse-product-nav-arrow {
+    width: 35px;
+    height: 35px;
+    bottom: 10px;
+    left: 10px;
+  }
+  
+  .converse-product-nav-arrow svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Mobile дээр зай багасгах */
+  .converse-carousel {
+    padding-left: 20px;
+    margin: 30px 0 20px 0;
+  }
+  
+  .converse-carousel__prev {
+    left: 30px;
+  }
+  
+  .converse-carousel__next {
+    right: 10px;
+  }
+}
+
+/* Animation for discount badges */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Hover effects for product cards */
+.converse-product-wrapper:hover {
+  border-color: #dc3545;
+}
+
+/* Payment Method Section Styles */
+.payment-method-section {
+  padding: 60px 0;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.payment-method-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+
+.payment-method-image-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.payment-method-image-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.payment-method-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* Responsive Design for Payment Method */
+@media (max-width: 768px) {
+  .payment-method-section {
+    padding: 40px 0;
+  }
+  
+  .payment-method-image-container {
+    padding: 20px;
+    margin: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-method-image-container {
+    padding: 15px;
+    margin: 0 10px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

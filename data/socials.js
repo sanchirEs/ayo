@@ -23,12 +23,12 @@ export const socialLinks = [
     viewBox: "0 0 14 13",
     icon: "#icon_instagram",
   },
-  {
-    href: "#",
-    className: "svg-icon svg-icon_pinterest",
-    width: 14,
-    height: 15,
-    viewBox: "0 0 14 15",
-    icon: "#icon_pinterest",
-  },
+  // {
+  //   href: "#",
+  //   className: "svg-icon svg-icon_pinterest",
+  //   width: 14,
+  //   height: 15,
+  //   viewBox: "0 0 14 15",
+  //   icon: "#icon_pinterest",
+  // },
 ];

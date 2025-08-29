@@ -35,16 +35,19 @@ const mongolianProvinces = [
 ];
 
 import { useContextElement } from "@/context/Context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useUserAddresses } from "@/hooks/useUserAddresses";
 import { useSession } from "next-auth/react";
 import api from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function Checkout() {
-  const { cartProducts, totalPrice } = useContextElement();
+  const { cartProducts, totalPrice, clearCart } = useContextElement();
   const { data: session, status } = useSession();
   const { addresses, loading: addressesLoading, createAddress, updateAddress } = useUserAddresses();
+  const router = useRouter();
+  
   const [selectedRegion, setSelectedRegion] = useState("");
   const [idDDActive, setIdDDActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,7 +61,13 @@ export default function Checkout() {
   const [justSavedAddress, setJustSavedAddress] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('QPAY');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  
+  // Payment modal states
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState('PENDING');
+  const [statusCheckInterval, setStatusCheckInterval] = useState(null);
+
   
   // Form states
   const [formData, setFormData] = useState({
@@ -70,6 +79,332 @@ export default function Checkout() {
     phone: "",
     userId: session?.user?.userId
   });
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (statusCheckInterval) {
+        clearInterval(statusCheckInterval);
+      }
+    };
+  }, [statusCheckInterval]);
+
+  // Payment status monitoring
+  const startPaymentStatusMonitoring = (paymentId) => {
+    let checkCount = 0;
+    const maxChecks = 12; // 1 minute (12 * 5 seconds)
+    
+    const interval = setInterval(async () => {
+      try {
+        checkCount++;
+        console.log(`Checking payment status for: ${paymentId} (attempt ${checkCount}/${maxChecks})`);
+        
+        // First try to check with provider (more accurate)
+        try {
+          const checkResponse = await api.payments.checkWithProvider(paymentId);
+          
+          if (checkResponse.success && checkResponse.data) {
+            const payment = checkResponse.data;
+            const newStatus = payment.status;
+            console.log('Provider payment status updated:', newStatus);
+            console.log('Payment data:', payment);
+            
+            // Update payment data with new status
+            setPaymentData(prev => ({
+              ...prev,
+              status: newStatus
+            }));
+            
+            // If payment is completed, stop monitoring
+            if (newStatus === 'COMPLETED') {
+              clearInterval(interval);
+              setStatusCheckInterval(null);
+              setPaymentStatus('COMPLETED');
+              
+              // Show success message
+              alert('Төлбөр амжилттай төлөгдлөө!');
+              return;
+            } else if (newStatus === 'FAILED' || newStatus === 'CANCELLED') {
+              clearInterval(interval);
+              setStatusCheckInterval(null);
+              setPaymentStatus(newStatus);
+              return;
+            }
+          }
+        } catch (providerError) {
+          console.log('Provider check failed, trying local status check:', providerError.message);
+        }
+        
+        // Fallback to local status check
+        const response = await api.payments.getStatus(paymentId);
+        
+        if (response.success && response.data) {
+          const payment = response.data;
+          const newStatus = payment.status;
+          console.log('Local payment status updated:', newStatus);
+          console.log('Payment data:', payment);
+          
+          // Update payment data with new status
+          setPaymentData(prev => ({
+            ...prev,
+            status: newStatus
+          }));
+          
+          // If payment is completed, stop monitoring
+          if (newStatus === 'COMPLETED') {
+            clearInterval(interval);
+            setStatusCheckInterval(null);
+            setPaymentStatus('COMPLETED');
+            
+            // Show success message
+            alert('Төлбөр амжилттай төлөгдлөө!');
+          } else if (newStatus === 'FAILED' || newStatus === 'CANCELLED') {
+            clearInterval(interval);
+            setStatusCheckInterval(null);
+            setPaymentStatus(newStatus);
+          }
+        }
+        
+        // Stop monitoring after max attempts
+        if (checkCount >= maxChecks) {
+          console.log('Max payment status checks reached, stopping monitoring');
+          clearInterval(interval);
+          setStatusCheckInterval(null);
+        }
+      } catch (error) {
+        console.error('Payment status check error:', error);
+        
+        // If it's a 404 error, the payment might not exist yet, so continue monitoring
+        if (error.message && error.includes('404')) {
+          console.log('Payment not found yet, continuing to monitor...');
+        } else {
+          // For other errors, stop monitoring after a few attempts
+          console.error('Payment status check failed, stopping monitoring');
+          clearInterval(interval);
+          setStatusCheckInterval(null);
+        }
+      }
+    }, 5000); // Check every 5 seconds
+
+    setStatusCheckInterval(interval);
+  };
+
+  // Function to handle order creation and payment
+  const handleOrderAndPayment = async () => {
+    try {
+      setIsProcessingPayment(true);
+      
+      // Validate required fields
+      if (!formData.addressLine1 || !formData.city || !formData.phone) {
+        alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
+        return;
+      }
+
+      // Validate cart has items
+      if (!cartProducts || cartProducts.length === 0) {
+        alert('Сагсанд бараа байхгүй байна!');
+        return;
+      }
+
+      // Prepare order data
+      const orderData = {
+        items: cartProducts.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          ...(item.variantId && { variantId: item.variantId })
+        })),
+        provider: selectedPaymentMethod,
+        shippingAddress: {
+          addressLine1: formData.addressLine1,
+          addressLine2: formData.addressLine2,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country,
+          mobile: formData.phone
+        }
+      };
+
+      console.log('Creating order with payment:', orderData);
+
+      // Create order with integrated payment
+      const response = await api.orders.create(orderData);
+      
+      console.log('Order creation response:', response);
+      console.log('Response data:', response.data);
+      console.log('Payment data:', response.data?.payment);
+      console.log('QR Code in payment:', response.data?.payment?.qrCode);
+      console.log('QR Image in payment:', response.data?.payment?.qrImage);
+      console.log('Payment URL in payment:', response.data?.payment?.paymentUrl);
+      
+      if (response.success) {
+        const { order, payment } = response.data;
+        console.log('Order created with payment:', { order, payment });
+        
+        // Set payment data for modal
+        setPaymentData({
+          orderId: order.id,
+          paymentId: payment.paymentId,
+          paymentMethod: selectedPaymentMethod,
+          amount: payment.amount,
+          currency: payment.currency,
+          status: payment.status,
+          qrImage: payment.qrCode, // Backend returns qrCode, not qrImage
+          qrCode: payment.qrCode,
+          paymentUrl: payment.paymentUrl,
+          transactionId: payment.transactionId
+        });
+        
+        // Start monitoring payment status if it's pending
+        if (payment.status === 'PENDING' && payment.paymentId) {
+          startPaymentStatusMonitoring(payment.paymentId);
+        }
+        
+        // Show payment modal
+        setShowPaymentModal(true);
+        
+        // Clear cart after successful order
+        clearCart();
+      }
+    } catch (error) {
+      console.error('Order creation error:', error);
+      alert('Алдаа гарлаа: ' + (error.message || 'Захиалга үүсгэхэд алдаа гарлаа'));
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  // Function to handle payment completion
+  const handlePaymentComplete = () => {
+    setShowPaymentModal(false);
+    setPaymentData(null);
+    if (statusCheckInterval) {
+      clearInterval(statusCheckInterval);
+      setStatusCheckInterval(null);
+    }
+    
+    // Redirect to account orders page
+    router.push('/account_orders');
+  };
+
+  // Function to handle payment cancellation
+  const handlePaymentCancel = async () => {
+    if (paymentData?.paymentId && paymentData.status === 'PENDING') {
+      if (confirm('Та төлбөрийг цуцлахдаа итгэлтэй байна уу?')) {
+        try {
+          const response = await api.payments.cancel(paymentData.paymentId);
+          
+          if (response.success) {
+            // Update payment data with cancelled status
+            setPaymentData(prev => ({
+              ...prev,
+              status: 'CANCELLED'
+            }));
+            
+            // Stop monitoring
+            if (statusCheckInterval) {
+              clearInterval(statusCheckInterval);
+              setStatusCheckInterval(null);
+            }
+            
+            setPaymentStatus('CANCELLED');
+            alert('Төлбөр амжилттай цуцлагдлаа.');
+          } else {
+            alert('Төлбөр цуцлахад алдаа гарлаа');
+          }
+        } catch (error) {
+          console.error('Payment cancellation error:', error);
+          alert('Төлбөр цуцлахад алдаа гарлаа: ' + error.message);
+        }
+      }
+    } else {
+      // Just close modal if no payment to cancel
+      setShowPaymentModal(false);
+      setPaymentData(null);
+      if (statusCheckInterval) {
+        clearInterval(statusCheckInterval);
+        setStatusCheckInterval(null);
+      }
+    }
+  };
+
+  // Function to manually check payment status
+  const handleManualStatusCheck = async () => {
+    if (paymentData?.paymentId) {
+      try {
+        // First try to check with provider
+        const checkResponse = await api.payments.checkWithProvider(paymentData.paymentId);
+        
+        if (checkResponse.success && checkResponse.data) {
+          const payment = checkResponse.data;
+          const newStatus = payment.status;
+          
+          // Update payment data with new status
+          setPaymentData(prev => ({
+            ...prev,
+            status: newStatus
+          }));
+          
+          // Show status message
+          const statusText = {
+            'PENDING': 'Хүлээгдэж буй',
+            'COMPLETED': 'Амжилттай',
+            'FAILED': 'Амжилтгүй',
+            'CANCELLED': 'Цуцлагдсан'
+          };
+          
+          alert(`Төлбөрийн статус: ${statusText[newStatus] || newStatus}`);
+          
+          // If payment is completed, stop monitoring
+          if (newStatus === 'COMPLETED') {
+            if (statusCheckInterval) {
+              clearInterval(statusCheckInterval);
+              setStatusCheckInterval(null);
+            }
+            setPaymentStatus('COMPLETED');
+          }
+        } else {
+          // Fallback to local status check
+          const response = await api.payments.getStatus(paymentData.paymentId);
+          
+          if (response.success && response.data) {
+            const payment = response.data;
+            const newStatus = payment.status;
+            
+            // Update payment data with new status
+            setPaymentData(prev => ({
+              ...prev,
+              status: newStatus
+            }));
+            
+            // Show status message
+            const statusText = {
+              'PENDING': 'Хүлээгдэж буй',
+              'COMPLETED': 'Амжилттай',
+              'FAILED': 'Амжилтгүй',
+              'CANCELLED': 'Цуцлагдсан'
+            };
+            
+            alert(`Төлбөрийн статус: ${statusText[newStatus] || newStatus}`);
+            
+            // If payment is completed, stop monitoring
+            if (newStatus === 'COMPLETED') {
+              if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                setStatusCheckInterval(null);
+              }
+              setPaymentStatus('COMPLETED');
+            }
+          } else {
+            alert('Статус шалгахад алдаа гарлаа');
+          }
+        }
+      } catch (error) {
+        console.error('Manual status check error:', error);
+        alert('Статус шалгахад алдаа гарлаа: ' + error.message);
+      }
+    }
+  };
+
 
   return (
     <>
@@ -482,8 +817,8 @@ export default function Checkout() {
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_2"
-                      checked={selectedPaymentMethod === 'QPAY_QR'}
-                      onChange={() => setSelectedPaymentMethod('QPAY_QR')}
+                      checked={selectedPaymentMethod === 'QPAY'}
+                      onChange={() => setSelectedPaymentMethod('QPAY')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -599,86 +934,7 @@ export default function Checkout() {
             <button 
               className="btn btn-primary btn-checkout"
               disabled={isProcessingPayment}
-              onClick={async () => {
-                try {
-                  setIsProcessingPayment(true);
-                  
-                  // Validate required fields
-                  if (!formData.addressLine1 || !formData.city || !formData.phone) {
-                    alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
-                    return;
-                  }
-
-                  // Create order with payment
-                  const orderData = {
-                    items: cartProducts.map(item => ({
-                      productId: item.id,
-                      quantity: item.quantity
-                    })),
-                    provider: selectedPaymentMethod === 'QPAY_QR' ? 'QPAY' : 
-                             selectedPaymentMethod === 'STOREPAY' ? 'STOREPAY' : 'QPAY',
-                    shippingAddress: {
-                      addressLine1: formData.addressLine1,
-                      addressLine2: formData.addressLine2,
-                      city: formData.city,
-                      postalCode: formData.postalCode,
-                      country: formData.country,
-                      mobile: formData.phone
-                    }
-                  };
-
-                  console.log('Creating order with payment:', orderData);
-
-                  // First create order, then handle payment separately
-                  const orderResponse = await api.orders.createSimple({
-                    items: orderData.items,
-                    shippingAddress: orderData.shippingAddress
-                  });
-                  
-                  console.log('Order creation response:', orderResponse);
-                  
-                  if (orderResponse.success) {
-                    // Now create payment for the order
-                    try {
-                      const paymentResponse = await api.payments.create({
-                        orderId: orderResponse.data.order.id,
-                        provider: orderData.provider
-                      });
-                      
-                      console.log('Payment creation response:', paymentResponse);
-                      
-                      if (paymentResponse.success) {
-                        setPaymentData(paymentResponse.data);
-                        
-                        // Handle different payment methods
-                        if (selectedPaymentMethod === 'QPAY_QR' && paymentResponse.data.qrImage) {
-                          // Show QR code modal
-                          alert('QR код амжилттай үүслээ! QR кодыг уншуулж төлбөр хийгнэ үү.');
-                          console.log('QR Image:', paymentResponse.data.qrImage);
-                        } else if (paymentResponse.data.paymentUrl) {
-                          // Redirect to payment URL
-                          window.open(paymentResponse.data.paymentUrl, '_blank');
-                        }
-                        
-                        alert('Захиалга амжилттай үүслээ! Төлбөр хийх хуудас руу шилжиж байна.');
-                      }
-                    } catch (paymentError) {
-                      console.error('Payment creation error:', paymentError);
-                      alert('Захиалга үүслээ, гэхдээ төлбөр үүсгэхэд алдаа гарлаа: ' + paymentError.message);
-                    }
-                  }
-                } catch (error) {
-                  console.error('Payment error details:', {
-                    message: error.message,
-                    status: error.status,
-                    response: error.response,
-                    stack: error.stack
-                  });
-                  alert('Алдаа гарлаа: ' + (error.message || 'Төлбөр хийхэд алдаа гарлаа'));
-                } finally {
-                  setIsProcessingPayment(false);
-                }
-              }}
+              onClick={handleOrderAndPayment}
             >
               {isProcessingPayment ? (
                 <>
@@ -819,68 +1075,255 @@ export default function Checkout() {
        ></div>
      )}
 
-     {/* QR Code Payment Modal */}
-     {paymentData && selectedPaymentMethod === 'QPAY_QR' && paymentData.qrImage && (
-       <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-         <div className="modal-dialog modal-sm">
-           <div className="modal-content">
-             <div className="modal-header">
-               <h5 className="modal-title">QR Кодоор төлөх</h5>
-               <button
-                 type="button"
-                 className="btn-close"
-                 onClick={() => setPaymentData(null)}
-               ></button>
-             </div>
-             <div className="modal-body text-center">
-               <div className="mb-3">
-                 <strong>Төлбөрийн дүн: {paymentData.amount} {paymentData.currency}</strong>
-               </div>
-               <div className="mb-3">
-                 <img 
-                   src={paymentData.qrImage} 
-                   alt="QR Code" 
-                   style={{ maxWidth: '200px', height: 'auto' }}
-                 />
-               </div>
-               <div className="mb-3">
-                 <small className="text-muted">
-                   QPay апп-аа нээж QR кодыг уншуулна уу
-                 </small>
-               </div>
-               <div className="d-grid gap-2">
-                 <button
-                   type="button"
-                   className="btn btn-primary"
-                   onClick={() => {
-                     if (paymentData.paymentUrl) {
-                       window.open(paymentData.paymentUrl, '_blank');
-                     }
-                   }}
-                 >
-                   Веб хуудас руу орох
-                 </button>
-                 <button
-                   type="button"
-                   className="btn btn-outline-secondary"
-                   onClick={() => setPaymentData(null)}
-                 >
-                   Хаах
-                 </button>
-               </div>
-             </div>
-           </div>
-         </div>
-       </div>
-     )}
+           {/* Payment Modal */}
+      {showPaymentModal && paymentData && (
+        <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+          <div className="modal-dialog modal-lg" style={{ 
+            maxHeight: '90vh', 
+            margin: '1.75rem auto',
+            maxWidth: '600px'
+          }}>
+            <div className="modal-content" style={{ 
+              maxHeight: '90vh',
+              borderRadius: '8px'
+            }}>
+              <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
+                <h5 className="modal-title">
+                  <i className="fas fa-credit-card me-2"></i>
+                  Төлбөр хийх
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handlePaymentCancel}
+                ></button>
+              </div>
+              <div className="modal-body" style={{ 
+                maxHeight: '80vh', 
+                overflowY: 'auto',
+                padding: '1rem'
+              }}>
+                {/* Success Message */}
+                <div className="text-center mb-4">
+                  <i className="fas fa-check-circle fa-4x text-success mb-3"></i>
+                  <h4 className="text-success">Захиалга амжилттай үүслээ!</h4>
+                  <p className="text-muted">Одоо төлбөр хийх хэсэгт орно уу</p>
+                </div>
 
-     {/* QR Modal Backdrop */}
-     {paymentData && selectedPaymentMethod === 'QPAY_QR' && paymentData.qrImage && (
+                {/* Order Information */}
+                <div className="card mb-4">
+                  <div className="card-header bg-light">
+                    <h6 className="mb-0">
+                      <i className="fas fa-info-circle me-2"></i>
+                      Захиалгын мэдээлэл
+                    </h6>
+                  </div>
+                  <div className="card-body">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <p><strong>Захиалгын дугаар:</strong><br/>#{paymentData.orderId}</p>
+                        <p><strong>Төлбөрийн дугаар:</strong><br/>{paymentData.paymentId}</p>
+                      </div>
+                      <div className="col-md-6">
+                        <p><strong>Төлбөрийн дүн:</strong><br/>{paymentData.amount} {paymentData.currency}</p>
+                        <p><strong>Төлбөрийн төрөл:</strong><br/>{paymentData.paymentMethod}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* QR Code Section */}
+                {(paymentData.qrImage || paymentData.qrCode) && (
+                  <div className="card mb-4">
+                    <div className="card-header bg-light">
+                      <h6 className="mb-0">
+                        <i className="fas fa-qrcode me-2"></i>
+                        QR Кодоор төлөх
+                      </h6>
+                    </div>
+                    <div className="card-body text-center">
+                     
+                                            <img 
+                          src={`data:image/png;base64,${paymentData.qrImage || paymentData.qrCode}`}
+
+                        alt="QR Code" 
+                        style={{ 
+                          maxWidth: '250px', 
+                          height: 'auto', 
+                          border: '2px solid #dee2e6',
+                          borderRadius: '8px',
+                          padding: '10px'
+                        }}
+                        // onError={(e) => {
+                        //   console.error('QR code image failed to load:', e.target.src);
+                        //   // Try to show a fallback or error message
+                        //   e.target.style.display = 'none';
+                        //   const errorDiv = document.createElement('div');
+                        //   errorDiv.innerHTML = '<p class="text-danger">QR код харагдахгүй байна</p>';
+                        //   e.target.parentNode.appendChild(errorDiv);
+                        // }}
+                      />
+                      <div className="mt-3">
+                        <small className="text-muted">
+                          <i className="fas fa-mobile-alt me-1"></i>
+                          QPay апп-аа нээж QR кодыг уншуулна уу
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Payment URL Section */}
+                {paymentData.paymentUrl && (
+                  <div className="card mb-4">
+                    <div className="card-header bg-light">
+                      <h6 className="mb-0">
+                        <i className="fas fa-external-link-alt me-2"></i>
+                        Веб хуудас руу орох
+                      </h6>
+                    </div>
+                    <div className="card-body text-center">
+                      <a 
+                        href={paymentData.paymentUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn btn-primary btn-lg"
+                      >
+                        <i className="fas fa-external-link-alt me-2"></i>
+                        Төлбөр хийх
+                      </a>
+                      <div className="mt-2">
+                        <small className="text-muted">
+                          Шинэ цонхонд төлбөрийн хуудас нээгдэнэ
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Transaction ID */}
+                {paymentData.transactionId && (
+                  <div className="alert alert-info">
+                    <strong>Транзакцийн дугаар:</strong> {paymentData.transactionId}
+                  </div>
+                )}
+
+                {/* Payment Status */}
+                <div className={`alert ${
+                  paymentData.status === 'COMPLETED' ? 'alert-success' :
+                  paymentData.status === 'FAILED' ? 'alert-danger' :
+                  paymentData.status === 'CANCELLED' ? 'alert-warning' :
+                  'alert-info'
+                }`}>
+                  <i className={`me-2 ${
+                    paymentData.status === 'COMPLETED' ? 'fas fa-check-circle' :
+                    paymentData.status === 'FAILED' ? 'fas fa-times-circle' :
+                    paymentData.status === 'CANCELLED' ? 'fas fa-ban' :
+                    'fas fa-clock'
+                  }`}></i>
+                  <strong>Төлбөрийн статус:</strong> {
+                    paymentData.status === 'PENDING' ? 'Хүлээгдэж буй' :
+                    paymentData.status === 'COMPLETED' ? 'Амжилттай' :
+                    paymentData.status === 'FAILED' ? 'Амжилтгүй' :
+                    paymentData.status === 'CANCELLED' ? 'Цуцлагдсан' :
+                    paymentData.status
+                  }
+                </div>
+
+                {/* Instructions */}
+                {paymentData.status === 'PENDING' && (
+                  <div className="alert alert-info">
+                    <h6><i className="fas fa-info-circle me-2"></i>Заавар:</h6>
+                    <ul className="mb-0">
+                      <li>QR кодыг уншуулж эсвэл веб хуудас руу орох</li>
+                      <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
+                      <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {paymentData.status === 'COMPLETED' && (
+                  <div className="alert alert-success">
+                    <h6><i className="fas fa-check-circle me-2"></i>Амжилттай!</h6>
+                    <p className="mb-0">Төлбөр амжилттай төлөгдлөө. Захиалгын жагсаалт руу орох бол дээрх товчийг дарна уу.</p>
+                  </div>
+                )}
+                
+                {(paymentData.status === 'FAILED' || paymentData.status === 'CANCELLED') && (
+                  <div className="alert alert-warning">
+                    <h6><i className="fas fa-exclamation-triangle me-2"></i>Анхааруулга:</h6>
+                    <p className="mb-0">Төлбөр {paymentData.status === 'FAILED' ? 'амжилтгүй' : 'цуцлагдсан'} байна. Дахин оролдох бол "Статус шалгах" товчийг дарна уу.</p>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer" style={{ borderTop: '1px solid #dee2e6' }}>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={handlePaymentCancel}
+                >
+                  <i className="fas fa-times me-2"></i>
+                  Хаах
+                </button>
+                
+                {paymentData.status === 'PENDING' && (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-outline-info"
+                      onClick={handleManualStatusCheck}
+                    >
+                      <i className="fas fa-sync-alt me-2"></i>
+                      Статус шалгах
+                    </button>
+                    
+                    <button
+                      type="button"
+                      className="btn btn-outline-warning"
+                      onClick={handlePaymentCancel}
+                    >
+                      <i className="fas fa-ban me-2"></i>
+                      Төлбөр цуцлах
+                    </button>
+                  </>
+                )}
+                
+                {paymentData.status === 'COMPLETED' && (
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    onClick={handlePaymentComplete}
+                  >
+                    <i className="fas fa-check me-2"></i>
+                    Захиалгын жагсаалт руу орох
+                  </button>
+                )}
+                
+                {(paymentData.status === 'FAILED' || paymentData.status === 'CANCELLED') && (
+                  <button
+                    type="button"
+                    className="btn btn-outline-info"
+                    onClick={handleManualStatusCheck}
+                  >
+                    <i className="fas fa-sync-alt me-2"></i>
+                    Статус шалгах
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+     {/* Modal Backdrop */}
+     {showPaymentModal && (
        <div 
          className="modal-backdrop fade show" 
-         onClick={() => setPaymentData(null)}
+         onClick={handlePaymentCancel}
        ></div>
      )}
+
+
      </>
    );
  }

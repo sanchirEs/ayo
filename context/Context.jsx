@@ -139,6 +139,11 @@ export default function Context({ children }) {
     localStorage.setItem("wishlist", JSON.stringify(wishList));
   }, [wishList]);
 
+  const clearCart = () => {
+    setCartProducts([]);
+    localStorage.removeItem("cartList");
+  };
+
   const contextElement = {
     cartProducts,
     setCartProducts,
@@ -150,6 +155,7 @@ export default function Context({ children }) {
     quickViewItem,
     wishList,
     setQuickViewItem,
+    clearCart,
   };
   return (
     <dataContext.Provider value={contextElement}>

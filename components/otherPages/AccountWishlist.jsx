@@ -181,9 +181,9 @@ export default function AccountWishlist() {
         ) : (
           <div className="text-center py-5">
             <div className="fs-18 mb-3">No products added to wishlist yet</div>
-            <Link href="/shop-1" className="btn btn-primary">
+            {/* <Link href="/shop-1" className="btn btn-primary">
               Continue Shopping
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>

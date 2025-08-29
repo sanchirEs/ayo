@@ -2,13 +2,56 @@
 
 import { useContextElement } from "@/context/Context";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import api from "@/lib/api";
 
 export default function OrderCompleted() {
   const { cartProducts, totalPrice } = useContextElement();
   const [showDate, setShowDate] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  
+  const orderId = searchParams.get('orderId');
+  const paymentId = searchParams.get('paymentId');
+
   useEffect(() => {
     setShowDate(true);
-  }, []);
+    
+    // Load order details if orderId is provided
+    if (orderId) {
+      loadOrderDetails();
+    } else {
+      setLoading(false);
+    }
+  }, [orderId]);
+
+  const loadOrderDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await api.orders.getById(orderId);
+      if (response.success) {
+        setOrderDetails(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load order details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="order-complete">
+        <div className="text-center py-5">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Уншиж байна...</span>
+          </div>
+          <p className="mt-3">Захиалгын мэдээллийг уншиж байна...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="order-complete">
@@ -26,45 +69,72 @@ export default function OrderCompleted() {
             fill="white"
           />
         </svg>
-        <h3>Your order is completed!</h3>
-        <p>Thank you. Your order has been received.</p>
+        <h3>Таны захиалга амжилттай дууссан!</h3>
+        <p>Баярлалаа. Таны захиалга хүлээн авлаа.</p>
       </div>
+      
       <div className="order-info">
         <div className="order-info__item">
-          <label>Order Number</label>
-          <span>13119</span>
+          <label>Захиалгын дугаар</label>
+          <span>{orderDetails?.id || orderId || 'N/A'}</span>
         </div>
         <div className="order-info__item">
-          <label>Date</label>
-          {showDate && <span>{new Date().toLocaleDateString()}</span>}
+          <label>Огноо</label>
+          {showDate && (
+            <span>
+              {orderDetails?.createdAt 
+                ? new Date(orderDetails.createdAt).toLocaleDateString('mn-MN')
+                : new Date().toLocaleDateString('mn-MN')
+              }
+            </span>
+          )}
         </div>
         <div className="order-info__item">
-          <label>Total</label>
-
-          <span>${totalPrice && totalPrice + 19}</span>
+          <label>Нийт дүн</label>
+          <span>{orderDetails?.total || totalPrice}₮</span>
         </div>
         <div className="order-info__item">
-          <label>Paymetn Method</label>
-          <span>Direct Bank Transfer</span>
+          <label>Төлбөрийн арга</label>
+          <span>{orderDetails?.payment?.provider || 'QPay'}</span>
         </div>
+        {paymentId && (
+          <div className="order-info__item">
+            <label>Төлбөрийн ID</label>
+            <span>{paymentId}</span>
+          </div>
+        )}
       </div>
+      
       <div className="checkout__totals-wrapper">
         <div className="checkout__totals">
-          <h3>Order Details</h3>
+          <h3>Захиалгын дэлгэрэнгүй</h3>
           <table className="checkout-cart-items">
             <thead>
               <tr>
-                <th>PRODUCT</th>
-                <th>SUBTOTAL</th>
+                <th>БҮТЭЭГДЭХҮҮН</th>
+                <th>ТОО ШИРХЭГ</th>
+                <th>ҮНЭ</th>
+                <th>НИЙТ</th>
               </tr>
             </thead>
             <tbody>
-              {cartProducts.map((elm, i) => (
+              {orderDetails?.orderItems?.map((item, i) => (
+                <tr key={i}>
+                  <td>
+                    {item.product?.name || `Бүтээгдэхүүн ${item.productId}`}
+                  </td>
+                  <td>{item.quantity}</td>
+                  <td>{item.price}₮</td>
+                  <td>{(item.price * item.quantity).toFixed(2)}₮</td>
+                </tr>
+              )) || cartProducts.map((elm, i) => (
                 <tr key={i}>
                   <td>
                     {elm.title} x {elm.quantity}
                   </td>
-                  <td>${elm.price}</td>
+                  <td>{elm.quantity}</td>
+                  <td>{elm.price}₮</td>
+                  <td>{(elm.price * elm.quantity).toFixed(2)}₮</td>
                 </tr>
               ))}
             </tbody>
@@ -72,25 +142,63 @@ export default function OrderCompleted() {
           <table className="checkout-totals">
             <tbody>
               <tr>
-                <th>SUBTOTAL</th>
-                <td>${totalPrice}</td>
+                <th>НИЙТ</th>
+                <td>{orderDetails?.total || totalPrice}₮</td>
               </tr>
               <tr>
-                <th>SHIPPING</th>
-                <td>Free shipping</td>
+                <th>ХҮРГЭЛТ</th>
+                <td>Үнэгүй</td>
               </tr>
               <tr>
-                <th>VAT</th>
-                <td>${totalPrice && 19}</td>
-              </tr>
-              <tr>
-                <th>TOTAL</th>
-                <td>${totalPrice && totalPrice + 19}</td>
+                <th>НИЙТ ТӨЛӨХ ДҮН</th>
+                <td>{orderDetails?.total || totalPrice}₮</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+      
+      {/* Order Status */}
+      {orderDetails?.status && (
+        <div className="mt-4">
+          <div className={`alert ${
+            orderDetails.status === 'PROCESSING' ? 'alert-info' :
+            orderDetails.status === 'SHIPPED' ? 'alert-warning' :
+            orderDetails.status === 'DELIVERED' ? 'alert-success' :
+            'alert-secondary'
+          }`}>
+            <strong>Захиалгын статус:</strong> {
+              orderDetails.status === 'PROCESSING' ? 'Боловсруулж буй' :
+              orderDetails.status === 'SHIPPED' ? 'Илгээгдсэн' :
+              orderDetails.status === 'DELIVERED' ? 'Хүргэгдсэн' :
+              orderDetails.status
+            }
+          </div>
+        </div>
+      )}
+      
+      {/* Shipping Address */}
+      {orderDetails?.shippingAddress && (
+        <div className="mt-4">
+          <h4>Хүргэх хаяг</h4>
+          <div className="p-3 bg-light rounded">
+            <p className="mb-1">
+              <strong>Хаяг:</strong> {orderDetails.shippingAddress.addressLine1}
+            </p>
+            {orderDetails.shippingAddress.addressLine2 && (
+              <p className="mb-1">
+                <strong>Нэмэлт мэдээлэл:</strong> {orderDetails.shippingAddress.addressLine2}
+              </p>
+            )}
+            <p className="mb-1">
+              <strong>Хот:</strong> {orderDetails.shippingAddress.city}
+            </p>
+            <p className="mb-1">
+              <strong>Утас:</strong> {orderDetails.shippingAddress.mobile}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
