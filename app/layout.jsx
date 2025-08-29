@@ -113,7 +113,7 @@ export default function RootLayout({ children }) {
         <Svgs />
         <Context>
          
-          <main className="page-wrapper">
+          <main className="">
           <Header14 />
           <MobileHeader />
             {children}

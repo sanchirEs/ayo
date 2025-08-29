@@ -1103,30 +1103,24 @@ export default function Checkout() {
                 overflowY: 'auto',
                 padding: '1rem'
               }}>
-                {/* Success Message */}
-                <div className="text-center mb-4">
-                  <i className="fas fa-check-circle fa-4x text-success mb-3"></i>
-                  <h4 className="text-success">Захиалга амжилттай үүслээ!</h4>
-                  <p className="text-muted">Одоо төлбөр хийх хэсэгт орно уу</p>
-                </div>
-
                 {/* Order Information */}
-                <div className="card mb-4">
-                  <div className="card-header bg-light">
-                    <h6 className="mb-0">
-                      <i className="fas fa-info-circle me-2"></i>
-                      Захиалгын мэдээлэл
-                    </h6>
-                  </div>
-                  <div className="card-body">
-                    <div className="row">
-                      <div className="col-md-6">
-                        <p><strong>Захиалгын дугаар:</strong><br/>#{paymentData.orderId}</p>
-                        <p><strong>Төлбөрийн дугаар:</strong><br/>{paymentData.paymentId}</p>
+                <div className="mb-3" style={{
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  border: 'none'
+                }}>
+                  <div className="row g-2">
+                    <div className="col-md-6">
+                      <div style={{ fontSize: '0.9rem' }}>
+                        <span style={{ color: '#6c757d', fontWeight: '500' }}>Захиалгын дугаар:</span>
+                        <div style={{ color: '#212529', fontWeight: '600', marginTop: '2px' }}>#{paymentData.orderId}</div>
                       </div>
-                      <div className="col-md-6">
-                        <p><strong>Төлбөрийн дүн:</strong><br/>{paymentData.amount} {paymentData.currency}</p>
-                        <p><strong>Төлбөрийн төрөл:</strong><br/>{paymentData.paymentMethod}</p>
+                    </div>
+                    <div className="col-md-6">
+                      <div style={{ fontSize: '0.9rem' }}>
+                        <span style={{ color: '#6c757d', fontWeight: '500' }}>Төлбөрийн дүн:</span>
+                        <div style={{ color: '#212529', fontWeight: '600', marginTop: '2px' }}>{paymentData.amount} {paymentData.currency}</div>
                       </div>
                     </div>
                   </div>
@@ -1134,13 +1128,13 @@ export default function Checkout() {
 
                 {/* QR Code Section */}
                 {(paymentData.qrImage || paymentData.qrCode) && (
-                  <div className="card mb-4">
-                    <div className="card-header bg-light">
+                  <div className="text-center">
+                    {/* <div className="card-header bg-light"> */}
                       <h6 className="mb-0">
                         <i className="fas fa-qrcode me-2"></i>
-                        QR Кодоор төлөх
+                        QR Код уншуулах
                       </h6>
-                    </div>
+                    {/* </div> */}
                     <div className="card-body text-center">
                      
                                             <img 
@@ -1174,7 +1168,7 @@ export default function Checkout() {
                 )}
 
                 {/* Payment URL Section */}
-                {paymentData.paymentUrl && (
+                {/* {paymentData.paymentUrl && (
                   <div className="card mb-4">
                     <div className="card-header bg-light">
                       <h6 className="mb-0">
@@ -1199,17 +1193,17 @@ export default function Checkout() {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Transaction ID */}
-                {paymentData.transactionId && (
+                {/* {paymentData.transactionId && (
                   <div className="alert alert-info">
                     <strong>Транзакцийн дугаар:</strong> {paymentData.transactionId}
                   </div>
-                )}
+                )} */}
 
                 {/* Payment Status */}
-                <div className={`alert ${
+                {/* <div className={`alert ${
                   paymentData.status === 'COMPLETED' ? 'alert-success' :
                   paymentData.status === 'FAILED' ? 'alert-danger' :
                   paymentData.status === 'CANCELLED' ? 'alert-warning' :
@@ -1228,14 +1222,14 @@ export default function Checkout() {
                     paymentData.status === 'CANCELLED' ? 'Цуцлагдсан' :
                     paymentData.status
                   }
-                </div>
+                </div> */}
 
                 {/* Instructions */}
                 {paymentData.status === 'PENDING' && (
                   <div className="alert alert-info">
                     <h6><i className="fas fa-info-circle me-2"></i>Заавар:</h6>
                     <ul className="mb-0">
-                      <li>QR кодыг уншуулж эсвэл веб хуудас руу орох</li>
+                      <li>QR кодыг уншуулж төлбөр хийх</li>
                       <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
                       <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
                     </ul>
@@ -1256,21 +1250,33 @@ export default function Checkout() {
                   </div>
                 )}
               </div>
-              <div className="modal-footer" style={{ borderTop: '1px solid #dee2e6' }}>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={handlePaymentCancel}
-                >
-                  <i className="fas fa-times me-2"></i>
-                  Хаах
-                </button>
-                
+              <div className="modal-footer" style={{ 
+                borderTop: '1px solid #e4e4e4',
+                padding: '1rem 1.5rem',
+                backgroundColor: '#faf9f8'
+              }}>
+         
                 {paymentData.status === 'PENDING' && (
                   <>
                     <button
                       type="button"
-                      className="btn btn-outline-info"
+                      className="btn"
+                      style={{
+                        backgroundColor: '#cde9f6',
+                        borderColor: '#4780aa',
+                        color: '#4780aa',
+                        fontWeight: '500',
+                        fontSize: '0.875rem',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#b8d9f0';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#cde9f6';
+                      }}
                       onClick={handleManualStatusCheck}
                     >
                       <i className="fas fa-sync-alt me-2"></i>
@@ -1279,7 +1285,23 @@ export default function Checkout() {
                     
                     <button
                       type="button"
-                      className="btn btn-outline-warning"
+                      className="btn"
+                      style={{
+                        backgroundColor: '#f7f3d7',
+                        borderColor: '#927238',
+                        color: '#927238',
+                        fontWeight: '500',
+                        fontSize: '0.875rem',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#f0e8c7';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#f7f3d7';
+                      }}
                       onClick={handlePaymentCancel}
                     >
                       <i className="fas fa-ban me-2"></i>
@@ -1291,7 +1313,23 @@ export default function Checkout() {
                 {paymentData.status === 'COMPLETED' && (
                   <button
                     type="button"
-                    className="btn btn-success"
+                    className="btn"
+                    style={{
+                      backgroundColor: '#def2d7',
+                      borderColor: '#5b7052',
+                      color: '#5b7052',
+                      fontWeight: '600',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 1.25rem',
+                      borderRadius: '4px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#d0e8c5';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = '#def2d7';
+                    }}
                     onClick={handlePaymentComplete}
                   >
                     <i className="fas fa-check me-2"></i>
@@ -1302,7 +1340,23 @@ export default function Checkout() {
                 {(paymentData.status === 'FAILED' || paymentData.status === 'CANCELLED') && (
                   <button
                     type="button"
-                    className="btn btn-outline-info"
+                    className="btn"
+                    style={{
+                      backgroundColor: '#cde9f6',
+                      borderColor: '#4780aa',
+                      color: '#4780aa',
+                      fontWeight: '500',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '4px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#b8d9f0';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = '#cde9f6';
+                    }}
                     onClick={handleManualStatusCheck}
                   >
                     <i className="fas fa-sync-alt me-2"></i>
