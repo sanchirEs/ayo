@@ -35,12 +35,14 @@ const mongolianProvinces = [
 ];
 
 import { useContextElement } from "@/context/Context";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useUserAddresses } from "@/hooks/useUserAddresses";
 import { useSession } from "next-auth/react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import pako from "pako";
+import QRCode from "qrcode";
 
 export default function Checkout() {
   const { cartProducts, totalPrice, clearCart } = useContextElement();
@@ -80,7 +82,225 @@ export default function Checkout() {
     userId: session?.user?.userId
   });
 
-  // Cleanup interval on unmount
+  // QR Code Display Component
+  const QRCodeDisplay = ({ qrData, paymentMethod }) => {
+    const [qrImageSrc, setQrImageSrc] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const processedRef = useRef(null);
+    const generatedRef = useRef(false);
+
+    // Memoize qrData to prevent unnecessary re-renders
+    const memoizedQrData = useMemo(() => qrData, [qrData]);
+
+    // Process QR data only once
+    useEffect(() => {
+      if (!memoizedQrData || processedRef.current === memoizedQrData) {
+        return;
+      }
+
+      processedRef.current = memoizedQrData;
+      generatedRef.current = false;
+
+      const processQRData = async () => {
+        try {
+          setIsLoading(true);
+          setError('');
+
+          let processedData = memoizedQrData;
+
+          // If it's already a data URL or external URL
+          if (qrData.startsWith('data:') || qrData.startsWith('http')) {
+            setQrImageSrc(qrData);
+            setIsLoading(false);
+            return;
+          }
+
+          // If it's GZIP compressed base64
+          if (qrData.startsWith('H4sI')) {
+            try {
+              console.log('Processing GZIP compressed QR data:', qrData.substring(0, 50) + '...');
+              
+              // Convert base64 to binary
+              const binary = atob(qrData);
+              const bytes = new Uint8Array(binary.length);
+              for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+              }
+
+              console.log('Binary length:', binary.length);
+
+              // Decompress using pako
+              const decompressed = pako.inflate(bytes);
+              processedData = String.fromCharCode.apply(null, decompressed);
+
+              console.log('Decompressed string length:', processedData.length);
+              console.log('Decompressed string:', processedData.substring(0, 100) + '...');
+
+              // Generate QR code image from the decoded text
+              try {
+                const qrDataUrl = await QRCode.toDataURL(processedData, {
+                  width: 250,
+                  margin: 2,
+                  color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                  }
+                });
+
+                console.log('Successfully generated QR code image from GZIP data');
+                setQrImageSrc(qrDataUrl);
+                setIsLoading(false);
+                return;
+              } catch (qrError) {
+                console.error('Failed to generate QR code image:', qrError);
+                // Fallback: show the text
+                setQrImageSrc(processedData);
+                setIsLoading(false);
+                return;
+              }
+            } catch (err) {
+              console.error('Failed to process GZIP QR data:', err);
+              setError('QR код уншихад алдаа гарлаа');
+              setIsLoading(false);
+              return;
+            }
+          }
+
+          // Generate QR code image
+          if (processedData.length > 1000 && /^[A-Za-z0-9+/=]+$/.test(processedData)) {
+            // This looks like a base64 image, convert to data URL
+            const qrDataUrl = `data:image/png;base64,${processedData}`;
+            setQrImageSrc(qrDataUrl);
+          } else if (processedData.length < 200) {
+            // Short text, try to generate QR code
+            try {
+              const qrDataUrl = await QRCode.toDataURL(processedData, {
+                width: 250,
+                margin: 2,
+                color: {
+                  dark: '#000000',
+                  light: '#FFFFFF'
+                }
+              });
+              setQrImageSrc(qrDataUrl);
+            } catch (err) {
+              console.error('Failed to generate QR code image from text:', err);
+              // Fallback: show the text
+              setQrImageSrc(processedData);
+            }
+          } else {
+            // Long text, show as text (don't try to generate QR code)
+            setQrImageSrc(processedData);
+          }
+
+          generatedRef.current = true;
+        } catch (err) {
+          console.error('QR code processing error:', err);
+          setError('QR код уншихад алдаа гарлаа');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      processQRData();
+    }, [memoizedQrData]);
+
+    if (isLoading) {
+      return (
+        <div className="text-center py-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">QR код үүсгэж байна...</span>
+          </div>
+          <div className="mt-2 text-muted">QR код үүсгэж байна...</div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="alert alert-danger">
+          <i className="fas fa-exclamation-triangle me-2"></i>
+          {error}
+        </div>
+      );
+    }
+
+    if (qrImageSrc) {
+      // If it's a data URL, show as image
+      if (qrImageSrc.startsWith('data:image')) {
+        return (
+          <img 
+            src={qrImageSrc}
+            alt="QR Code" 
+            style={{ 
+              maxWidth: '250px', 
+              height: 'auto', 
+              border: '2px solid #dee2e6',
+              borderRadius: '8px',
+              padding: '10px'
+            }}
+            onLoad={(e) => {
+              // console.log('QR code image loaded successfully');
+            }}
+            onError={(e) => {
+              console.error('QR code image failed to load');
+              setError('QR код харагдахгүй байна');
+            }}
+          />
+        );
+      }
+
+      // If it's QR code text, show with instructions
+      return (
+        <div style={{
+          padding: '20px',
+          backgroundColor: '#f8f9fa',
+          border: '2px dashed #dee2e6',
+          borderRadius: '8px',
+          margin: '10px 0'
+        }}>
+          <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+            <strong>QR Кодын текст:</strong>
+          </div>
+          <div style={{
+            fontFamily: 'monospace',
+            fontSize: '12px',
+            wordBreak: 'break-all',
+            backgroundColor: 'white',
+            padding: '10px',
+            border: '1px solid #dee2e6',
+            borderRadius: '4px'
+          }}>
+            {qrImageSrc}
+          </div>
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+            Энэ нь QR кодын текст юм. Та үүнийг QR код үүсгэгч апп-аар уншуулж болно.
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="alert alert-warning">
+        <i className="fas fa-info-circle me-2"></i>
+        QR код үүсгэх боломжгүй байна
+      </div>
+    );
+  };
+
+  const getPaymentAppName = (paymentMethod) => {
+    switch (paymentMethod) {
+      case 'QPAY':
+        return 'QPay';
+      case 'POCKET':
+        return 'Pocket';
+      case 'STOREPAY':
+        return 'Storepay';
+      default:
+        return 'Төлбөрийн';
+    }
+  };  // Cleanup interval on unmount
   useEffect(() => {
     return () => {
       if (statusCheckInterval) {
@@ -109,11 +329,16 @@ export default function Checkout() {
             console.log('Provider payment status updated:', newStatus);
             console.log('Payment data:', payment);
             
-            // Update payment data with new status
-            setPaymentData(prev => ({
+            // Update payment data with new status only if it actually changed
+            setPaymentData(prev => {
+              if (prev.status === newStatus) {
+                return prev; // Return same reference if status didn't change
+              }
+              return {
               ...prev,
               status: newStatus
-            }));
+              };
+            });
             
             // If payment is completed, stop monitoring
             if (newStatus === 'COMPLETED') {
@@ -144,11 +369,16 @@ export default function Checkout() {
           console.log('Local payment status updated:', newStatus);
           console.log('Payment data:', payment);
           
-          // Update payment data with new status
-          setPaymentData(prev => ({
+          // Update payment data with new status only if it actually changed
+          setPaymentData(prev => {
+            if (prev.status === newStatus) {
+              return prev; // Return same reference if status didn't change
+            }
+            return {
             ...prev,
             status: newStatus
-          }));
+            };
+          });
           
           // If payment is completed, stop monitoring
           if (newStatus === 'COMPLETED') {
@@ -267,7 +497,25 @@ export default function Checkout() {
       }
     } catch (error) {
       console.error('Order creation error:', error);
-      alert('Алдаа гарлаа: ' + (error.message || 'Захиалга үүсгэхэд алдаа гарлаа'));
+      
+      // Handle specific payment provider errors
+      let errorMessage = 'Захиалга үүсгэхэд алдаа гарлаа';
+      
+      if (error.message) {
+        if (error.message.includes('хамгийн бага дүнгийн шаардлага')) {
+          errorMessage = `Төлбөрийн алдаа: ${error.message}`;
+        } else if (error.message.includes('Pocket Zero')) {
+          errorMessage = `Pocket төлбөрийн алдаа: ${error.message}`;
+        } else if (error.message.includes('Storepay')) {
+          errorMessage = `Storepay төлбөрийн алдаа: ${error.message}`;
+        } else if (error.message.includes('QPAY')) {
+          errorMessage = `QPay төлбөрийн алдаа: ${error.message}`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      alert(`Алдаа гарлаа: ${errorMessage}`);
     } finally {
       setIsProcessingPayment(false);
     }
@@ -308,6 +556,11 @@ export default function Checkout() {
             
             setPaymentStatus('CANCELLED');
             alert('Төлбөр амжилттай цуцлагдлаа.');
+            
+            // Ask if user wants to go to orders page
+            // if (confirm('Захиалга хуудас руу очих уу?')) {
+              router.push('/account_orders');
+            // }
           } else {
             alert('Төлбөр цуцлахад алдаа гарлаа');
           }
@@ -323,6 +576,11 @@ export default function Checkout() {
       if (statusCheckInterval) {
         clearInterval(statusCheckInterval);
         setStatusCheckInterval(null);
+      }
+      
+      // Ask if user wants to go to orders page
+      if (confirm('Захиалга хуудас руу очих уу?')) {
+        router.push('/account_orders');
       }
     }
   };
@@ -361,6 +619,11 @@ export default function Checkout() {
               setStatusCheckInterval(null);
             }
             setPaymentStatus('COMPLETED');
+              
+              // Ask if user wants to go to orders page
+              if (confirm('Төлбөр амжилттай! Захиалга хуудас руу очих уу?')) {
+                router.push('/account_orders');
+              }
           }
         } else {
           // Fallback to local status check
@@ -393,6 +656,11 @@ export default function Checkout() {
                 setStatusCheckInterval(null);
               }
               setPaymentStatus('COMPLETED');
+              
+              // Ask if user wants to go to orders page
+              if (confirm('Төлбөр амжилттай! Захиалга хуудас руу очих уу?')) {
+                router.push('/account_orders');
+              }
             }
           } else {
             alert('Статус шалгахад алдаа гарлаа');
@@ -873,14 +1141,15 @@ export default function Checkout() {
                     <div className="flex-grow-1">
                       <div className="fw-medium">Pocket</div>
                       <small className="text-muted">Pocket-аар төлбөр хийх</small>
+                      <small className="text-warning d-block">Хамгийн бага: 1,000₮</small>
                     </div>
                     <input
                       className="form-check-input"
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_3"
-                      checked={selectedPaymentMethod === 'STOREPAY'}
-                      onChange={() => setSelectedPaymentMethod('STOREPAY')}
+                      checked={selectedPaymentMethod === 'POCKET'}
+                      onChange={() => setSelectedPaymentMethod('POCKET')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -921,6 +1190,7 @@ export default function Checkout() {
                     <div className="flex-grow-1">
                       <div className="fw-medium">Storepay</div>
                       <small className="text-muted">Storepay-аар төлбөр хийх</small>
+                      <small className="text-warning d-block">Хамгийн бага: 1,000₮</small>
                     </div>
                     <input
                       className="form-check-input"
@@ -973,7 +1243,7 @@ export default function Checkout() {
               {isProcessingPayment ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Төлбөр хийж байна...
+                  Захиалга хийж байна...
                 </>
               ) : (
                 'ЗАХИАЛГА ХИЙХ'
@@ -1200,38 +1470,19 @@ export default function Checkout() {
                 {/* QR Code Section */}
                 {(paymentData.qrImage || paymentData.qrCode) && (
                   <div className="text-center">
-                    {/* <div className="card-header bg-light"> */}
-                      <h6 className="mb-0">
+                    <h6 className="mb-2">
                         <i className="fas fa-qrcode me-2"></i>
                         QR Код уншуулах
                       </h6>
-                    {/* </div> */}
                     <div className="card-body text-center">
-                     
-                                            <img 
-                          src={`data:image/png;base64,${paymentData.qrImage || paymentData.qrCode}`}
-
-                        alt="QR Code" 
-                        style={{ 
-                          maxWidth: '250px', 
-                          height: 'auto', 
-                          border: '2px solid #dee2e6',
-                          borderRadius: '8px',
-                          padding: '10px'
-                        }}
-                        // onError={(e) => {
-                        //   console.error('QR code image failed to load:', e.target.src);
-                        //   // Try to show a fallback or error message
-                        //   e.target.style.display = 'none';
-                        //   const errorDiv = document.createElement('div');
-                        //   errorDiv.innerHTML = '<p class="text-danger">QR код харагдахгүй байна</p>';
-                        //   e.target.parentNode.appendChild(errorDiv);
-                        // }}
+                      <QRCodeDisplay 
+                        qrData={paymentData?.qrImage || paymentData?.qrCode}
+                        paymentMethod={paymentData?.paymentMethod}
                       />
                       <div className="mt-3">
                         <small className="text-muted">
                           <i className="fas fa-mobile-alt me-1"></i>
-                          QPay апп-аа нээж QR кодыг уншуулна уу
+                          {getPaymentAppName(paymentData.paymentMethod)} апп-аа нээж QR кодыг уншуулна уу
                         </small>
                       </div>
                     </div>
