@@ -121,7 +121,7 @@ export default function BrandProduct() {
          
      {/* Mobile: Show only banner with clickable area */}
      <div className="d-lg-none">
-       <Link href="/shop-4" className="converse-mobile-banner">
+       <Link href="/shop" className="converse-mobile-banner">
          <div className="converse-mobile-bg">
            <img
              src="/assets/images/brandsBg/converse_banner_center.png"

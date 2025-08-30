@@ -261,7 +261,7 @@ export default function FilterAll({ onFiltersChange }) {
                   expandParentIfChildSelected(category.id);
                 }
                 // Simple client-side navigation
-                router.push(`/shop-4/${category.id}`, { scroll: false });
+                router.push(`/shop/${category.id}`, { scroll: false });
               }}
             >
               {category.name}

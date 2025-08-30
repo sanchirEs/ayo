@@ -336,19 +336,9 @@ export default function Shop4({
   }
 
   return (
-    <section className="shop-main container d-flex pt-4 pt-xl-5">
-      {/* SIDEBAR */}
-      <div className="shop-sidebar side-sticky bg-body">
-        <div onClick={openModalShopFilter} className="aside-header d-flex d-lg-none align-items-center">
-          <h3 className="text-uppercase fs-6 mb-0">Filter By</h3>
-          <button className="btn-close-lg js-close-aside btn-close-aside ms-auto" />
-        </div>
-        <div className="pt-4 pt-lg-0" />
-        <FilterAll onFiltersChange={handleFiltersChange} />
-      </div>
 
-      {/* LIST */}
-      <div className="shop-list flex-grow-1">
+    
+      <div >
         <div className="d-flex justify-content-between mb-4 pb-md-2">
           <div className="breadcrumb mb-0 d-none d-md-block flex-grow-1">
             <BreadCumb />
@@ -657,6 +647,6 @@ export default function Shop4({
           </button>
         </div> */}
       </div>
-    </section>
+  
   );
 }

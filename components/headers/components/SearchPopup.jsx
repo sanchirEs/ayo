@@ -99,7 +99,7 @@ export default function SearchPopup() {
     if (searchQuery.trim()) {
       saveToRecentSearches(searchQuery);
       const currentPath = window.location.pathname + window.location.search;
-      router.push(`/shop-4?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`);
+              router.push(`/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`);
       setIsPopupOpen(false);
       setSearchQuery("");
       setSearchResults([]);
@@ -214,17 +214,17 @@ export default function SearchPopup() {
                      <h6 className="sub-menu__title fs-base">Шуурхай холбоосууд</h6>
               <ul className="sub-menu__list list-unstyled">
                 <li className="sub-menu__item">
-                         <Link href="/shop-4" className="menu-link menu-link_us-s">
+                         <Link href="/shop" className="menu-link menu-link_us-s">
                            Шинэ бүтээгдэхүүн
                   </Link>
                 </li>
                 <li className="sub-menu__item">
-                         <Link href="/shop-4" className="menu-link menu-link_us-s">
+                         <Link href="/shop" className="menu-link menu-link_us-s">
                            Хямдралтай
                          </Link>
                 </li>
                 <li className="sub-menu__item">
-                         <Link href="/shop-4" className="menu-link menu-link_us-s">
+                         <Link href="/shop" className="menu-link menu-link_us-s">
                            Хамгийн их зарагдсан
                          </Link>
                        </li>
@@ -358,17 +358,17 @@ export default function SearchPopup() {
                  <h6 className="sub-menu__title fs-base">Шуурхай холбоосууд</h6>
                  <ul className="sub-menu__list list-unstyled">
                    <li className="sub-menu__item">
-                     <Link href="/shop-4" className="menu-link menu-link_us-s">
+                     <Link href="/shop" className="menu-link menu-link_us-s">
                        Шинэ бүтээгдэхүүн
                   </Link>
                 </li>
                 <li className="sub-menu__item">
-                     <Link href="/shop-4" className="menu-link menu-link_us-s">
+                     <Link href="/shop" className="menu-link menu-link_us-s">
                        Хямдралтай
                      </Link>
                 </li>
                 <li className="sub-menu__item">
-                     <Link href="/shop-4" className="menu-link menu-link_us-s">
+                     <Link href="/shop" className="menu-link menu-link_us-s">
                        Хамгийн их зарагдсан
                      </Link>
                 </li>

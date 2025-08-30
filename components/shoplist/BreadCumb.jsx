@@ -82,7 +82,7 @@ export default function BreadCumb() {
       <span className="breadcrumb-separator menu-link fw-medium ps-1 pe-1">
         /
       </span>
-      <Link href="/shop-4" className="menu-link menu-link_us-s text-uppercase fw-medium">
+      <Link href="/shop" className="menu-link menu-link_us-s text-uppercase fw-medium">
         Дэлгүүр
       </Link>
       {categoryId && (
@@ -99,7 +99,7 @@ export default function BreadCumb() {
               {categoryInfo.parent && (
                 <>
                   <Link 
-                    href={`/shop-4/${categoryInfo.parent.id}`}
+                    href={`/shop/${categoryInfo.parent.id}`}
                     className="menu-link menu-link_us-s text-uppercase fw-medium"
                   >
                     {categoryInfo.parent.name}

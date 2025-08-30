@@ -272,7 +272,7 @@ export default function Nav() {
                           }}
                         >
                           <Link
-                            href={`/shop-4/${root.id}`}
+                            href={`/shop/${root.id}`}
                             className="menu-link sub-menu__title"
                             onClick={closeMegaMenu}
                             style={{
@@ -323,7 +323,7 @@ export default function Nav() {
                                         {withoutKids.map((leaf) => (
                                           <li key={leaf.id} className="sub-menu__item" style={{ padding: '4px 0' }}>
                                             <Link 
-                                              href={`/shop-4/${leaf.id}`} 
+                                              href={`/shop/${leaf.id}`} 
                                               className="menu-link menu-link_us-s sub-menu__title allcats__leaf-bold"
                                               onClick={closeMegaMenu}
                                               style={{
@@ -351,22 +351,22 @@ export default function Nav() {
                                   {/* Each item with children goes to its own column with its children below */}
                                   {withKids.map((child) => (
                                     <div key={child.id} className="col pe-4 mb-4">
-                                      <Link 
-                                        href={`/shop-4/${child.id}`} 
-                                        className="sub-menu__title allcats__leaf-bold"
-                                        onClick={closeMegaMenu}
-                                        style={{
-                                          color: 'var(--color-primary)',
-                                          textDecoration: 'none',
-                                          transition: 'color 0.3s ease',
-                                          fontWeight: '600',
-                                          fontSize: '0.95rem',
-                                          display: 'block',
-                                          // marginBottom: '8px'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                          e.target.style.color = 'var(--color-secondary)';
-                                        }}
+                                                                              <Link 
+                                          href={`/shop/${child.id}`} 
+                                          className="sub-menu__title allcats__leaf-bold"
+                                          onClick={closeMegaMenu}
+                                          style={{
+                                            color: 'var(--color-primary)',
+                                            textDecoration: 'none',
+                                            transition: 'color 0.3s ease',
+                                            fontWeight: '600',
+                                            fontSize: '0.95rem',
+                                            display: 'block',
+                                            // marginBottom: '8px'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.color = 'var(--color-secondary)';
+                                          }}
                                         onMouseLeave={(e) => {
                                           e.target.style.color = 'var(--color-primary)';
                                         }}
@@ -393,7 +393,7 @@ export default function Nav() {
           {catTree.slice(0, 6).map((root) => (
             <li key={root.id} className="navigation__item">
               <Link 
-                href={`/shop-4/${root.id}`} 
+                href={`/shop/${root.id}`} 
                 className="navigation__link"
                 onClick={closeMegaMenu}
                 style={{
