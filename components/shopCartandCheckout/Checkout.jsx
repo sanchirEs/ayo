@@ -432,20 +432,35 @@ export default function Checkout() {
               <div className="col-md-6">
                 <button
                   type="button"
-                  className={`btn w-100 ${
-                    addressMode === 'existing' 
-                      ? 'btn-primary' 
-                      : 'btn-outline-primary'
-                  }`}
+                  className="btn w-100"
+                  style={{
+                    border: '1px solid #495D35',
+                    color: addressMode === 'existing' ? 'white' : '#495D35',
+                    backgroundColor: addressMode === 'existing' ? '#495D35' : 'transparent',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (addressMode !== 'existing') {
+                      e.target.style.backgroundColor = '#495D35';
+                      e.target.style.color = 'white';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (addressMode !== 'existing') {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = '#495D35';
+                    }
+                  }}
                   onClick={() => setShowAddressModal(true)}
                   disabled={!session?.user || addresses.length === 0}
                 >
                   <i className="fas fa-map-marker-alt me-2"></i>
                   Өмнө оруулсан хаягаасаа сонгох
                   {addresses.length > 0 && (
-                    <span className={`badge ms-2 ${
-                      addressMode === 'existing' ? 'bg-light text-primary' : 'bg-primary'
-                    }`}>{addresses.length}</span>
+                    <span className="badge ms-2" style={{
+                      backgroundColor: addressMode === 'existing' ? 'white' : '#495D35',
+                      color: addressMode === 'existing' ? '#495D35' : 'white'
+                    }}>{addresses.length}</span>
                   )}
                 </button>
                 {!session?.user && (
@@ -458,11 +473,25 @@ export default function Checkout() {
               <div className="col-md-6">
                 <button
                   type="button"
-                  className={`btn w-100 ${
-                    addressMode === 'new' 
-                      ? 'btn-primary' 
-                      : 'btn-outline-primary'
-                  }`}
+                  className="btn w-100"
+                  style={{
+                    border: '1px solid #495D35',
+                    color: addressMode === 'new' ? 'white' : '#495D35',
+                    backgroundColor: addressMode === 'new' ? '#495D35' : 'transparent',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (addressMode !== 'new') {
+                      e.target.style.backgroundColor = '#495D35';
+                      e.target.style.color = 'white';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (addressMode !== 'new') {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = '#495D35';
+                    }
+                  }}
                   onClick={() => {
                     setFormData({
                       country: "Mongolia",
@@ -614,7 +643,25 @@ export default function Checkout() {
               <div className="col-md-12">
                 <button
                   type="button"
-                  className="btn btn-primary btn-checkout mt-3"
+                  className="btn btn-checkout mt-3"
+                  style={{
+                    border: '1px solid #495D35',
+                    color: 'white',
+                    backgroundColor: '#495D35',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSavingAddress) {
+                      e.target.style.backgroundColor = '#6B8E5A';
+                      e.target.style.borderColor = '#6B8E5A';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSavingAddress) {
+                      e.target.style.backgroundColor = '#495D35';
+                      e.target.style.borderColor = '#495D35';
+                    }
+                  }}
                   disabled={isSavingAddress}
                   onClick={async () => {
                     try {
@@ -697,11 +744,11 @@ export default function Checkout() {
         <div className="checkout__totals-wrapper">
           <div className="sticky-content">
             <div className="checkout__totals">
-              <h3>Таны захиалга</h3>
+              <h3 style={{ color: '#495D35' }}>Таны захиалга</h3>
               <table className="checkout-cart-items">
-                <thead>
+                <thead >
                   <tr>
-                    <th>БҮТЭЭГДЭХҮҮН</th>
+                    <th >БҮТЭЭГДЭХҮҮН</th>
                     <th>НИЙТ</th>
                   </tr>
                 </thead>
@@ -739,11 +786,12 @@ export default function Checkout() {
               </table>
             </div>
             <div className="checkout__payment-methods">
-              <h4 className="mb-3">Төлбөрийн нөхцөл</h4>
+              <h4 className="mb-3" style={{ color: '#495D35' }}>Төлбөрийн нөхцөл</h4>
               
               <div className="payment-options">
                 <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: '#F4F7F5',
+                  borderColor: '#E9ECEF',
                   transition: 'all 0.2s ease',
                   cursor: 'pointer'
                 }}>
@@ -757,9 +805,9 @@ export default function Checkout() {
                       height: '50px', 
                       backgroundColor: '#fff',
                       borderRadius: '8px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid #E9ECEF'
                     }}>
-                      <i className="fas fa-university fa-2x text-primary"></i>
+                      <i className="fas fa-university fa-2x" style={{ color: '#495D35' }}></i>
                     </div>
                     <div className="flex-grow-1">
                       <div className="fw-medium">Дансаар шилжүүлэх</div>
@@ -781,7 +829,8 @@ export default function Checkout() {
                 </div>
 
                 <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: '#F4F7F5',
+                  borderColor: '#E9ECEF',
                   transition: 'all 0.2s ease',
                   cursor: 'pointer'
                 }}>
@@ -795,7 +844,7 @@ export default function Checkout() {
                       height: '50px', 
                       backgroundColor: '#fff',
                       borderRadius: '8px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid #E9ECEF'
                     }}>
                       <img 
                         src="/assets/images/payment/qr.png" 
@@ -806,7 +855,7 @@ export default function Checkout() {
                           e.target.nextSibling.style.display = 'block';
                         }}
                       />
-                      <i className="fas fa-qrcode fa-2x text-primary" style={{ display: 'none' }}></i>
+                      <i className="fas fa-qrcode fa-2x" style={{ display: 'none', color: '#495D35' }}></i>
                     </div>
                     <div className="flex-grow-1">
                       <div className="fw-medium">QR Кодоор төлөх</div>
@@ -828,7 +877,8 @@ export default function Checkout() {
                 </div>
 
                 <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: '#F4F7F5',
+                  borderColor: '#E9ECEF',
                   transition: 'all 0.2s ease',
                   cursor: 'pointer'
                 }}>
@@ -842,7 +892,7 @@ export default function Checkout() {
                       height: '50px', 
                       backgroundColor: '#fff',
                       borderRadius: '8px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid #E9ECEF'
                     }}>
                       <img 
                         src="/assets/images/payment/pocket.png" 
@@ -853,7 +903,7 @@ export default function Checkout() {
                           e.target.nextSibling.style.display = 'block';
                         }}
                       />
-                      <i className="fas fa-wallet fa-2x text-primary" style={{ display: 'none' }}></i>
+                      <i className="fas fa-wallet fa-2x" style={{ display: 'none', color: '#495D35' }}></i>
                     </div>
                     <div className="flex-grow-1">
                       <div className="fw-medium">Pocket</div>
@@ -875,7 +925,8 @@ export default function Checkout() {
                 </div>
 
                 <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: '#F4F7F5',
+                  borderColor: '#E9ECEF',
                   transition: 'all 0.2s ease',
                   cursor: 'pointer'
                 }}>
@@ -889,7 +940,7 @@ export default function Checkout() {
                       height: '50px', 
                       backgroundColor: '#fff',
                       borderRadius: '8px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid #E9ECEF'
                     }}>
                       <img 
                         src="/assets/images/payment/storepay.png" 
@@ -900,7 +951,7 @@ export default function Checkout() {
                           e.target.nextSibling.style.display = 'block';
                         }}
                       />
-                      <i className="fas fa-credit-card fa-2x text-primary" style={{ display: 'none' }}></i>
+                      <i className="fas fa-credit-card fa-2x" style={{ display: 'none', color: '#495D35' }}></i>
                     </div>
                     <div className="flex-grow-1">
                       <div className="fw-medium">Storepay</div>
@@ -932,7 +983,25 @@ export default function Checkout() {
               </div>
             </div>
             <button 
-              className="btn btn-primary btn-checkout"
+              className="btn btn-checkout"
+              style={{
+                border: '1px solid #495D35',
+                color: 'white',
+                backgroundColor: '#495D35',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!isProcessingPayment) {
+                  e.target.style.backgroundColor = '#6B8E5A';
+                  e.target.style.borderColor = '#6B8E5A';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isProcessingPayment) {
+                  e.target.style.backgroundColor = '#495D35';
+                  e.target.style.borderColor = '#495D35';
+                }
+              }}
               disabled={isProcessingPayment}
               onClick={handleOrderAndPayment}
             >
@@ -962,8 +1031,11 @@ export default function Checkout() {
              maxHeight: '90vh',
              borderRadius: '8px'
            }}>
-             <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
-               <h5 className="modal-title">Хаяг сонгох</h5>
+             <div className="modal-header" style={{ 
+               borderBottom: '1px solid #E9ECEF',
+               backgroundColor: '#F4F7F5'
+             }}>
+               <h5 className="modal-title" style={{ color: '#495D35' }}>Хаяг сонгох</h5>
                <button
                  type="button"
                  className="btn-close"
@@ -986,9 +1058,12 @@ export default function Checkout() {
                    {addresses.map((address) => (
                      <div 
                        key={address.id} 
-                       className={`address-item p-3 border rounded mb-2 cursor-pointer transition-all ${
-                         selectedAddress?.id === address.id ? 'border-primary' : 'border-light'
-                       }`}
+                       className="address-item p-3 border rounded mb-2 cursor-pointer transition-all"
+                       style={{
+                         borderColor: selectedAddress?.id === address.id ? '#495D35' : '#E9ECEF',
+                         backgroundColor: selectedAddress?.id === address.id ? '#F4F7F5' : 'white',
+                         borderWidth: selectedAddress?.id === address.id ? '2px' : '1px'
+                       }}
                        onClick={() => setSelectedAddress(address)}
                      >
                        <div className="d-flex justify-content-between align-items-start">
@@ -1019,16 +1094,33 @@ export default function Checkout() {
                  </div>
                ) : (
                  <div className="text-center py-4 text-muted">
-                   <i className="fas fa-map-marker-alt fa-2x mb-3 text-muted"></i>
+                   <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
                    <div>Хадгалсан хаяг байхгүй байна</div>
                    <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small>
                  </div>
                )}
              </div>
-             <div className="modal-footer" style={{ borderTop: '1px solid #dee2e6' }}>
+             <div className="modal-footer" style={{ 
+               borderTop: '1px solid #E9ECEF',
+               backgroundColor: '#F4F7F5'
+             }}>
                <button
                  type="button"
-                 className="btn btn-secondary"
+                 className="btn"
+                 style={{
+                   border: '1px solid #495D35',
+                   color: '#495D35',
+                   backgroundColor: 'transparent',
+                   transition: 'all 0.3s ease'
+                 }}
+                 onMouseEnter={(e) => {
+                   e.target.style.backgroundColor = '#495D35';
+                   e.target.style.color = 'white';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.target.style.backgroundColor = 'transparent';
+                   e.target.style.color = '#495D35';
+                 }}
                  onClick={() => setShowAddressModal(false)}
                >
                  Хаах
@@ -1036,7 +1128,21 @@ export default function Checkout() {
                {selectedAddress && (
                  <button
                    type="button"
-                   className="btn btn-primary"
+                   className="btn"
+                   style={{
+                     border: '1px solid #495D35',
+                     color: 'white',
+                     backgroundColor: '#495D35',
+                     transition: 'all 0.3s ease'
+                   }}
+                   onMouseEnter={(e) => {
+                     e.target.style.backgroundColor = '#6B8E5A';
+                     e.target.style.borderColor = '#6B8E5A';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.backgroundColor = '#495D35';
+                     e.target.style.borderColor = '#495D35';
+                   }}
                    onClick={() => {
                      // Fill form with selected address
                      setFormData({

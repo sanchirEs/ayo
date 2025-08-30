@@ -114,8 +114,15 @@ export default function RootLayout({ children }) {
         <Context>
          
           <main className="">
-          <Header14 />
-          <MobileHeader />
+          <div style={{ 
+            position: 'sticky', 
+            top: 0, 
+            zIndex: 1000,
+            backgroundColor: 'white'
+          }}>
+            <Header14 />
+            <MobileHeader />
+          </div>
             {children}
             <Footer1 />
             <MobileFooter1 />

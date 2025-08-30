@@ -342,7 +342,7 @@ export default function AccountOrders() {
                         <strong>{formatPrice(order.total)}</strong>
                       </td>
                       <td>
-                                                  <button 
+                          <button 
                             className="btn btn-sm"
                             style={{
                               border: '1px solid #495D35',
@@ -364,8 +364,8 @@ export default function AccountOrders() {
                             }}
                           >
                           <i className="fas fa-eye me-1"></i>
-                          Дэлгэрэнгүй
-                        </button>
+                            Дэлгэрэнгүй
+                          </button>
                       </td>
                     </tr>
                   ))}
@@ -428,9 +428,9 @@ export default function AccountOrders() {
               }
             </p>
             {activeTab === 'all' && (
-              <a href="/shop-1" className="btn btn-primary">
-                Дэлгүүр рүү очих
-              </a>
+            <a href="/shop-1" className="btn btn-primary">
+              Дэлгүүр рүү очих
+            </a>
             )}
           </div>
         )}

@@ -8,8 +8,8 @@ export default function () {
     <>
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
-        <section className="shop-checkout container">
-          <h2 className="page-title">Shipping and Checkout</h2>
+        <section className="shop-checkout container" style={{backgroundColor: "#FBFFFC"}}>
+          <h2 className="page-title" style={{ color: '#495D35' }}>Хүргэлт ба төлбөр</h2>
           <ChectoutSteps />
           <Checkout />
         </section>
