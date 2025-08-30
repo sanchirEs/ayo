@@ -21,6 +21,7 @@ export default function OrderDetail({ orderId }) {
       try {
         setLoading(true);
         const response = await api.orders.getById(orderId);
+        console.log("response in order detail: ", response);
         
         if (response.success) {
           setOrder(response.data);
@@ -99,6 +100,7 @@ export default function OrderDetail({ orderId }) {
         const result = response.data;
         const payment = result.payment;
         const providerResponse = result.providerResponse;
+        console.log("payment in order detail: ", payment);
         
         setPaymentData({
           orderId: order.id,
@@ -333,7 +335,7 @@ export default function OrderDetail({ orderId }) {
           <div className="card-header" style={{ backgroundColor: '#F4F7F5', borderBottom: '1px solid #E9ECEF' }}>
             <h6 className="mb-0" style={{ color: '#495D35' }}>
               <i className="fas fa-shopping-bag me-2"></i>
-              Захиалгын бараанууд
+              Захиалгын бүтээгдэхүүнүүд
             </h6>
           </div>
           <div className="card-body p-0">
@@ -341,7 +343,7 @@ export default function OrderDetail({ orderId }) {
               <table className="table table-hover mb-0">
                                  <thead style={{ backgroundColor: '#495D35', color: 'white' }}>
                   <tr>
-                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Бараа</th>
+                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Бүтээгдэхүүн</th>
                     <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Үнэ</th>
                     <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Тоо ширхэг</th>
                     <th className="text-end" style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Нийт</th>
@@ -352,11 +354,11 @@ export default function OrderDetail({ orderId }) {
                     <tr key={index}>
                       <td>
                         <div className="d-flex align-items-center">
-                          {item.product && item.product.images && item.product.images[0] && (
+                          {item.product && item.product.ProductImages && item.product.ProductImages.length > 0 && (
                             <img 
-                              src={item.product.images[0]} 
-                              alt={item.product.name}
-                              style={{ width: '50px', height: '50px', objectFit: 'cover', marginRight: '15px' }}
+                              src={item.product.ProductImages[0].imageUrl} 
+                              alt={item.product.ProductImages[0].altText || item.product.name}
+                              style={{ width: '50px', height: '50px', objectFit: 'cover', marginRight: '15px', borderRadius: '8px' }}
                             />
                           )}
                           <div>
