@@ -15,8 +15,8 @@ import React from "react";
 import Banner from "@/components/homes/home-15/Banner";
 
 export const metadata = {
-  title: "Нүүр хуудас || Uomo eCommerce",
-  description: "Монголын шилдэг онлайн дэлгүүр - Uomo eCommerce",
+  title: "Нүүр хуудас || Ayo eCommerce",
+  description: "Монголын шилдэг онлайн дэлгүүр - Ayo eCommerce",
 };
 
 export default function HomePage15() {

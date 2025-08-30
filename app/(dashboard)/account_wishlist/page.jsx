@@ -3,8 +3,8 @@ import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import React from "react";
 
 export const metadata = {
-  title: "Dashboard Account Wishlist || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Dashboard Account Wishlist || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function AccountWishlistPage() {
   return (

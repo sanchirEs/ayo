@@ -2,8 +2,8 @@
 import Notfound from "@/components/otherPages/Notfound";
 
 export const metadata = {
-  title: "Page Not Found || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Page Not Found || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function PageNotFound() {
   return (

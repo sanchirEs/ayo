@@ -1,10 +1,9 @@
-import Footer1 from "@/components/footers/Footer1";
 import AccountOrders from "@/components/otherPages/AccountOrders";
 import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import React, { Suspense } from "react";
 
 export const metadata = {
-  title: "Миний захиалгууд || Uomo eCommerce",
+  title: "Миний захиалгууд || Ayo eCommerce",
   description: "Хэрэглэгчийн захиалгын жагсаалт",
 };
 export default function AccountOrderPage() {

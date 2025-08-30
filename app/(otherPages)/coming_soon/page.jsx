@@ -4,8 +4,8 @@ import Faq from "@/components/otherPages/Faq";
 import React from "react";
 
 export const metadata = {
-  title: "Comming Soon || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Coming Soon || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function CommingSoonPage() {
   return (

@@ -2,8 +2,8 @@ import Shop3 from "@/components/shoplist/Shop3";
 import React, { Suspense } from "react";
 
 export const metadata = {
-  title: "Shop 3 || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Shop 3 || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function ShopPage3() {
   return (

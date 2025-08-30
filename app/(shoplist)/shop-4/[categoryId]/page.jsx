@@ -2,8 +2,8 @@ import Shop4 from "@/components/shoplist/Shop4";
 import React, { Suspense } from "react";
 
 export const metadata = {
-  title: "Shop 4 || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Shop 4 || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 
 export default async function ShopPage4WithCategory({ params, searchParams }) {

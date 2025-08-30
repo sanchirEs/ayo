@@ -1,10 +1,9 @@
-import Footer1 from "@/components/footers/Footer1";
 import OrderDetail from "@/components/otherPages/OrderDetail";
 import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import React, { Suspense } from "react";
 
 export const metadata = {
-  title: "Захиалгын дэлгэрэнгүй || Uomo eCommerce",
+  title: "Захиалгын дэлгэрэнгүй || Ayo eCommerce",
   description: "Захиалгын дэлгэрэнгүй мэдээлэл",
 };
 

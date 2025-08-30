@@ -3,8 +3,8 @@ import LoginRegister from "@/components/otherPages/LoginRegister";
 import React, { Suspense } from "react";
 
 export const metadata = {
-  title: "Login Register || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Login Register || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function LoginPage() {
   return (

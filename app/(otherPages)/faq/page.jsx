@@ -3,8 +3,8 @@ import Faq from "@/components/otherPages/Faq";
 import React from "react";
 
 export const metadata = {
-  title: "Faq || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Faq || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function FaqPage() {
   return (

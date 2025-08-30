@@ -69,7 +69,7 @@ export default function MobileHeader() {
               src="/assets/images/logoReal.png"
               width={112}
               height={28}
-              alt="Uomo"
+                              alt="Ayo"
               className="logo__image d-block"
             />
           </a>

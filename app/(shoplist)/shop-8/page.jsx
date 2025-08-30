@@ -3,8 +3,8 @@ import Shop8 from "@/components/shoplist/Shop8";
 import React from "react";
 
 export const metadata = {
-  title: "Shop 8 || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Shop 8 || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function ShopPage8() {
   return (

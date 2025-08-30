@@ -139,7 +139,7 @@ export const banners5 = [
   },
   {
     imgSrc: "/assets/images/home/demo20/banner-3.jpg",
-    title: "Free delivery for Uomo members",
+    title: "Free delivery for Ayo members",
     promotion: "PROMOTIONS UP TO 10% OFF",
     buttonText: "See More",
   },

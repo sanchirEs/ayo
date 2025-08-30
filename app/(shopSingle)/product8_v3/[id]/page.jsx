@@ -1,4 +1,3 @@
-import Footer1 from "@/components/footers/Footer1";
 import RelatedSlider from "@/components/singleProduct/RelatedSlider";
 
 import SingleProduct3 from "@/components/singleProduct/SingleProduct3";
@@ -6,8 +5,8 @@ import React from "react";
 import { allProducts } from "@/data/products";
 // e0e0e0;
 export const metadata = {
-  title: "Shop Single 8 || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Shop Single 8 || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default async function ProductDetailsPage8(props) {
   const params = await props.params;

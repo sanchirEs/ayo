@@ -122,7 +122,7 @@ export default function Header14() {
                   src="/assets/images/logoReal.png"
                   width={112}
                   height={40}
-                  alt="Uomo"
+                  alt="Ayo"
                   className="logo__image"
                 />
               </Link>

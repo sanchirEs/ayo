@@ -4,8 +4,8 @@ import Shop9 from "@/components/shoplist/Shop9";
 import React from "react";
 
 export const metadata = {
-  title: "Shop 9 || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Shop 9 || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function ShopPage9() {
   return (

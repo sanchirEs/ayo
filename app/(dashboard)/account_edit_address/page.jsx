@@ -1,10 +1,9 @@
-import Footer1 from "@/components/footers/Footer1";
 import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import EditAddress from "@/components/otherPages/EditAddress";
 import React from "react";
 
 export const metadata = {
-  title: "Хаягийн мэдээлэл || Ayo E-commerce",
+  title: "Хаягийн мэдээлэл || Ayo eCommerce",
   description: "Хэрэглэгчийн хаягийн мэдээллийг удирдах",
 };
 export default function AccountEditAddressPage() {

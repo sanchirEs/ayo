@@ -1,8 +1,8 @@
 import HomePage15 from "./home/page";
 
 export const metadata = {
-  title: "Home 1 || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Home || Ayo eCommerce",
+  description: "Ayo eCommerce ",
 };
 export default function Home() {
   return (

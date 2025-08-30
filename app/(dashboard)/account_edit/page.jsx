@@ -1,11 +1,10 @@
-import Footer1 from "@/components/footers/Footer1";
 import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import EditAccount from "@/components/otherPages/EditAccount";
 import React from "react";
 
 export const metadata = {
-  title: "Dashboard Account Edit || Uomo eCommerce React Nextjs Template",
-  description: "Uomo eCommerce React Nextjs Template",
+  title: "Dashboard Account Edit || Ayo eCommerce",
+  description: "Ayo eCommerce",
 };
 export default function AccountEditPage() {
   return (
