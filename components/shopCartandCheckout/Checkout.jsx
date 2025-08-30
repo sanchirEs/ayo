@@ -789,44 +789,9 @@ export default function Checkout() {
               <h4 className="mb-3" style={{ color: '#495D35' }}>Төлбөрийн нөхцөл</h4>
               
               <div className="payment-options">
-                <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
-                  backgroundColor: '#F4F7F5',
-                  borderColor: '#E9ECEF',
-                  transition: 'all 0.2s ease',
-                  cursor: 'pointer'
-                }}>
-                  <label
-                    className="form-check-label d-flex align-items-center w-100"
-                    htmlFor="checkout_payment_method_1"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center" style={{ 
-                      width: '50px', 
-                      height: '50px', 
-                      backgroundColor: '#fff',
-                      borderRadius: '8px',
-                      border: '1px solid #E9ECEF'
-                    }}>
-                      <i className="fas fa-university fa-2x" style={{ color: '#495D35' }}></i>
-                    </div>
-                    <div className="flex-grow-1">
-                      <div className="fw-medium">Дансаар шилжүүлэх</div>
-                      <small className="text-muted">Банкны данс руу төлбөр хийх</small>
-                    </div>
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="checkout_payment_method"
-                      id="checkout_payment_method_1"
-                      checked={selectedPaymentMethod === 'QPAY'}
-                      onChange={() => setSelectedPaymentMethod('QPAY')}
-                      style={{ 
-                        marginLeft: '10px',
-                        transform: 'scale(1.2)'
-                      }}
-                    />
-                  </label>
-                </div>
+                
+                
+                
 
                 <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
                   backgroundColor: '#F4F7F5',

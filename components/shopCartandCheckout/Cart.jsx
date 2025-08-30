@@ -75,11 +75,11 @@ const setQuantity = (id, q) => {
             <table className="cart-table">
               <thead>
                 <tr>
-                  <th>Product</th>
+                  <th>Бүтээгдэхүүн</th>
                   <th></th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Subtotal</th>
+                  <th>Үнэ</th>
+                  <th>Тоо хэмжээ</th>
+                  <th>Нийт үнэ</th>
                   <th></th>
                 </tr>
               </thead>
@@ -88,7 +88,7 @@ const setQuantity = (id, q) => {
                   const unitPrice = Number(elm.price || 0);
                   const lineTotal = unitPrice * (elm.quantity || 1);
                   return (
-                    <tr key={`${elm.id}-${i}`}>
+                    <tr key={`₮{elm.id}-${i}`}>
                       <td>
                         <div className="px-4 shopping-cart__product-item">
                           <Image
@@ -101,16 +101,36 @@ const setQuantity = (id, q) => {
                         </div>
                       </td>
                       <td>
-                        <div className="shopping-cart__product-item__detail">
-                          <h4>{elm.name}</h4>
+                        <div className="shopping-cart__product-item__detail" style={{ 
+                          padding: '0 15px',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '300px'
+                        }}>
+                          <h4 style={{ 
+                            fontSize: '16px',
+                            lineHeight: '1.4',
+                            marginBottom: '8px',
+                            fontWeight: '500',
+                            color: '#333',
+                            wordBreak: 'break-word'
+                          }}>
+                            {elm.name}
+                          </h4>
 
                           {/* ✅ Variant attributes байвал харуулна */}
                           {Array.isArray(elm.attributes) &&
                             elm.attributes.length > 0 && (
-                              <ul className="shopping-cart__product-item__options">
+                              <ul className="shopping-cart__product-item__options" style={{
+                                listStyle: 'none',
+                                padding: 0,
+                                margin: 0,
+                                fontSize: '14px',
+                                color: '#666'
+                              }}>
                                 {elm.attributes.map((a, idx) => (
-                                  <li key={idx}>
-                                    {a.name}: {a.value}
+                                  <li key={idx} style={{ marginBottom: '4px' }}>
+                                    <span style={{ fontWeight: '500' }}>{a.name}:</span> {a.value}
                                   </li>
                                 ))}
                               </ul>
@@ -119,11 +139,15 @@ const setQuantity = (id, q) => {
                       </td>
                       <td>
                         <span className="shopping-cart__product-price">
-                          ${unitPrice.toLocaleString()}
+                        ₮{unitPrice.toLocaleString()}
                         </span>
                       </td>
                       <td>
-                        <div className="qty-control position-relative">
+                        <div className="qty-control position-relative" style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
                           <input
                             type="number"
                             name="quantity"
@@ -131,16 +155,35 @@ const setQuantity = (id, q) => {
                             min={1}
                             onChange={(e) => setQuantity(elm.id, e.target.value)}
                             className="qty-control__number text-center"
+                      
                           />
                           <div
                             onClick={() => setQuantity(elm.id, (elm.quantity || 1) - 1)}
                             className="qty-control__reduce"
+                          
+                            onMouseEnter={(e) => {
+                    
+                              e.currentTarget.style.color = '#495D35';
+                            }}
+                            onMouseLeave={(e) => {
+                           
+                              e.currentTarget.style.color = '#333';
+                            }}
                           >
                             -
                           </div>
                           <div
                             onClick={() => setQuantity(elm.id, (elm.quantity || 1) + 1)}
                             className="qty-control__increase"
+                           
+                            onMouseEnter={(e) => {
+                             
+                              e.currentTarget.style.color = '#495D35';
+                            }}
+                            onMouseLeave={(e) => {
+                            
+                              e.currentTarget.style.color = '#333';
+                            }}
                           >
                             +
                           </div>
@@ -148,7 +191,7 @@ const setQuantity = (id, q) => {
                       </td>
                       <td>
                         <span className="shopping-cart__subtotal">
-                          ${lineTotal.toLocaleString()}
+                        ₮{lineTotal.toLocaleString()}
                         </span>
                       </td>
                       <td>
@@ -230,67 +273,21 @@ const setQuantity = (id, q) => {
         <div className="shopping-cart__totals-wrapper">
           <div className="sticky-content">
             <div className="shopping-cart__totals">
-              <h3>Cart Totals</h3>
+              <h3>Нийт (сагс)</h3>
               <table className="cart-totals">
                 <tbody>
                   <tr>
-                    <th>Subtotal</th>
-                    <td>${computedSubtotal.toLocaleString()}</td>
+                    <th>Бүтээгдэхүүний нийт үнэ</th>
+                    <td>₮{computedSubtotal.toLocaleString()}</td>
                   </tr>
-                  {/* <tr>
-                    <th>Shipping</th>
-                    <td>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input form-check-input_fill"
-                          type="checkbox"
-                          id="free_shipping"
-                          checked={checkboxes.free_shipping}
-                          onChange={handleCheckboxChange}
-                        />
-                        <label className="form-check-label" htmlFor="free_shipping">
-                          Free shipping
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input form-check-input_fill"
-                          type="checkbox"
-                          id="flat_rate"
-                          checked={checkboxes.flat_rate}
-                          onChange={handleCheckboxChange}
-                        />
-                        <label className="form-check-label" htmlFor="flat_rate">
-                          Flat rate: $49
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input form-check-input_fill"
-                          type="checkbox"
-                          id="local_pickup"
-                          checked={checkboxes.local_pickup}
-                          onChange={handleCheckboxChange}
-                        />
-                        <label className="form-check-label" htmlFor="local_pickup">
-                          Local pickup: $8
-                        </label>
-                      </div>
-                      <div>Shipping to AL.</div>
-                      <div>
-                        <a href="#" className="menu-link menu-link_us-s">
-                          CHANGE ADDRESS
-                        </a>
-                      </div>
-                    </td>
-                  </tr> */}
+                 
                   <tr>
-                    <th>VAT</th>
-                    <td>${vat.toLocaleString()}</td>
+                    <th>Хүргэлтийн зардал</th>
+                    <td>₮{vat.toLocaleString()}</td>
                   </tr>
                   <tr>
-                    <th>Total</th>
-                    <td>${grandTotal.toLocaleString()}</td>
+                    <th>НИЙТ</th>
+                    <td>₮{grandTotal.toLocaleString()}</td>
                   </tr>
                 </tbody>
               </table>
@@ -301,8 +298,9 @@ const setQuantity = (id, q) => {
                 <button 
                   className="btn btn-primary btn-checkout"
                   onClick={handleCheckout}
+                  style={{backgroundColor: "#495D35", color: "white"}}
                 >
-                  Захиалга өгөх хаягаа оруулах
+                  Захиалга хийх
                 </button>
               </div>
             </div>

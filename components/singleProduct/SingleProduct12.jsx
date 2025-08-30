@@ -132,7 +132,7 @@ export default function SingleProduct12({ product }) {
               <BreadCumb />
             </div>
 
-            <div className="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
+            {/* <div className="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
               <a className="text-uppercase fw-medium">
                 <svg className="mb-1px" width="10" height="10" viewBox="0 0 25 25">
                   <use href="#icon_prev_md" />
@@ -145,7 +145,7 @@ export default function SingleProduct12({ product }) {
                   <use href="#icon_next_md" />
                 </svg>
               </a>
-            </div>
+            </div> */}
           </div>
 
           <h1 className="product-single__name">{product?.name}</h1>

@@ -47,7 +47,7 @@ const setQuantity = (id, q) => {
       <div className="aside aside_right overflow-hidden cart-drawer" id="cartDrawer">
         <div className="aside-header d-flex align-items-center">
           <h3 className="text-uppercase fs-6 mb-0">
-            SHOPPING BAG (
+            Сагс (
             <span className="cart-amount js-cart-items-count">{cartProducts.length}</span>
             )
           </h3>
@@ -70,7 +70,7 @@ const setQuantity = (id, q) => {
                         height={400}
                         style={{ height: "fit-content" }}
                         src={elm.image || "/images/placeholder-330x400.png"}
-                        alt={elm.name || "Product"}
+                        alt={elm.name || "Бүтээгдэхүүн"}
                       />
                     </div>
 
@@ -122,7 +122,7 @@ const setQuantity = (id, q) => {
                         </div>
 
                         <span className="cart-drawer-item__price money price">
-                          ${lineTotal.toLocaleString()}
+                          ₮{lineTotal.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -139,31 +139,31 @@ const setQuantity = (id, q) => {
             })}
           </div>
         ) : (
-          <div className="fs-18 mt-5 px-5">Your cart is empty. Start shopping!</div>
+          <div className="fs-18 mt-5 px-5">Таны сагс хоосон байна. Худалдаж эхлээрэй!</div>
         )}
 
         <div className="cart-drawer-actions position-absolute start-0 bottom-0 w-100">
           <hr className="cart-drawer-divider" />
           <div className="d-flex justify-content-between">
-            <h6 className="fs-base fw-medium">SUBTOTAL:</h6>
+            <h6 className="fs-base fw-medium">Нийт:</h6>
             {/* Хэрэв context-д totalPrice аль хэдийн байгаа бол түүнийг ашигла */}
             <span className="cart-subtotal fw-medium">
-              ${Number(totalPrice || cartProducts.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity || 1)), 0)).toLocaleString()}
+              ₮{Number(totalPrice || cartProducts.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity || 1)), 0)).toLocaleString()}
             </span>
           </div>
 
           {cartProducts.length ? (
             <>
               <Link href="/shop_cart" className="btn btn-light mt-3 d-block">
-                View Cart
+                Сагсыг харах
               </Link>
-              <Link href="/shop_checkout" className="btn btn-primary mt-3 d-block">
-                Checkout
+              <Link href="/shop_checkout" className="btn btn-success mt-3 d-block" style={{backgroundColor: "#495D35", color: "white"}}>
+                Худалдаж авах
               </Link>
             </>
           ) : (
             <Link href="/shop-1" className="btn btn-light mt-3 d-block">
-              Explore shop
+              Дэлгүүрээ үзэх
             </Link>
           )}
         </div>
