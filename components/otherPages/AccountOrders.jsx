@@ -36,6 +36,17 @@ export default function AccountOrders() {
     return badgeMap[status] || 'bg-secondary';
   };
 
+  const getStatusBadgeStyle = (status) => {
+    const styleMap = {
+      'PENDING': { backgroundColor: '#C7D4BA', color: 'white' },
+      'PROCESSING': { backgroundColor: '#A9C19A', color: 'white' },
+      'SHIPPED': { backgroundColor: '#8BA67A', color: 'white' },
+      'DELIVERED': { backgroundColor: '#6B8E5A', color: 'white' },
+      'CANCELLED': { backgroundColor: '#495D35', color: 'white' }
+    };
+    return styleMap[status] || { backgroundColor: '#E5E8E0', color: '#495D35' };
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('mn-MN', {
@@ -137,7 +148,7 @@ export default function AccountOrders() {
           </div>
           <ul className="nav nav-tabs flex-wrap" id="orderTabs" role="tablist" style={{ borderBottom: '2px solid #dee2e6' }}>
             <li className="nav-item" role="presentation">
-                              <button
+                                              <button
                   className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
                   onClick={() => setActiveTab('all')}
                   type="button"
@@ -153,8 +164,8 @@ export default function AccountOrders() {
                     transition: 'all 0.3s ease'
                   }}
                 >
-                Бүгд
-                <span className="badge bg-secondary ms-2">{getOrderCount('all')}</span>
+                  Бүгд
+                  <span className="badge ms-2" style={{ backgroundColor: '#E5E8E0', color: '#495D35' }}>{getOrderCount('all')}</span>
               </button>
             </li>
             <li className="nav-item" role="presentation">
@@ -173,9 +184,9 @@ export default function AccountOrders() {
                   backgroundColor: 'transparent',
                   transition: 'all 0.3s ease'
                 }}
-              >
-                Хүлээгдэж буй
-                <span className="badge bg-warning ms-2">{getOrderCount('PENDING')}</span>
+                              >
+                  Хүлээгдэж буй
+                  <span className="badge ms-2" style={{ backgroundColor: '#C7D4BA', color: 'white' }}>{getOrderCount('PENDING')}</span>
               </button>
             </li>
             <li className="nav-item" role="presentation">
@@ -194,9 +205,9 @@ export default function AccountOrders() {
                   backgroundColor: 'transparent',
                   transition: 'all 0.3s ease'
                 }}
-              >
-                Боловсруулж буй
-                <span className="badge bg-info ms-2">{getOrderCount('PROCESSING')}</span>
+                              >
+                  Боловсруулж буй
+                  <span className="badge ms-2" style={{ backgroundColor: '#A9C19A', color: 'white' }}>{getOrderCount('PROCESSING')}</span>
               </button>
             </li>
             <li className="nav-item" role="presentation">
@@ -215,9 +226,9 @@ export default function AccountOrders() {
                   backgroundColor: 'transparent',
                   transition: 'all 0.3s ease'
                 }}
-              >
-                Илгээгдсэн
-                <span className="badge bg-primary ms-2">{getOrderCount('SHIPPED')}</span>
+                              >
+                  Илгээгдсэн
+                  <span className="badge ms-2" style={{ backgroundColor: '#8BA67A', color: 'white' }}>{getOrderCount('SHIPPED')}</span>
               </button>
             </li>
             <li className="nav-item" role="presentation">
@@ -236,9 +247,9 @@ export default function AccountOrders() {
                   backgroundColor: 'transparent',
                   transition: 'all 0.3s ease'
                 }}
-              >
-                Хүргэгдсэн
-                <span className="badge bg-success ms-2">{getOrderCount('DELIVERED')}</span>
+                              >
+                  Хүргэгдсэн
+                  <span className="badge ms-2" style={{ backgroundColor: '#6B8E5A', color: 'white' }}>{getOrderCount('DELIVERED')}</span>
               </button>
             </li>
             <li className="nav-item" role="presentation">
@@ -257,9 +268,9 @@ export default function AccountOrders() {
                   backgroundColor: 'transparent',
                   transition: 'all 0.3s ease'
                 }}
-              >
-                Цуцлагдсан
-                <span className="badge bg-danger ms-2">{getOrderCount('CANCELLED')}</span>
+                              >
+                  Цуцлагдсан
+                  <span className="badge ms-2" style={{ backgroundColor: '#495D35', color: 'white' }}>{getOrderCount('CANCELLED')}</span>
               </button>
             </li>
           </ul>
@@ -303,23 +314,23 @@ export default function AccountOrders() {
                       </td>
                       <td>{formatDate(order.createdAt)}</td>
                       <td>
-                        <span className={`badge ${getStatusBadgeClass(order.status)}`}>
+                        <span className="badge" style={getStatusBadgeStyle(order.status)}>
                           {getStatusText(order.status)}
                         </span>
                         {order.payment && (
-                          <div className="text-muted small mt-1">
+                          <div className="text-muted small mt-1" style={{ color: "#495D35" }}>
                             {order.payment.status === 'COMPLETED' ? (
-                              <span className="text-success">
+                              <span >
                                 <i className="fas fa-check-circle me-1"></i>
                                 Төлбөр төлөгдсөн
                               </span>
                             ) : order.payment.status === 'PENDING' ? (
-                              <span className="text-warning">
+                              <span >
                                 <i className="fas fa-clock me-1"></i>
                                 Төлбөр хүлээгдэж буй
                               </span>
                             ) : (
-                              <span className="text-danger">
+                              <span >
                                 <i className="fas fa-times-circle me-1"></i>
                                 Төлбөр амжилтгүй
                               </span>
