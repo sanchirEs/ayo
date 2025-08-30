@@ -10,7 +10,7 @@ export default function AccountWishlistPage() {
   return (
     <>
       <div className="mb-4 pb-4"></div>
-      <section className="my-account container">
+      <section className="my-account container" style={{backgroundColor: "#FBFFFC"}}>
         <h2 className="page-title">Wishlist</h2>
         <div className="row">
           <DashboardSidebar />

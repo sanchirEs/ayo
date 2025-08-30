@@ -1,22 +1,23 @@
 import Footer1 from "@/components/footers/Footer1";
-import AccountOrders from "@/components/otherPages/AccountOrders";
+import OrderDetail from "@/components/otherPages/OrderDetail";
 import DashboardSidebar from "@/components/otherPages/DashboardSidebar";
 import React, { Suspense } from "react";
 
 export const metadata = {
-  title: "Миний захиалгууд || Uomo eCommerce",
-  description: "Хэрэглэгчийн захиалгын жагсаалт",
+  title: "Захиалгын дэлгэрэнгүй || Uomo eCommerce",
+  description: "Захиалгын дэлгэрэнгүй мэдээлэл",
 };
-export default function AccountOrderPage() {
+
+export default function OrderDetailPage({ params }) {
   return (
     <>
       <div className="mb-4 pb-4"></div>
       <section className="my-account container" style={{backgroundColor: "#FBFFFC"}}>
-        <h2 className="page-title">Миний захиалгууд</h2>
+        <h2 className="page-title">Захиалгын дэлгэрэнгүй</h2>
         <div className="row">
           <DashboardSidebar />
-          <Suspense fallback={<div>Loading orders...</div>}>
-            <AccountOrders />
+          <Suspense fallback={<div>Loading order details...</div>}>
+            <OrderDetail orderId={params.id} />
           </Suspense>
         </div>
       </section>
