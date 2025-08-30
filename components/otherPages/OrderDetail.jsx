@@ -52,15 +52,15 @@ export default function OrderDetail({ orderId }) {
     return statusMap[status] || status;
   };
 
-  const getStatusBadgeClass = (status) => {
-    const badgeMap = {
-      'PENDING': 'bg-warning',
-      'PROCESSING': 'bg-info',
-      'SHIPPED': 'bg-primary',
-      'DELIVERED': 'bg-success',
-      'CANCELLED': 'bg-danger'
+  const getStatusBadgeStyle = (status) => {
+    const styleMap = {
+      'PENDING': { backgroundColor: '#C7D4BA', color: 'white' },
+      'PROCESSING': { backgroundColor: '#A9C19A', color: 'white' },
+      'SHIPPED': { backgroundColor: '#8BA67A', color: 'white' },
+      'DELIVERED': { backgroundColor: '#6B8E5A', color: 'white' },
+      'CANCELLED': { backgroundColor: '#495D35', color: 'white' }
     };
-    return badgeMap[status] || 'bg-secondary';
+    return styleMap[status] || { backgroundColor: '#E5E8E0', color: '#495D35' };
   };
 
   const formatDate = (dateString) => {
@@ -145,7 +145,21 @@ export default function OrderDetail({ orderId }) {
             {error}
           </div>
           <button 
-            className="btn btn-primary"
+            className="btn"
+            style={{
+              border: '1px solid #495D35',
+              color: '#495D35',
+              backgroundColor: 'transparent',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#495D35';
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#495D35';
+            }}
             onClick={() => router.back()}
           >
             Буцах
@@ -163,7 +177,21 @@ export default function OrderDetail({ orderId }) {
             Захиалга олдсонгүй
           </div>
           <button 
-            className="btn btn-primary"
+            className="btn"
+            style={{
+              border: '1px solid #495D35',
+              color: '#495D35',
+              backgroundColor: 'transparent',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#495D35';
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#495D35';
+            }}
             onClick={() => router.back()}
           >
             Буцах
@@ -185,7 +213,21 @@ export default function OrderDetail({ orderId }) {
             </p>
           </div>
           <button 
-            className="btn btn-outline-secondary"
+            className="btn"
+            style={{
+              border: '1px solid #495D35',
+              color: '#495D35',
+              backgroundColor: 'transparent',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#495D35';
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#495D35';
+            }}
             onClick={() => router.back()}
           >
             <i className="fas fa-arrow-left me-2"></i>
@@ -199,13 +241,13 @@ export default function OrderDetail({ orderId }) {
             <div className="row align-items-center">
               <div className="col-md-6">
                 <h6 className="mb-2">Захиалгын төлөв</h6>
-                <span className={`badge ${getStatusBadgeClass(order.status)} fs-6`}>
+                <span className="badge fs-6" style={getStatusBadgeStyle(order.status)}>
                   {getStatusText(order.status)}
                 </span>
               </div>
               <div className="col-md-6 text-md-end">
                 <h6 className="mb-2">Нийт дүн</h6>
-                <h4 className="text-primary mb-0">{formatPrice(order.total)}</h4>
+                <h4 className="mb-0" style={{ color: '#495D35' }}>{formatPrice(order.total)}</h4>
               </div>
             </div>
           </div>
@@ -214,8 +256,8 @@ export default function OrderDetail({ orderId }) {
         {/* Payment Status */}
         {order.payment && (
           <div className="card mb-4">
-            <div className="card-header">
-              <h6 className="mb-0">
+            <div className="card-header" style={{ backgroundColor: '#F4F7F5', borderBottom: '1px solid #E9ECEF' }}>
+              <h6 className="mb-0" style={{ color: '#495D35' }}>
                 <i className="fas fa-credit-card me-2"></i>
                 Төлбөрийн мэдээлэл
               </h6>
@@ -226,17 +268,17 @@ export default function OrderDetail({ orderId }) {
                   <p><strong>Төлбөрийн төрөл:</strong> {order.payment.provider || 'QPAY'}</p>
                   <p><strong>Төлбөрийн статус:</strong></p>
                   {order.payment.status === 'COMPLETED' ? (
-                    <span className="badge bg-success">
+                    <span className="badge" style={{ backgroundColor: '#6B8E5A', color: 'white' }}>
                       <i className="fas fa-check-circle me-1"></i>
                       Төлбөр төлөгдсөн
                     </span>
                   ) : order.payment.status === 'PENDING' ? (
-                    <span className="badge bg-warning">
+                    <span className="badge" style={{ backgroundColor: '#C7D4BA', color: 'white' }}>
                       <i className="fas fa-clock me-1"></i>
                       Төлбөр хүлээгдэж буй
                     </span>
                   ) : (
-                    <span className="badge bg-danger">
+                    <span className="badge" style={{ backgroundColor: '#495D35', color: 'white' }}>
                       <i className="fas fa-times-circle me-1"></i>
                       Төлбөр амжилтгүй
                     </span>
@@ -245,7 +287,25 @@ export default function OrderDetail({ orderId }) {
                 <div className="col-md-6 text-md-end">
                   {order.payment.status === 'PENDING' && (
                     <button 
-                      className="btn btn-success"
+                      className="btn"
+                      style={{
+                        border: '1px solid #495D35',
+                        color: 'white',
+                        backgroundColor: '#495D35',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isProcessingPayment) {
+                          e.target.style.backgroundColor = '#6B8E5A';
+                          e.target.style.borderColor = '#6B8E5A';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isProcessingPayment) {
+                          e.target.style.backgroundColor = '#495D35';
+                          e.target.style.borderColor = '#495D35';
+                        }
+                      }}
                       onClick={handlePaymentForOrder}
                       disabled={isProcessingPayment}
                     >
@@ -270,8 +330,8 @@ export default function OrderDetail({ orderId }) {
 
         {/* Order Items */}
         <div className="card mb-4">
-          <div className="card-header">
-            <h6 className="mb-0">
+          <div className="card-header" style={{ backgroundColor: '#F4F7F5', borderBottom: '1px solid #E9ECEF' }}>
+            <h6 className="mb-0" style={{ color: '#495D35' }}>
               <i className="fas fa-shopping-bag me-2"></i>
               Захиалгын бараанууд
             </h6>
@@ -279,12 +339,12 @@ export default function OrderDetail({ orderId }) {
           <div className="card-body p-0">
             <div className="table-responsive">
               <table className="table table-hover mb-0">
-                <thead className="table-light">
+                                 <thead style={{ backgroundColor: '#495D35', color: 'white' }}>
                   <tr>
-                    <th>Бараа</th>
-                    <th>Үнэ</th>
-                    <th>Тоо ширхэг</th>
-                    <th className="text-end">Нийт</th>
+                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Бараа</th>
+                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Үнэ</th>
+                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Тоо ширхэг</th>
+                    <th className="text-end" style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Нийт</th>
                   </tr>
                 </thead>
                 <tbody>

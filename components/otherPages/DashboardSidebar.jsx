@@ -28,7 +28,7 @@ export default function DashboardSidebar() {
               <Link
                 href={elm.href}
                 className={`menu-link menu-link_us-s ${
-                  pathname == elm.href ? "menu-link_active" : ""
+                  pathname === elm.href || (elm.href === "/account_orders" && pathname.startsWith("/account_orders/")) ? "menu-link_active" : ""
                 } `}
               >
                 {elm.title}

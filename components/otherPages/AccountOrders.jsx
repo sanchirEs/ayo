@@ -342,13 +342,27 @@ export default function AccountOrders() {
                         <strong>{formatPrice(order.total)}</strong>
                       </td>
                       <td>
-                        <button 
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.location.href = `/account_orders/${order.id}`;
-                          }}
-                        >
+                                                  <button 
+                            className="btn btn-sm"
+                            style={{
+                              border: '1px solid #495D35',
+                              color: '#495D35',
+                              backgroundColor: 'transparent',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#495D35';
+                              e.target.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'transparent';
+                              e.target.style.color = '#495D35';
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = `/account_orders/${order.id}`;
+                            }}
+                          >
                           <i className="fas fa-eye me-1"></i>
                           Дэлгэрэнгүй
                         </button>
