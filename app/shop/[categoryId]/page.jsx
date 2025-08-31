@@ -1,18 +1,22 @@
 import React, { Suspense } from "react";
-import Shop4 from "@/components/shoplist/Shop4";
+import ShopLayoutWrapper from "@/components/shoplist/ShopLayoutWrapper";
 
-export default function ShopCategoryPage({ params, searchParams }) {
-  const categoryId = parseInt(params?.categoryId);
+export default async function ShopCategoryPage({ params, searchParams }) {
+  // Fix Next.js 15 async params issue
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  
+  const categoryId = parseInt(resolvedParams?.categoryId);
   
   // URL: /shop/123?page=2&limit=12&sort=price-asc
-  const page = Number(searchParams?.page || 1);
-  const limit = Number(searchParams?.limit || 12);
-  const sort = String(searchParams?.sort || "newest");
+  const page = Number(resolvedSearchParams?.page || 1);
+  const limit = Number(resolvedSearchParams?.limit || 12);
+  const sort = String(resolvedSearchParams?.sort || "newest");
   
   return (
     <div className="shop-products">
       <Suspense fallback={<div>Loading category products...</div>}>
-        <Shop4 
+        <ShopLayoutWrapper 
           categoryId={categoryId}
           initialPage={page}
           initialLimit={limit}

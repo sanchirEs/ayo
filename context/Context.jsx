@@ -44,9 +44,9 @@ export default function Context({ children }) {
   };
 
   const toggleWishlist = async (id) => {
-    // Check if user is logged in
-    if (!user) {
-      console.log('User not logged in, using local storage for wishlist');
+    // Check if user is logged in and has access token
+    if (!user || !user.accessToken) {
+      console.log('User not logged in or no access token, using local storage for wishlist');
       // Fallback to local storage if not logged in
       if (wishList.includes(id)) {
         setWishList((pre) => [...pre.filter((elm) => elm != id)]);
@@ -69,8 +69,15 @@ export default function Context({ children }) {
     } catch (error) {
       console.error('Wishlist toggle error:', error);
       
-      // Don't show error for 404 or network issues, just use local storage
-      if (error.message.includes('404') || error.message.includes('Not Found') || error.message.includes('fetch')) {
+      // Handle authentication errors specifically
+      if (error.message.includes('Invalid TOKEN') || 
+          error.message.includes('Authentication required') ||
+          error.message.includes('401') ||
+          error.message.includes('403')) {
+        console.log('Authentication error, using local storage for wishlist');
+      } else if (error.message.includes('404') || 
+                 error.message.includes('Not Found') || 
+                 error.message.includes('fetch')) {
         console.log('Wishlist API not available, using local storage');
       }
       
@@ -101,9 +108,9 @@ export default function Context({ children }) {
   // Load wishlist from backend on component mount
   useEffect(() => {
     const loadWishlist = async () => {
-      // Check if user is logged in
-      if (!user) {
-        console.log('User not logged in, loading wishlist from local storage');
+      // Check if user is logged in and has access token
+      if (!user || !user.accessToken) {
+        console.log('User not logged in or no access token, loading wishlist from local storage');
         const items = JSON.parse(localStorage.getItem("wishlist"));
         if (items?.length) {
           setWishList(items);
@@ -119,12 +126,19 @@ export default function Context({ children }) {
       } catch (error) {
         console.error('Failed to load wishlist from backend:', error);
         
-        // Don't show error for 404 or network issues, just use local storage
-        if (error.message.includes('404') || error.message.includes('Not Found') || error.message.includes('fetch')) {
+        // Handle authentication errors specifically
+        if (error.message.includes('Invalid TOKEN') || 
+            error.message.includes('Authentication required') ||
+            error.message.includes('401') ||
+            error.message.includes('403')) {
+          console.log('Authentication error, using local storage for wishlist');
+        } else if (error.message.includes('404') || 
+                   error.message.includes('Not Found') || 
+                   error.message.includes('fetch')) {
           console.log('Wishlist API not available, using local storage');
         }
         
-        // Fallback to local storage
+        // Fallback to local storage for any error
         const items = JSON.parse(localStorage.getItem("wishlist"));
         if (items?.length) {
           setWishList(items);

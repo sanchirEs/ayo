@@ -16,6 +16,7 @@ export default function AccountWishlist() {
   const fetchWishlistProducts = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await api.wishlist.get();
       if (response.success) {
         setWishlistProducts(response.data || []);
@@ -24,7 +25,20 @@ export default function AccountWishlist() {
       }
     } catch (err) {
       console.error('Error fetching wishlist:', err);
-      setError('Error loading wishlist products');
+      
+      // Handle authentication errors specifically
+      if (err.message.includes('Invalid TOKEN') || 
+          err.message.includes('Authentication required') ||
+          err.message.includes('401') ||
+          err.message.includes('403')) {
+        setError('Please log in to view your wishlist');
+      } else if (err.message.includes('404') || 
+                 err.message.includes('Not Found') || 
+                 err.message.includes('fetch')) {
+        setError('Wishlist service temporarily unavailable');
+      } else {
+        setError('Error loading wishlist products');
+      }
     } finally {
       setLoading(false);
     }
