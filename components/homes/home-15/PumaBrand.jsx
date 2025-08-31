@@ -9,14 +9,14 @@ import Link from "next/link";
 import ProductCard from "@/components/common/ProductCard";
 import api from "@/lib/api";
 
-export default function BrandProduct() {
+export default function PumaBrand() {
   const [data, setData] = useState({ products: [], pagination: null });
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
   useEffect(() => {
     let mounted = true;
-    // Use homepageService to get featured products for Converse brand
+    // Use homepageService to get featured products for Puma brand
     api.homepage
       .bundled({ sections: 'featured', limit: 20, include: 'card' })
       .then((res) => {
@@ -24,9 +24,9 @@ export default function BrandProduct() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("converse products: ", featuredProducts)
+        console.log("puma products: ", featuredProducts)
       })
-      .catch((e) => setErr(e.message || "Failed to load converse products"))
+      .catch((e) => setErr(e.message || "Failed to load puma products"))
       .finally(() => setLoading(false));
     return () => {
       mounted = false;
@@ -45,8 +45,8 @@ export default function BrandProduct() {
       loop: products.length > 5, // loop only if enough items
       pagination: false,
       navigation: {
-        nextEl: ".converse-carousel__next",
-        prevEl: ".converse-carousel__prev",
+        nextEl: ".puma-carousel__next",
+        prevEl: ".puma-carousel__prev",
       },
       breakpoints: {
         320: { slidesPerView: 2, slidesPerGroup: 2, spaceBetween: 14 },
@@ -59,12 +59,12 @@ export default function BrandProduct() {
 
   if (loading) {
     return (
-        <section className="converse-brand-section">
-          <div className="converse-bg-pattern"></div>
-          <div className="converse-bg-overlay"></div>
+        <section className="puma-brand-section">
+          <div className="puma-bg-pattern"></div>
+          <div className="puma-bg-overlay"></div>
           <div className="container">
-            <div className="converse-brand-logo">
-              <h2 className="converse-logo-text">CONVERSE</h2>
+            <div className="puma-brand-logo">
+              <h2 className="puma-logo-text">PUMA</h2>
             </div>
             <p className="text-center">Loading products…</p>
           </div>
@@ -74,12 +74,12 @@ export default function BrandProduct() {
 
   if (err) {
     return (
-        <section className="converse-brand-section">
-          <div className="converse-bg-pattern"></div>
-          <div className="converse-bg-overlay"></div>
+        <section className="puma-brand-section">
+          <div className="puma-bg-pattern"></div>
+          <div className="puma-bg-overlay"></div>
           <div className="container">
-            <div className="converse-brand-logo">
-              <h2 className="converse-logo-text">CONVERSE</h2>
+            <div className="puma-brand-logo">
+              <h2 className="puma-logo-text">PUMA</h2>
             </div>
             <p className="text-danger text-center">{err}</p>
           </div>
@@ -88,29 +88,29 @@ export default function BrandProduct() {
   }
 
       return (
-      <section className="converse-brand-section">
+      <section className="puma-brand-section">
         {/* Desktop: Hero-style banner with background image */}
         <div className="d-none d-lg-block">
           <div className="overflow-hidden position-relative h-100">
             <div className="slideshow-bg ">
               <Image
                 loading="lazy"
-                src="/assets/images/brandsBg/brands1.webp"
+                src="/assets/images/brands/brand3.png"
                 width="1920"
                 height="600"
-                alt="Converse Background"
+                alt="Puma Background"
                 className="slideshow-bg__img object-fit-cover"
               />
             </div>
             <div className="slideshow-text container position-absolute start-100 top-50 translate-middle">
-              {/* <div className="converse-brand-logo">
-                <h2 className="converse-logo-text">CONVERSE</h2>
+              {/* <div className="puma-brand-logo">
+                <h2 className="puma-logo-text">PUMA</h2>
               </div> */}
             
           
           
                        {/* View All Button */}
-             {/* <div className="converse-view-all">
+             {/* <div className="puma-view-all">
                <Link href="/shop-4" className="btn">
                  Бүгдийг үзэх
                </Link>
@@ -121,12 +121,12 @@ export default function BrandProduct() {
            
        {/* Mobile: Show only banner with clickable area */}
        <div className="d-lg-none">
-         <Link href="/shop" className="converse-mobile-banner">
-           <div className="converse-mobile-bg">
+         <Link href="/shop" className="puma-mobile-banner">
+           <div className="puma-mobile-bg">
              <img
-               src="/assets/images/brandsBg/converse_banner_center.png"
-               alt="Converse"
-               className="converse-mobile-img"
+               src="/assets/images/brands/brand3.png"
+               alt="Puma"
+               className="puma-mobile-img"
                style={{ width: '100%', height: 'auto' }}
              />
            </div>

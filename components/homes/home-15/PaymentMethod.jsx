@@ -4,16 +4,34 @@ import Image from "next/image";
 
 export default function PaymentMethod() {
   return (
-    <section className="payment-method-section">
-      <div className="">
-        <div className="">
-          <div className="payment-method-image-container">
+    <section className="payment-method-section-compact">
+      <div className="container">
+        <div className="payment-methods-wrapper" style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: '16px', 
+          flexWrap: 'wrap' 
+        }}>
+          <div className="payment-method-card" style={{ flex: '1', maxWidth: '40%' }}>
             <Image
-              src="/assets/images/payment/paymentMethod.png"
-              alt="Payment Methods and Conditions"
-              width={2000}
-              height={80}
-              className="payment-method-image"
+              src="/assets/images/payment/storepay_web.webp"
+              alt="Storepay Payment Method"
+              width={350}
+              height={70}
+              className="payment-method-logo"
+              style={{ width: '100%', height: 'auto' }}
+              priority
+            />
+          </div>
+          <div className="payment-method-card" style={{ flex: '1', maxWidth: '40%' }}>
+            <Image
+              src="/assets/images/payment/pocket_web.webp"
+              alt="Pocket Payment Method"
+              width={350}
+              height={70}
+              className="payment-method-logo"
+              style={{ width: '100%', height: 'auto' }}
               priority
             />
           </div>

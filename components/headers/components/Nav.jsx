@@ -222,9 +222,11 @@ export default function Nav() {
                 color: 'var(--color-text)',
                 textDecoration: 'none',
                 transition: 'color 0.3s ease',
-                // padding: '8px 16px',
+                padding: '6px 16px 6px 0',
                 borderRadius: '6px',
-                fontWeight: '500'
+                fontWeight: '500',
+                fontSize: '0.85rem',
+                marginRight: '24px'
               }}
               onMouseEnter={(e) => {
                 e.target.style.color = 'var(--color-primary)';
@@ -389,34 +391,52 @@ export default function Nav() {
             )}
           </li>
 
-          {/* First 6 root categories as regular nav items */}
-          {catTree.slice(0, 6).map((root) => (
-            <li key={root.id} className="navigation__item">
-              <Link 
-                href={`/shop/${root.id}`} 
-                className="navigation__link"
-                onClick={closeMegaMenu}
-                style={{
-                  color: 'var(--color-text)',
-                  textDecoration: 'none',
-                  transition: 'color 0.3s ease',
-                  // padding: '8px 16px',   
-                  borderRadius: '6px',
-                  fontWeight: '500'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = 'var(--color-primary)';
-                  e.target.style.backgroundColor = 'rgba(47, 79, 47, 0.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = 'var(--color-text)';
-                  e.target.style.backgroundColor = 'transparent';
-                }}
-              >
-                {root.name}
-              </Link>
-            </li>
-          ))}
+          {/* Specific categories in order */}
+          {(() => {
+            const specificCategories = [
+              'Хямдралын багц',
+              'Арьс арчилгаа',
+              'Нүүр будалт',
+              'Үнэртэн',
+              'Маск',
+              'Эмэгтэйчүүдийн бүтээгдэхүүн'
+            ];
+            
+            return specificCategories.map((categoryName, index) => {
+              const category = catTree.find(cat => cat.name === categoryName);
+              if (!category) return null;
+              
+              return (
+                <li key={category.id} className="navigation__item">
+                  <Link 
+                    href={`/shop/${category.id}`} 
+                    className="navigation__link"
+                    onClick={closeMegaMenu}
+                    style={{
+                      color: 'var(--color-text)',
+                      textDecoration: 'none',
+                      transition: 'color 0.3s ease',
+                      padding: '6px 16px 6px 0',   
+                      borderRadius: '6px',
+                      fontWeight: '500',
+                      fontSize: '0.85rem',
+                      marginRight: '24px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = 'var(--color-primary)';
+                      e.target.style.backgroundColor = 'rgba(47, 79, 47, 0.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = 'var(--color-text)';
+                      e.target.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              );
+            });
+          })()}
         </>
       )}
     </>

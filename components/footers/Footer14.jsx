@@ -31,10 +31,10 @@ export default function Footer14() {
               </div>
               <div className="service-promotion__content-wrap">
                 <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  Fast And Free Delivery
+                  Хурдан Шуурхай Хүргэлт
                 </h3>
                 <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Free delivery for all orders over $140
+                  Бид таны захиалгыг 0-оос 48 цагийн дотор хүргэнэ.
                 </p>
               </div>
             </div>
@@ -54,10 +54,10 @@ export default function Footer14() {
               </div>
               <div className="service-promotion__content-wrap">
                 <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  24/7 Customer Support
+                  24/7 Үйлчилгээ
                 </h3>
                 <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Friendly 24/7 customer support
+                  Та хүссэн цагтаа хүссэн бүтээгдэхүүнээ захиалаарай.
                 </p>
               </div>
             </div>
@@ -77,10 +77,10 @@ export default function Footer14() {
               </div>
               <div className="service-promotion__content-wrap">
                 <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  Money Back Guarantee
+                  Тав тухтай үйлчилгээ
                 </h3>
                 <p className="service-promotion__content text-secondary mb-0 text-white">
-                  We return money within 30 days
+                  Хямд үнэ, өргөн сонголт
                 </p>
               </div>
             </div>
@@ -108,14 +108,14 @@ export default function Footer14() {
             </div>
             {/* <!-- /.logo --> */}
             <p className="footer-address">
-              1418 River Drive, Suite 35 Cottonhall, CA 9622 United States
+               2-р хороо, ЧД, 58-р байр 1 давхар Улаанбаатар хот, Монгол улс
             </p>
 
             <p className="m-0">
-                              <strong className="fw-medium">sale@ayo.com</strong>
+                              <strong className="fw-medium">sanchirenkhamgalan@gmail.com</strong>
             </p>
             <p>
-              <strong className="fw-medium">+1 246-345-0695</strong>
+              <strong className="fw-medium">+976 7200 9191</strong>
             </p>
 
             <ul className="social-links list-unstyled d-flex flex-wrap mb-0">
@@ -143,7 +143,7 @@ export default function Footer14() {
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Company</h6>
+            <h6 className="sub-menu__title text-uppercase">Компани</h6>
             <ul className="sub-menu__list list-unstyled">
               {footerLinks1.map((elm, i) => (
                 <li key={i} className="sub-menu__item">
@@ -157,7 +157,7 @@ export default function Footer14() {
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Shop</h6>
+            <h6 className="sub-menu__title text-uppercase">Дэлгүүр</h6>
             <ul className="sub-menu__list list-unstyled">
               {footerLinks2.map((elm, i) => (
                 <li key={i} className="sub-menu__item">
@@ -171,7 +171,7 @@ export default function Footer14() {
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Help</h6>
+            <h6 className="sub-menu__title text-uppercase">Тусламж</h6>
             <ul className="sub-menu__list list-unstyled">
               {footerLinks3.map((elm, i) => (
                 <li key={i} className="sub-menu__item">
@@ -185,10 +185,9 @@ export default function Footer14() {
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-newsletter col-12 mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Subscribe</h6>
+            <h6 className="sub-menu__title text-uppercase">Бүртгүүлэх</h6>
             <p>
-              Be the first to get the latest news about trends, promotions, and
-              much more!
+              Хямдрал, урамшуулал болон бусад шинэ мэдээллийг хамгийн түрүүнд аваарай!
             </p>
             <form
               onSubmit={(e) => e.preventDefault()}
@@ -198,12 +197,12 @@ export default function Footer14() {
                 className="form-control border-white"
                 type="email"
                 name="email"
-                placeholder="Your email address"
+                placeholder="Таны имэйл хаяг"
               />
               <input
                 className="btn-link fw-medium bg-white position-absolute top-0 end-0 h-100"
                 type="submit"
-                defaultValue="JOIN"
+                defaultValue="НЭГДЭХ"
               />
             </form>
           </div>
@@ -216,7 +215,7 @@ export default function Footer14() {
       <div className="footer-bottom container">
         <div className="d-block d-md-flex align-items-center">
           <span className="footer-copyright me-auto">
-                          ©{new Date().getFullYear()} Ayo
+                     Ayo Cosmetics
           </span>
           <div className="footer-settings d-block d-md-flex align-items-center">
             <div className="d-flex align-items-center">
@@ -224,9 +223,9 @@ export default function Footer14() {
                 htmlFor="footerSettingsLanguage"
                 className="me-2 text-white"
               >
-                Language
+                  © {new Date().getFullYear()}.  AIM TRENDSET LLC.  Бүх эрх хуулиар хамгаалагдсан
               </label>
-              <select
+              {/* <select
                 id="footerSettingsLanguage"
                 className="form-select form-select-sm bg-transparent border-0"
                 aria-label="Default select example"
@@ -241,15 +240,15 @@ export default function Footer14() {
                     {option.text}
                   </option>
                 ))}
-              </select>
+              </select> */}
             </div>
 
-            <div className="d-flex align-items-center">
+            {/* <div className="d-flex align-items-center">
               <label
                 htmlFor="footerSettingsCurrency"
                 className="ms-md-3 me-2 text-white"
               >
-                Currency
+                Валют
               </label>
               <select
                 id="footerSettingsCurrency"
@@ -267,7 +266,7 @@ export default function Footer14() {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
           </div>
           {/* <!-- /.footer-settings --> */}
         </div>

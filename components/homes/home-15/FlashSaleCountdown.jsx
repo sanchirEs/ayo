@@ -52,105 +52,105 @@ export default function FlashSaleCountdown() {
   };
 
   return (
-    <section className={`products-carousel ${styles.flashSaleCountdown}`}>
-      {/* Background Image */}
-      <div className={styles.backgroundImageContainer}>
-        <img 
-          src="/assets/images/banner/flashSaleBanner.png" 
-          alt="Flash Sale Background"
-          className={styles.backgroundImage}
-        />
-      </div>
-
-      {/* Notification Toast */}
-      {showNotification && (
-        <div className={`position-fixed top-0 start-50 translate-middle-x p-3 ${styles.notificationToast}`} style={{ zIndex: 9999 }}>
-          <div className="bg-success text-white rounded-3 p-3 d-flex align-items-center gap-2">
-            <span>🔔</span>
-            <span>{isNotified ? "Flash sale эхлэхэд мэдэгдэх болно!" : "Flash sale дахин эхэллээ!"}</span>
-          </div>
+      <section className={`products-carousel ${styles.flashSaleCountdown}`}>
+        {/* Background Image */}
+        <div className={styles.backgroundImageContainer}>
+          <img 
+            src="/assets/images/banner/banner3.jpg" 
+            alt="Flash Sale Background"
+            className={styles.backgroundImage}
+          />
         </div>
-      )}
 
-<div className={`py-4 px-4 ${styles.countdownContainer}`}>
-  <div className={styles.contentBox}>
-    {/* Flash Sale Icon and Title */}
-    <div className="mb-3">
-      <div className="fs-1 mb-2">⚡</div>
-      <h2 className={`section-title text-uppercase fs-25 fw-bold mb-2 ${styles.countdownTitle}`}>
-        Flash Sale эхлэхэд
-      </h2>
-      <p className={`fs-16 mb-3 ${styles.countdownSubtitle}`}>
-        Хямдрал эхлэхэд үлдсэн хугацаа
-      </p>
-    </div>
-  
-    <div className={`${styles.countdownTimer}`}>
-          <div className="text-center">
-            <div className={`${styles.timerBox}`}>
-              <span className={styles.timerNumber}>{formatNumber(timeLeft.days)}</span>
-              <small className={styles.timerLabel}>Өдөр</small>
+        {/* Notification Toast */}
+        {showNotification && (
+          <div className={`position-fixed top-0 start-50 translate-middle-x p-3 ${styles.notificationToast}`} style={{ zIndex: 9999 }}>
+            <div className="bg-success text-white rounded-3 p-3 d-flex align-items-center gap-2">
+              <span>🔔</span>
+              <span>{isNotified ? "Flash sale эхлэхэд мэдэгдэх болно!" : "Flash sale дахин эхэллээ!"}</span>
             </div>
           </div>
-          
-          <div className="text-center">
-            <div className={`${styles.timerBox}`}>
-              <span className={styles.timerNumber}>{formatNumber(timeLeft.hours)}</span>
-              <small className={styles.timerLabel}>Цаг</small>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <div className={`${styles.timerBox}`}>
-              <span className={styles.timerNumber}>{formatNumber(timeLeft.minutes)}</span>
-              <small className={styles.timerLabel}>Минут</small>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <div className={`${styles.timerBox}`}>
-              <span className={styles.timerNumber}>{formatNumber(timeLeft.seconds)}</span>
-              <small className={styles.timerLabel}>Секунд</small>
-            </div>
-          </div>
-        </div>
-        <div className={styles.infoCard}>
-          <h3 className={styles.infoTitle}>Flash Sale Удахгүй эхлэнэ</h3>
-          <p className="text-secondary mb-3">
-            Онцгой хямдралтай бараануудыг хүлээж байна:
+        )}
+
+    <div className={`py-4 px-4 ${styles.countdownContainer}`}>
+      <div className={styles.contentBox}>
+        {/* Flash Sale Icon and Title */}
+        <div className="mb-3">
+          <div className="fs-1 mb-2">⚡</div>
+          <h2 className={`section-title text-uppercase fs-25 fw-bold mb-2 ${styles.countdownTitle}`}>
+            Flash Sale эхлэхэд
+          </h2>
+          <p className={`fs-16 mb-3 ${styles.countdownSubtitle}`}>
+            Хямдрал эхлэхэд үлдсэн хугацаа
           </p>
-          <ul className={styles.infoList}>
-            <li>Сонгосон бараануудад 70% хүртэл хямдрал</li>
-            <li>Зөвхөн flash sale-д зориулсан онцгой хямдрал</li>
-          </ul>
-          <div className="mt-3">
-            <button 
-              className={`btn btn-lg px-4 py-2 ${styles.notifyButton}`}
-              onClick={handleNotifyClick}
-              disabled={isNotified}
-            >
-              {isNotified ? 'Мэдэгдэх болсон' : 'Мэдэгдэх'}
-            </button>
-            {isNotified && (
-              <p className="text-success mt-2 mb-0">
-                <small>✓ Flash sale эхлэхэд мэдэгдэх болно!</small>
+        </div>
+      
+        <div className={`${styles.countdownTimer}`}>
+              <div className="text-center">
+                <div className={`${styles.timerBox}`}>
+                  <span className={styles.timerNumber}>{formatNumber(timeLeft.days)}</span>
+                  <small className={styles.timerLabel}>Өдөр</small>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className={`${styles.timerBox}`}>
+                  <span className={styles.timerNumber}>{formatNumber(timeLeft.hours)}</span>
+                  <small className={styles.timerLabel}>Цаг</small>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className={`${styles.timerBox}`}>
+                  <span className={styles.timerNumber}>{formatNumber(timeLeft.minutes)}</span>
+                  <small className={styles.timerLabel}>Минут</small>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className={`${styles.timerBox}`}>
+                  <span className={styles.timerNumber}>{formatNumber(timeLeft.seconds)}</span>
+                  <small className={styles.timerLabel}>Секунд</small>
+                </div>
+              </div>
+            </div>
+            <div className={styles.infoCard}>
+              <h3 className={styles.infoTitle}>Flash Sale Удахгүй эхлэнэ</h3>
+              <p className="text-secondary mb-3">
+                Онцгой хямдралтай бараануудыг хүлээж байна:
               </p>
-            )}
-          </div>
-        </div>
+              <ul className={styles.infoList}>
+                <li>Сонгосон бараануудад 70% хүртэл хямдрал</li>
+                <li>Зөвхөн flash sale-д зориулсан онцгой хямдрал</li>
+              </ul>
+              <div className="mt-3">
+                <button 
+                  className={`btn btn-lg px-4 py-2 ${styles.notifyButton}`}
+                  onClick={handleNotifyClick}
+                  disabled={isNotified}
+                >
+                  {isNotified ? 'Мэдэгдэх болсон' : 'Мэдэгдэх'}
+                </button>
+                {isNotified && (
+                  <p className="text-success mt-2 mb-0">
+                    <small>✓ Flash sale эхлэхэд мэдэгдэх болно!</small>
+                  </p>
+                )}
+              </div>
+            </div>
 
-         {/* Additional Info */}
-         <div className="mt-3">
-          <p className="text-white opacity-75 mb-1">
-            <small>Flash sale 10 минутын дараа эхлэнэ</small>
-          </p>
-          <p className="text-white opacity-75">
-            <small>Хязгаарлагдмал тоо - хурдан захиална уу!</small>
-          </p>
-        </div>
-    </div>
-    </div>
-    
-    </section>
+             {/* Additional Info */}
+             <div className="mt-3">
+              <p className="text-white opacity-75 mb-1">
+                <small>Flash sale 10 минутын дараа эхлэнэ</small>
+              </p>
+              <p className="text-white opacity-75">
+                <small>Хязгаарлагдмал тоо - хурдан захиална уу!</small>
+              </p>
+            </div>
+      </div>
+             </div>
+       
+       </section>
   );
 }

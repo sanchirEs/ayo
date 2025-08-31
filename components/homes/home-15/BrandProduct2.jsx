@@ -9,7 +9,7 @@ import Link from "next/link";
 import ProductCard from "@/components/common/ProductCard";
 import api from "@/lib/api";
 
-export default function BrandProduct() {
+export default function BrandProduct2() {
   const [data, setData] = useState({ products: [], pagination: null });
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -95,7 +95,7 @@ export default function BrandProduct() {
             <div className="slideshow-bg ">
               <Image
                 loading="lazy"
-                src="/assets/images/brandsBg/brands1.webp"
+                src="/assets/images/banner/little-drops.webp"
                 width="1920"
                 height="600"
                 alt="Converse Background"

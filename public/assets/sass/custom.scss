@@ -545,7 +545,7 @@ body {
   font-weight: 700;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-family-base);
   
   @media (max-width: 768px) {
     font-size: 1.3rem;
@@ -861,4 +861,168 @@ body {
       }
     }
   }
+}
+
+/* Ensure navigation elements use correct font */
+.nav-font {
+  font-family: var(--font-family-base) !important;
+}
+
+/*============================================*/
+/*============ Font Consistency ==============*/
+/*============================================*/
+
+/* Ensure all elements inherit the correct font family */
+* {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Override Bootstrap's default font family */
+body,
+button,
+input,
+select,
+textarea,
+.form-control,
+.form-select,
+.btn,
+.nav-link,
+.dropdown-item,
+.modal-title,
+.alert,
+.badge,
+.card-title,
+.card-text,
+.list-group-item,
+.table,
+.table th,
+.table td,
+.pagination,
+.page-link,
+.breadcrumb,
+.breadcrumb-item,
+.nav-tabs .nav-link,
+.nav-pills .nav-link,
+.progress,
+.progress-bar,
+.tooltip,
+.popover,
+.popover-header,
+.popover-body {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Ensure headings use the correct heading font */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+  font-family: var(--font-heading) !important;
+}
+
+/* Override any component-specific font overrides */
+.product-card,
+.product-single,
+.section-title,
+.block-title,
+.page-title,
+.navigation__link,
+.menu__link,
+.footer__link,
+.social__link,
+.brand__link,
+.category__link,
+.search__input,
+.cart__item,
+.checkout__form,
+.account__form,
+.blog__title,
+.blog__content,
+.testimonial__content,
+.newsletter__form,
+.instagram__item,
+.lookbook__item,
+.banner__content,
+.slideshow__content,
+.collection__title,
+.collection__description,
+.service__title,
+.service__description,
+.promotion__title,
+.promotion__description,
+.accessory__title,
+.accessory__description,
+.sidebar__title,
+.sidebar__content,
+.pagination__link,
+.breadcrumb__link,
+.tab__content,
+.accordion__content,
+.modal__content,
+.drawer__content,
+.popup__content,
+.aside__content {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Special font classes should still work */
+.font-courgette {
+  font-family: Courgette !important;
+}
+
+.font-sofia {
+  font-family: "SofiaProBold" !important;
+}
+
+/* Override any inline styles that might be set */
+[style*="font-family"] {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Ensure form elements don't get overridden by browser defaults */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+textarea,
+select {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Override any third-party component fonts */
+.rc-slider,
+.rc-slider-handle,
+.rc-slider-track,
+.rc-slider-rail,
+.swiper,
+.swiper-slide,
+.swiper-button-next,
+.swiper-button-prev,
+.swiper-pagination,
+.tippy-box,
+.tippy-content,
+.react-tooltip,
+.toast,
+.toast-header,
+.toast-body {
+  font-family: var(--font-family-base) !important;
+}
+
+/* Ensure consistent font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Override any remaining system font fallbacks */
+* {
+  font-family: "Noto Sans", sans-serif !important;
 }

@@ -102,9 +102,44 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100;200;300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+        <style jsx global>{`
+          /* NUCLEAR NOTO SANS OVERRIDE - DESTROY ALL JOST */
+          * {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          h1, h2, h3, h4, h5, h6 {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          body, html, div, span, p, a, button, input, textarea, select, label {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          .container, .row, .col-*, .btn, .form-control {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          .product-card, .pc__title, .pc__category, .money, .price, .section-title {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          [class*=""] {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          :root {
+            --font-family-base: "Noto Sans", sans-serif !important;
+            --font-heading: "Noto Sans", sans-serif !important;
+          }
+        `}</style>
       </head>
           
-      <body>
+      <body style={{ fontFamily: 'var(--font-family-base)' }}>
           <SessionProvider
             
               refetchInterval={0}

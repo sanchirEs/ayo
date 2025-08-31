@@ -4,6 +4,48 @@
   overflow: hidden;
 }
 
+/* Nike Brand Section Styles */
+.nike-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Adidas Brand Section Styles */
+.adidas-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Puma Brand Section Styles */
+.puma-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Reebok Brand Section Styles */
+.reebok-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Under Armour Brand Section Styles */
+.under-armour-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* New Balance Brand Section Styles */
+.new-balance-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Asics Brand Section Styles */
+.asics-brand-section {
+  position: relative;
+  overflow: hidden;
+}
+
 /* Hero-style banner for desktop */
 .converse-brand-section .slideshow-bg {
   position: relative;
@@ -50,6 +92,174 @@
   z-index: 2;
 }
 
+/* Nike Brand Background Patterns */
+.nike-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 0, 0, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.nike-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* Adidas Brand Background Patterns */
+.adidas-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(0, 0, 0, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.adidas-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* Puma Brand Background Patterns */
+.puma-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 165, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 165, 0, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.puma-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* Reebok Brand Background Patterns */
+.reebok-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(0, 0, 255, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.reebok-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* Under Armour Brand Background Patterns */
+.under-armour-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(128, 0, 128, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(128, 0, 128, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(128, 0, 128, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.under-armour-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* New Balance Brand Background Patterns */
+.new-balance-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 128, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 128, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(0, 128, 0, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.new-balance-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* Asics Brand Background Patterns */
+.asics-bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.asics-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
 .converse-brand-section .container {
   position: relative;
   z-index: 3;
@@ -61,6 +271,125 @@
 }
 
 .converse-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Nike Logo Text */
+.nike-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Adidas Logo Text */
+.adidas-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Puma Logo Text */
+.puma-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Reebok Logo Text */
+.reebok-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Under Armour Logo Text */
+.under-armour-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* New Balance Logo Text */
+.new-balance-logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 12px;
+  margin: 0 0 30px 0;
+  text-shadow: 3px 3px 6px rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 20px 50px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Asics Logo Text */
+.asics-logo-text {
   font-size: 4rem;
   font-weight: 900;
   color: #000;
@@ -224,7 +553,7 @@
   margin-bottom: 8px;
   color: #000;
   line-height: 1.2;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-heading);
 }
 
 .converse-product-title a {
@@ -241,7 +570,7 @@
   font-size: 13px;
   margin-bottom: 12px;
   font-weight: 400;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family-base);
 }
 
 .converse-price-container {
@@ -255,7 +584,7 @@
   font-size: 24px;
   font-weight: 900;
   color: #ff4757;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family-base);
 }
 
 .converse-original-price {
@@ -263,7 +592,7 @@
   color: #6c757d;
   text-decoration: line-through;
   font-weight: 400;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family-base);
 }
 
 .converse-carousel__prev,
@@ -469,6 +798,73 @@
   }
 }
 
+/* Compact Payment Method Section Styles */
+.payment-method-section-compact {
+  padding: 40px 0 !important;
+  background: transparent !important;
+  width: 100% !important;
+}
+
+.payment-methods-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 40px !important;
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  padding: 0 30px !important;
+  width: 100% !important;
+}
+
+.payment-method-card {
+  display: block !important;
+  width: 48% !important;
+  flex: none !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  transition: transform 0.3s ease !important;
+}
+
+.payment-method-card:hover {
+  transform: scale(1.05) !important;
+}
+
+.payment-method-logo {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: contain !important;
+  border-radius: 15px !important;
+  max-width: 100% !important;
+}
+
+/* Responsive Design for Compact Payment Method */
+@media (max-width: 768px) {
+  .payment-methods-wrapper {
+    gap: 20px !important;
+    padding: 0 20px !important;
+  }
+  
+  .payment-method-card {
+    width: 47% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-methods-wrapper {
+    flex-direction: column !important;
+    gap: 25px !important;
+    padding: 0 30px !important;
+  }
+  
+  .payment-method-card {
+    width: 100% !important;
+  }
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -513,4 +909,442 @@
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   backface-visibility: hidden;
+}
+
+/* Banner Container System - Prevents stretching on large screens */
+.banner-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 15px !important;
+  display: block !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Global banner width control - target all banner-like sections */
+.hero-banner-container,
+.banner-container,
+.theme-15 main > .hero-banner-container,
+.theme-15 main .hero-banner-container,
+.theme-15 .hero-banner-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 15px !important;
+  box-sizing: border-box !important;
+}
+
+/* Maximum specificity overrides */
+div.hero-banner-container,
+div.banner-container,
+main .hero-banner-container,
+main .banner-container,
+body .hero-banner-container,
+body .banner-container,
+.theme-15 main div.hero-banner-container,
+.theme-15 main div.banner-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  display: block !important;
+}
+
+/* Force container behavior with even higher specificity */
+html body .theme-15 main .hero-banner-container,
+html body .theme-15 main .banner-container,
+html body .hero-banner-container,
+html body .banner-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 15px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Override CSS modules for banner containers */
+.banner-container .flashSaleCountdown,
+.banner-container .flashSaleBannerSection,
+.banner-container .backgroundImageContainer,
+.banner-container .flashSaleBgContainer {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.banner-container-wide {
+  width: 100% !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 0 15px !important;
+}
+
+.banner-container-narrow {
+  width: 100% !important;
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  padding: 0 15px !important;
+}
+
+/* Hero Banner Container - High specificity to override SCSS */
+.hero-banner-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 15px !important;
+  overflow: hidden !important;
+}
+
+/* Mobile Banner Styles for All Brands */
+.converse-mobile-banner,
+.nike-mobile-banner,
+.adidas-mobile-banner,
+.puma-mobile-banner,
+.reebok-mobile-banner,
+.under-armour-mobile-banner,
+.new-balance-mobile-banner,
+.asics-mobile-banner {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.converse-mobile-banner:hover,
+.nike-mobile-banner:hover,
+.adidas-mobile-banner:hover,
+.puma-mobile-banner:hover,
+.reebok-mobile-banner:hover,
+.under-armour-mobile-banner:hover,
+.new-balance-mobile-banner:hover,
+.asics-mobile-banner:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+.converse-mobile-bg,
+.nike-mobile-bg,
+.adidas-mobile-bg,
+.puma-mobile-bg,
+.reebok-mobile-bg,
+.under-armour-mobile-bg,
+.new-balance-mobile-bg,
+.asics-mobile-bg {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.converse-mobile-img,
+.nike-mobile-img,
+.adidas-mobile-img,
+.puma-mobile-img,
+.reebok-mobile-img,
+.under-armour-mobile-img,
+.new-balance-mobile-img,
+.asics-mobile-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.converse-mobile-banner:hover .converse-mobile-img,
+.nike-mobile-banner:hover .nike-mobile-img,
+.adidas-mobile-banner:hover .adidas-mobile-img,
+.puma-mobile-banner:hover .puma-mobile-img,
+.reebok-mobile-banner:hover .reebok-mobile-img,
+.under-armour-mobile-banner:hover .under-armour-mobile-img,
+.new-balance-mobile-banner:hover .new-balance-mobile-img,
+.asics-mobile-banner:hover .asics-mobile-img {
+  transform: scale(1.05);
+}
+
+/* Override slideshow width inside hero container */
+.hero-banner-container .slideshow,
+.hero-banner-container .swiper-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Override slideshow background image width */
+.hero-banner-container .slideshow-bg,
+.hero-banner-container .slideshow-bg__img {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 15px !important;
+}
+
+/* Override all banner sections inside containers */
+.banner-container .converse-brand-section,
+.banner-container .slideshow,
+.banner-container .swiper-container,
+.banner-container .slideshow-bg,
+.banner-container .slideshow-bg__img,
+.banner-container .swiper-slide,
+.banner-container .js-swiper-slider,
+.banner-container section,
+.banner-container .payment-method-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure payment method and banner images show fully */
+.banner-container .payment-method-image-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+.banner-container .payment-method-image {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  max-height: 400px !important;
+}
+
+/* Force all elements within banner containers to respect container width */
+.banner-container *,
+.hero-banner-container * {
+  max-width: 100% !important;
+}
+
+/* Specific overrides for swiper components */
+.banner-container .swiper,
+.banner-container .swiper-wrapper,
+.hero-banner-container .swiper,
+.hero-banner-container .swiper-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Ensure banner images display properly */
+.banner-container img,
+.banner-container .slideshow-bg__img,
+.hero-banner-container img,
+.hero-banner-container .slideshow-bg__img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  max-height: 600px !important;
+}
+
+/* For slideshow containers, use cover but with better aspect ratio */
+.hero-banner-container .slideshow-bg__img {
+  object-fit: cover !important;
+  height: 100% !important;
+  min-height: 400px !important;
+  max-height: 600px !important;
+}
+
+/* Adjust slideshow height for better image display */
+.hero-banner-container .slideshow.type4 {
+  height: auto !important;
+  min-height: 400px !important;
+  max-height: 600px !important;
+}
+
+.hero-banner-container .slideshow-bg {
+  height: auto !important;
+  min-height: 400px !important;
+  max-height: 600px !important;
+}
+
+/* Responsive container adjustments */
+@media (min-width: 1400px) {
+  .banner-container {
+    max-width: 1320px !important;
+  }
+  
+  .banner-container-wide {
+    max-width: 1600px !important;
+  }
+  
+  .banner-container-narrow {
+    max-width: 1100px !important;
+  }
+  
+  .hero-banner-container {
+    max-width: 1320px !important;
+  }
+}
+
+@media (max-width: 1399px) and (min-width: 1200px) {
+  .banner-container,
+  .hero-banner-container {
+    max-width: 1140px !important;
+  }
+  
+  .banner-container-wide {
+    max-width: 1320px !important;
+  }
+  
+  .banner-container-narrow {
+    max-width: 1000px !important;
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 992px) {
+  .banner-container,
+  .hero-banner-container {
+    max-width: 960px !important;
+  }
+  
+  .banner-container-wide {
+    max-width: 1140px !important;
+  }
+  
+  .banner-container-narrow {
+    max-width: 900px !important;
+  }
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+  .banner-container,
+  .hero-banner-container {
+    max-width: 720px !important;
+  }
+  
+  .banner-container-wide {
+    max-width: 960px !important;
+  }
+  
+  .banner-container-narrow {
+    max-width: 700px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .banner-container,
+  .banner-container-wide,
+  .banner-container-narrow,
+  .hero-banner-container {
+    max-width: 100% !important;
+    padding: 0 10px !important;
+  }
+}
+
+/* Wide screen adjustments for better image display */
+@media (min-width: 1200px) {
+  .hero-banner-container .slideshow-bg__img {
+    object-fit: contain !important;
+    max-height: 500px !important;
+    height: auto !important;
+  }
+  
+  .hero-banner-container .slideshow.type4 {
+    height: auto !important;
+    max-height: 500px !important;
+  }
+  
+  .hero-banner-container .slideshow-bg {
+    height: auto !important;
+    max-height: 500px !important;
+  }
+}
+
+/* Ultra-wide screen adjustments */
+@media (min-width: 1600px) {
+  .hero-banner-container .slideshow-bg__img,
+  .banner-container img {
+    object-fit: contain !important;
+    max-height: 600px !important;
+  }
+}
+
+/* NUCLEAR NOTO SANS OVERRIDE - DESTROY ALL JOST EVERYWHERE */
+* {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+html, body, div, span, p, a, h1, h2, h3, h4, h5, h6, button, input, textarea, select, label {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+.container, .row, .col-*, .btn, .form-control {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+.product-card, .pc__title, .pc__category, .money, .price, .section-title {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+[class*=""] {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+.theme-15 {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+.theme-15 *, 
+.theme-15 *::before, 
+.theme-15 *::after {
+  font-family: "Noto Sans", sans-serif !important;
+  font-weight: 400 !important;
+}
+
+.theme-15 h1, .theme-15 h2, .theme-15 h3, .theme-15 h4, .theme-15 h5, .theme-15 h6,
+.theme-15 .h1, .theme-15 .h2, .theme-15 .h3, .theme-15 .h4, .theme-15 .h5, .theme-15 .h6 {
+  font-family: "Noto Sans", sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Force Noto Sans on product cards */
+.theme-15 .product-card, 
+.theme-15 .product-card *, 
+.theme-15 .pc__title, 
+.theme-15 .pc__category, 
+.theme-15 .money, 
+.theme-15 .price {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+/* Force Noto Sans on section titles */
+.theme-15 .section-title {
+  font-family: "Noto Sans", sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Force Noto Sans on Bootstrap elements */
+.theme-15 .container *, 
+.theme-15 .row *, 
+.theme-15 .col-* {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+/* Force Noto Sans on all text elements */
+.theme-15 p, 
+.theme-15 span, 
+.theme-15 a, 
+.theme-15 div, 
+.theme-15 section,
+.theme-15 button,
+.theme-15 input,
+.theme-15 label {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+/* Override any stubborn components with Noto Sans */
+.theme-15 [class*="text"], 
+.theme-15 [class*="title"], 
+.theme-15 [class*="heading"],
+.theme-15 [class*="label"],
+.theme-15 [class*="description"] {
+  font-family: "Noto Sans", sans-serif !important;
 }
