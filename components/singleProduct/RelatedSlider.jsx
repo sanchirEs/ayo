@@ -58,11 +58,32 @@ export default function RelatedSlider({ currentProduct }) {
         setLoading(true);
         setError(null);
         console.log("currentProduct.category.id", currentProduct.categoryId);
-        const response = await api.products.getAll({
-          categoryId: currentProduct.categoryId,
-          limit: 8,
-          excludeId: currentProduct.id // Exclude current product
-        });
+        // Try to get products by category, fallback to alternative endpoints if enhanced fails
+        let response;
+        try {
+          response = await api.products.enhanced({
+            categoryId: currentProduct.categoryId,
+            limit: 8
+          });
+        } catch (error) {
+          console.warn('Enhanced endpoint failed, trying alternative approach:', error);
+          try {
+            // Try to get all products and filter by category on frontend
+            const allProducts = await api.products.new({ limit: 20 });
+            if (allProducts?.data?.products) {
+              // Filter products by category and exclude current product
+              const filteredProducts = allProducts.data.products
+                .filter(p => p.categoryId === currentProduct.categoryId && p.id !== currentProduct.id)
+                .slice(0, 8);
+              response = { data: { products: filteredProducts } };
+            } else {
+              response = { data: { products: [] } };
+            }
+          } catch (fallbackError) {
+            console.warn('Fallback also failed:', fallbackError);
+            response = { data: { products: [] } };
+          }
+        }
         console.log("response related products", response);
         
         // Filter out current product and get products array
