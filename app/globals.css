@@ -477,3 +477,40 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Custom Slideshow Styles for Hero Component */
+.slideshow.type4 {
+  height: 26.25rem; /* 420px for mobile */
+}
+
+@media (min-width: 992px) {
+  .slideshow.type4 {
+    height: 50rem; /* 800px for desktop - increased from 37.5rem */
+  }
+}
+
+.slideshow-bg {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.slideshow-bg__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+/* Hover effect for better image quality perception */
+.slideshow-bg:hover .slideshow-bg__img {
+  transform: scale(1.02);
+}
+
+/* Ensure proper image rendering */
+.slideshow-bg__img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+}

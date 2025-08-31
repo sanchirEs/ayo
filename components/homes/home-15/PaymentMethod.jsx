@@ -9,7 +9,7 @@ export default function PaymentMethod() {
         <div className="">
           <div className="payment-method-image-container">
             <Image
-              src="/assets/images/payment/paymentCond.png"
+              src="/assets/images/payment/paymentMethod.png"
               alt="Payment Methods and Conditions"
               width={2000}
               height={80}

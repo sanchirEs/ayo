@@ -1,0 +1,42 @@
+.flashSaleBannerSection {
+  position: relative;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+.flashSaleBgContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.flashSaleBgImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.flashSaleContentOverlay {
+  position: relative;
+  z-index: 2;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flashSaleBannerSection {
+    min-height: 500px;
+  }
+  
+  .flashSaleContentOverlay {
+    min-height: 500px;
+    padding: 1rem 0;
+  }
+}

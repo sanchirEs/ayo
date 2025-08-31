@@ -31,34 +31,37 @@ export default function Hero() {
           <div className="overflow-hidden position-relative h-100">
             <div className="slideshow-bg">
               <Image
-                loading="lazy"
                 src={elm.bgImage}
                 width="1920"
-                height="600"
+                height="800"
                 alt="Pattern"
                 className="slideshow-bg__img object-fit-cover"
+                priority={i === 0}
+                loading={i === 0 ? undefined : "lazy"}
+                quality={95}
+                sizes="100vw"
               />
             </div>
             <div className="slideshow-text container position-absolute start-50 top-50 translate-middle">
-              <h2
+              {/* <h2
                 className="fs-70 mb-2 mb-lg-3 animate animate_fade animate_btt animate_delay-5 text-uppercase fw-normal"
-                style={{ fontFamily: "var(--font-variable-average_Sans)" }}
+                style={{ fontFamily: "var(--font-variable-average_Sans)", }}
               >
                 {elm.title}
-              </h2>
-              <p className="h6 mb-4 pb-2 animate animate_fade animate_btt animate_delay-5 lh-2rem">
+              </h2> */}
+              {/* <p className="h6 mb-4 pb-2 animate animate_fade animate_btt animate_delay-5 lh-2rem">
                 {elm.description.split(" ").slice(0, 13).join(" ")}
                 <br />
                 {elm.description.split(" ").slice(13).join(" ")}
-              </p>
-              <div className="animate animate_fade animate_btt animate_delay-7">
+              </p> */}
+              {/* <div className="animate animate_fade animate_btt animate_delay-7">
                 <Link
                   href="/shop-1"
                   className="btn btn-primary border-0 fs-base text-uppercase fw-normal btn-50"
                 >
                   <span>VIEW MORE</span>
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </SwiperSlide>

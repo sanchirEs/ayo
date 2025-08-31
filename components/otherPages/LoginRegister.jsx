@@ -69,6 +69,11 @@ export default function LoginRegister() {
       .trim()
       .email("И-мэйл буруу байна")
       .required("И-мэйл заавал шаардлагатай"),
+    telephone: Yup.string()
+      .trim()
+      .matches(/^[0-9+\-\s()]+$/, "Утасны дугаар зөвхөн тоо, +, -, (, ), хоосон зай агуулж болно")
+      .min(8, "Утасны дугаар хамгийн багадаа 8 тэмдэгт")
+      .required("Утасны дугаар заавал шаардлагатай"),
     password: Yup.string()
       .min(6, "Нууц үг хамгийн багадаа 6 тэмдэгт")
       .matches(/[A-Z]/, "Нууц үг дор хаяж 1 том үсэгтэй байх ёстой")
@@ -95,7 +100,7 @@ export default function LoginRegister() {
             aria-controls="tab-item-login"
             aria-selected="true"
           >
-            Login
+            Нэвтрэх
           </a>
         </li>
         <li className="nav-item" role="presentation">
@@ -108,7 +113,7 @@ export default function LoginRegister() {
             aria-controls="tab-item-register"
             aria-selected="false"
           >
-            Register
+            Бүртгүүлэх
           </a>
         </li>
       </ul>
@@ -211,6 +216,7 @@ export default function LoginRegister() {
                 lastName: "",
                 username: "",
                 email: "",
+                telephone: "",
                 password: "",
                 confirmPassword: "",
               }}
@@ -223,6 +229,7 @@ export default function LoginRegister() {
                     lastName: values.lastName,
                     username: values.username,
                     email: values.email,
+                    telephone: values.telephone,
                     password: values.password,
                   });
                   setStatus({
@@ -340,6 +347,29 @@ export default function LoginRegister() {
                     </label>
                     {touched.email && errors.email && (
                       <div className="invalid-feedback d-block">{errors.email}</div>
+                    )}
+                  </div>
+
+                  <div className="pb-2"></div>
+
+                  {/* Telephone */}
+                  <div className="form-floating mb-3">
+                    <input
+                      name="telephone"
+                      type="text"
+                      className={
+                        "form-control form-control_gray" +
+                        (touched.telephone && errors.telephone ? " is-invalid" : "")
+                      }
+                      id="customerTelephoneRegisterInput"
+                      placeholder="Telephone *"
+                      value={values.telephone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    <label htmlFor="customerTelephoneRegisterInput">Telephone *</label>
+                    {touched.telephone && errors.telephone && (
+                      <div className="invalid-feedback d-block">{errors.telephone}</div>
                     )}
                   </div>
 

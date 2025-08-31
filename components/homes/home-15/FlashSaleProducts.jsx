@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import ProductCard from "@/components/common/ProductCard";
+import FlashSaleCountdown from "./FlashSaleCountdown";
 import api from "@/lib/api";
 
 export default function FlashSaleProducts() {
@@ -32,6 +33,7 @@ export default function FlashSaleProducts() {
 
   const products = data.products;
 
+  // Always call useMemo hook before any conditional returns
   const swiperOptions = useMemo(
     () => ({
       autoplay: { delay: 3000 }, // Faster autoplay for flash sale
@@ -53,6 +55,11 @@ export default function FlashSaleProducts() {
     }),
     [products.length]
   );
+
+  // If no products, show the countdown
+  if (!loading && !err && products.length === 0) {
+    return <FlashSaleCountdown />;
+  }
 
   if (loading) {
     return (
