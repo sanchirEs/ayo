@@ -106,3 +106,5 @@ app/
 - Implement filter persistence in URL
 - Add category tree expansion state
 - Implement infinite scroll for products
+
+

@@ -106,8 +106,13 @@ export default function Categories() {
             // Map category names to image names
             const getCategoryImage = (categoryName) => {
               const name = categoryName?.toLowerCase() || '';
+              if (name.includes('ам') || name.includes('skincare')) return '/assets/images/categories/am.jpg';
+              if (name.includes('бие') || name.includes('skincare')) return '/assets/images/categories/bodycare.png';
               if (name.includes('арьс') || name.includes('skincare')) return '/assets/images/categories/skincare.png';
-              if (name.includes('бие') || name.includes('bodycare')) return '/assets/images/categories/bodycare.png';
+              if (name.includes('маск') || name.includes('skincare')) return '/assets/images/categories/mask.png';
+              if (name.includes('туслах') || name.includes('skincare')) return '/assets/images/categories/tuslah.png';
+              if (name.includes('үнэртэн') || name.includes('skincare')) return '/assets/images/categories/perfume.jpg';
+              // if (name.includes('бие') || name.includes('bodycare')) return '/assets/images/categories/bodycare.png';
               if (name.includes('нүүр') || name.includes('makeup')) return '/assets/images/categories/makeup.png';
               if (name.includes('үс') || name.includes('haircare')) return '/assets/images/categories/haircare.png';
               if (name.includes('хувцас') || name.includes('clothing')) return '/assets/images/categories/clothes.png';

@@ -515,7 +515,7 @@ export default function Checkout() {
         }
       }
       
-      alert(`Алдаа гарлаа: ${errorMessage}`);
+      alert(`${errorMessage}`);
     } finally {
       setIsProcessingPayment(false);
     }
@@ -558,9 +558,9 @@ export default function Checkout() {
             alert('Төлбөр амжилттай цуцлагдлаа.');
             
             // Ask if user wants to go to orders page
-            // if (confirm('Захиалга хуудас руу очих уу?')) {
+    
               router.push('/account_orders');
-            // }
+            
           } else {
             alert('Төлбөр цуцлахад алдаа гарлаа');
           }
@@ -582,6 +582,66 @@ export default function Checkout() {
       if (confirm('Захиалга хуудас руу очих уу?')) {
         router.push('/account_orders');
       }
+    }
+  };
+
+  // Function to handle "Pay Later" - save order without payment
+  const handlePayLater = async () => {
+    try {
+      setIsProcessingPayment(true);
+      
+      // Validate required fields
+      if (!formData.addressLine1 || !formData.city || !formData.phone) {
+        alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
+        return;
+      }
+
+      // Validate cart has items
+      if (!cartProducts || cartProducts.length === 0) {
+        alert('Сагсанд бараа байхгүй байна!');
+        return;
+      }
+
+      // Prepare order data without payment
+      const orderData = {
+        items: cartProducts.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          ...(item.variantId && { variantId: item.variantId })
+        })),
+        shippingAddress: {
+          addressLine1: formData.addressLine1,
+          addressLine2: formData.addressLine2,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country,
+          mobile: formData.phone
+        }
+      };
+
+      console.log('Creating order without payment:', orderData);
+
+      // Create order without payment (PENDING status)
+      const response = await api.orders.create(orderData);
+      
+      if (response.success) {
+        const { order } = response.data;
+        console.log('Order created without payment:', order);
+        
+        // Clear cart after successful order
+        clearCart();
+        
+        // Show success message and redirect
+        alert('Захиалга амжилттай үүслээ! Захиалгын жагсаалт руу орох уу?');
+        
+        // Redirect to account orders page
+        router.push('/account_orders');
+      }
+    } catch (error) {
+      console.error('Order creation error:', error);
+      alert('Захиалга үүсгэхэд алдаа гарлаа: ' + (error.message || 'Алдаа гарлаа'));
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -1141,7 +1201,7 @@ export default function Checkout() {
                     <div className="flex-grow-1">
                       <div className="fw-medium">Pocket</div>
                       <small className="text-muted">Pocket-аар төлбөр хийх</small>
-                      <small className="text-warning d-block">Хамгийн бага: 1,000₮</small>
+                      {/* <small className="text-warning d-block">Хамгийн бага: 1,000₮</small> */}
                     </div>
                     <input
                       className="form-check-input"
@@ -1190,7 +1250,7 @@ export default function Checkout() {
                     <div className="flex-grow-1">
                       <div className="fw-medium">Storepay</div>
                       <small className="text-muted">Storepay-аар төлбөр хийх</small>
-                      <small className="text-warning d-block">Хамгийн бага: 1,000₮</small>
+                      {/* <small className="text-warning d-block">Хамгийн бага: 1,000₮</small> */}
                     </div>
                     <input
                       className="form-check-input"
@@ -1217,38 +1277,83 @@ export default function Checkout() {
                 уншина уу.
               </div>
             </div>
-            <button 
-              className="btn btn-checkout"
-              style={{
-                border: '1px solid #495D35',
-                color: 'white',
-                backgroundColor: '#495D35',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (!isProcessingPayment) {
-                  e.target.style.backgroundColor = '#6B8E5A';
-                  e.target.style.borderColor = '#6B8E5A';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isProcessingPayment) {
-                  e.target.style.backgroundColor = '#495D35';
-                  e.target.style.borderColor = '#495D35';
-                }
-              }}
-              disabled={isProcessingPayment}
-              onClick={handleOrderAndPayment}
-            >
-              {isProcessingPayment ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Захиалга хийж байна...
-                </>
-              ) : (
-                'ЗАХИАЛГА ХИЙХ'
-              )}
-            </button>
+            {/* <div className="d-flex flex-column gap-2"> */}
+              <button 
+                className="btn btn-checkout"
+                style={{
+                  border: '1px solid #495D35',
+                  color: 'white',
+                  backgroundColor: '#495D35',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = '#6B8E5A';
+                    e.target.style.borderColor = '#6B8E5A';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = '#495D35';
+                    e.target.style.borderColor = '#495D35';
+                  }
+                }}
+                disabled={isProcessingPayment}
+                onClick={handleOrderAndPayment}
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Захиалга үүсгэж байна...
+                  </>
+                ) : (
+                  'ЗАХИАЛГА ХИЙХ'
+                )}
+              </button>
+{/*               
+              <button 
+                className="btn btn-outline-secondary"
+                style={{
+                  border: '1px solid #6c757d',
+                  color: '#6c757d',
+                  backgroundColor: 'transparent',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = '#6c757d';
+                    e.target.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#6c757d';
+                  }
+                }}
+                disabled={isProcessingPayment}
+                onClick={handlePayLater}
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Захиалга үүсгэж байна...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-clock me-2"></i>
+                    Дараа төлөх
+                  </>
+                )}
+              </button>
+              
+              <div className="text-center">
+                <small className="text-muted">
+                  "Дараа төлөх" дээр дарахад захиалга хадгалагдаж, 
+                  захиалгын жагсаалт дээр төлбөр төлөх боломжтой
+                </small>
+              </div> */}
+            {/* </div> */}
           </div>
         </div>
       </div>
@@ -1628,6 +1733,39 @@ export default function Checkout() {
                     >
                       <i className="fas fa-ban me-2"></i>
                       Төлбөр цуцлах
+                    </button>
+                    
+                    <button
+                      type="button"
+                      className="btn"
+                      style={{
+                        backgroundColor: '#e2e3e5',
+                        borderColor: '#6c757d',
+                        color: '#6c757d',
+                        fontWeight: '500',
+                        fontSize: '0.875rem',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#d1d3d4';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#e2e3e5';
+                      }}
+                      onClick={() => {
+                        setShowPaymentModal(false);
+                        setPaymentData(null);
+                        if (statusCheckInterval) {
+                          clearInterval(statusCheckInterval);
+                          setStatusCheckInterval(null);
+                        }
+                        router.push('/account_orders');
+                      }}
+                    >
+                      <i className="fas fa-clock me-2"></i>
+                      Дараа төлөх
                     </button>
                   </>
                 )}

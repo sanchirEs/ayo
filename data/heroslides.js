@@ -459,18 +459,25 @@ export const slideData9 = [
 export const slideData10 = [
   {
     id: 1,
-    bgImage: "/assets/images/banner.png",
+    bgImage: "/assets/images/banner/bannerBig.png",
     title: "Natural Glow",
     description:
       "Beaux products protect, moisturize, and lubricate your skin. It smartly nourish your skin. with lotions, day creams, night creams, tinted moisturizers, and more.",
   },
-  // {
-  //   id: 2,
-  //   bgImage: "/assets/images/home/demo15/slider2_bg.jpg",
-  //   title: "Natural Glow",
-  //   description:
-  //     "Beaux products protect, moisturize, and lubricate your skin. It smartly nourish your skin. with lotions, day creams, night creams, tinted moisturizers, and more.",
-  // },
+  {
+    id: 2,
+    bgImage: "/assets/images/banner/banner2.png",
+    title: "Natural Glow",
+    description:
+      "Beaux products protect, moisturize, and lubricate your skin. It smartly nourish your skin. with lotions, day creams, night creams, tinted moisturizers, and more.",
+  },
+  {
+    id: 3,
+    bgImage: "/assets/images/banner/banner3.png",
+    title: "Natural Glow",
+    description:
+      "Beaux products protect, moisturize, and lubricate your skin. It smartly nourish your skin. with lotions, day creams, night creams, tinted moisturizers, and more.",
+  },
 ];
 
 export const slideData11 = [
