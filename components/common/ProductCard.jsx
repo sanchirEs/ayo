@@ -17,6 +17,9 @@ export default function ProductCard({ product, imageWidth = 330, imageHeight = 4
   // Check if product is already in cart
   const isInCart = cartProducts.find((elm) => elm.id == product.id);
 
+  // Check if product is already in wishlist
+  const isInWishlist = isAddedtoWishlist(product.id);
+
   // Add to cart function
   const addToCart = () => {
     if (isInCart) return;
@@ -45,6 +48,11 @@ export default function ProductCard({ product, imageWidth = 330, imageHeight = 4
       cartDrawerOverlay.classList.add("page-overlay_visible");
       cartDrawer.classList.add("aside_visible");
     }
+  };
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = async () => {
+    await toggleWishlist(product.id);
   };
 
   return (
@@ -83,10 +91,10 @@ export default function ProductCard({ product, imageWidth = 330, imageHeight = 4
         <div className="anim_appear-right position-absolute top-0 mt-3 me-3">
           <button
             className={`btn btn-square btn-hover-primary d-block border-1 text-uppercase mb-2 js-add-wishlist ${
-              isAddedtoWishlist(product.id) ? "active" : ""
+              isInWishlist ? "active" : ""
             }`}
-            onClick={async () => await toggleWishlist(product.id)}
-            title={isAddedtoWishlist(product.id) ? "Хүслийн жагсаалтаас хасах" : "Хүслийн жагсаалтад нэмэх"}
+            onClick={handleWishlistToggle}
+            title={isInWishlist ? "Хүслийн жагсаалтаас хасах" : "Хүслийн жагсаалтад нэмэх"}
           >
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
               <use href="#icon_heart"></use>

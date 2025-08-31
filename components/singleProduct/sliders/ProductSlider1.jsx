@@ -84,7 +84,12 @@ export default function ProductSlider1({ images = [] }) {
         </Gallery>
       </div>
 
-      <div className="product-single__thumbnail">
+      <div className="product-single__thumbnail" style={{ 
+        maxHeight: '674px', 
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <Swiper
           modules={[Thumbs]}
           breakpoints={{
@@ -94,10 +99,29 @@ export default function ProductSlider1({ images = [] }) {
           className="swiper-container swiper-container-initialized swiper-container-pointer-events swiper-container-free-mode swiper-container-thumbs swiper-container-horizontal"
           onSwiper={setThumbsSwiper}
           slidesPerView={4}
+          style={{
+            height: '100%',
+            maxHeight: '674px'
+          }}
         >
           {items.map((elm, i) => (
-            <SwiperSlide key={i} className="swiper-slide product-single__image-item" style={{ marginBottom: 10 }}>
-              <Image loading="lazy" className="h-auto" src={elm.imgSrc} width={104} height={104} alt="image" />
+            <SwiperSlide key={i} className="swiper-slide product-single__image-item" style={{ 
+              marginBottom: 10,
+              height: 'auto',
+              maxHeight: '104px'
+            }}>
+              <Image 
+                loading="lazy" 
+                className="h-auto w-100" 
+                src={elm.imgSrc} 
+                width={104} 
+                height={104} 
+                alt="image"
+                style={{
+                  objectFit: 'cover',
+                  maxHeight: '104px'
+                }}
+              />
             </SwiperSlide>
           ))}
         </Swiper>

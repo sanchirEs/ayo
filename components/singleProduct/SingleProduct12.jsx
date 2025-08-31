@@ -16,6 +16,9 @@ export default function SingleProduct12({ product }) {
   const { cartProducts, setCartProducts } = useContextElement();
   const [quantity, setQuantity] = useState(1);
   const [warn, setWarn] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [showIngredients, setShowIngredients] = useState(false);
+  const [showHowToUse, setShowHowToUse] = useState(false);
 
   // --- Backend талбаруудыг тааруулах ---
   const images = product?.ProductImages?.map((i) => i.imageUrl) ?? [];
@@ -182,6 +185,198 @@ export default function SingleProduct12({ product }) {
           <div className="product-single__short-desc">
             <p>{product?.description || "No description."}</p>
           </div>
+
+          {/* Product Specifications */}
+          {product?.specs && product.specs.length > 0 && (
+            <div className="product-specifications mb-4">
+              <h6 className="fw-semibold mb-3 text-dark">Барааны тодорхойлолт</h6>
+              <div className="specs-container" style={{
+                backgroundColor: '#f8f9fa',
+                padding: '1rem',
+                borderRadius: '8px'
+              }}>
+                {product.specs.map((spec, index) => (
+                  <div key={index} className="spec-item d-flex justify-content-between align-items-center py-1" style={{
+                    borderBottom: index < product.specs.length - 1 ? '1px solid #e9ecef' : 'none'
+                  }}>
+                    <span className="spec-label text-dark" style={{ color: '#2d5a27' }}>
+                      {spec.type?.toUpperCase() || 'N/A'}
+                    </span>
+                    <span className="spec-value text-dark" style={{ color: '#2d5a27' }}>
+                      {spec.value || 'N/A'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Product Variants */}
+          {product?.variants && product.variants.length > 0 && (
+            <div className="product-variants mb-4">
+              <h6 className="fw-semibold mb-3 text-dark">Барааны хувилбарууд</h6>
+              
+              {/* Variant Type Selection (e.g., Color, Scent) */}
+              {(() => {
+                const variantTypes = new Set();
+                product.variants.forEach(variant => {
+                  variant.attributes?.forEach(attr => {
+                    if (attr?.option?.attribute?.name) {
+                      variantTypes.add(attr.option.attribute.name);
+                    }
+                  });
+                });
+                
+                return Array.from(variantTypes).map(type => {
+                  const options = product.variants
+                    .filter(variant => 
+                      variant.attributes?.some(attr => 
+                        attr?.option?.attribute?.name === type
+                      )
+                    )
+                    .map(variant => {
+                      const attr = variant.attributes?.find(a => 
+                        a?.option?.attribute?.name === type
+                      );
+                      return {
+                        variantId: variant.id,
+                        value: attr?.option?.value || 'N/A',
+                        image: variant.images?.[0]?.imageUrl,
+                        price: variant.price,
+                        isDefault: variant.isDefault,
+                        inStock: variant.inventory?.quantity > 0,
+                        variant: variant // Keep full variant object for reference
+                      };
+                    });
+
+                  return (
+                    <div key={type} className="variant-section mb-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <label className="fw-medium text-dark me-2">{type}:</label>
+                        <span className="text-muted">
+                          {selectedVariant && selectedVariant.attributes?.some(attr => 
+                            attr?.option?.attribute?.name === type
+                          ) ? 
+                            selectedVariant.attributes.find(attr => 
+                              attr?.option?.attribute?.name === type
+                            )?.option?.value :
+                            options.find(opt => opt.isDefault)?.value || options[0]?.value
+                          }
+                        </span>
+                      </div>
+                      
+                      <div className="variant-options d-flex flex-wrap gap-2">
+                        {options.map((option, index) => {
+                          const isSelected = selectedVariant?.id === option.variantId || 
+                            (!selectedVariant && option.isDefault);
+                          
+                          return (
+                            <div
+                              key={option.variantId}
+                              className={`variant-option position-relative ${isSelected ? 'selected' : ''} ${!option.inStock ? 'out-of-stock' : ''}`}
+                              style={{
+                                cursor: option.inStock ? 'pointer' : 'not-allowed',
+                                opacity: option.inStock ? 1 : 0.5
+                              }}
+                              onClick={() => {
+                                if (option.inStock) {
+                                  setSelectedVariant(option.variant);
+                                  // Reset quantity when variant changes
+                                  setQuantity(1);
+                                  setWarn("");
+                                }
+                              }}
+                            >
+                              {option.image && (
+                                <img
+                                  src={option.image}
+                                  alt={option.value}
+                                  className="variant-image"
+                                  style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    objectFit: 'cover',
+                                    borderRadius: '8px',
+                                    border: isSelected ? '3px solid #000' : '2px solid #e9ecef'
+                                  }}
+                                />
+                              )}
+                              
+                              {/* Labels */}
+                              {option.isDefault && (
+                                <span className="position-absolute top-0 start-0 badge bg-success text-white" style={{ fontSize: '0.7rem' }}>
+                                  NEW
+                                </span>
+                              )}
+                              
+                              {!option.inStock && (
+                                <span className="position-absolute top-0 end-0 badge bg-danger text-white" style={{ fontSize: '0.7rem' }}>
+                                  OUT
+                                </span>
+                              )}
+                              
+                              <div className="variant-info text-center mt-1">
+                                <div className="variant-value small fw-medium">{option.value}</div>
+                                <div className="variant-price small text-muted">₮{Number(option.price).toLocaleString()}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
+
+          {/* Ingredients Section */}
+          {product?.ingredients && (
+            <div className="ingredients-section mb-3">
+              <div className="d-flex justify-content-between align-items-center py-2" style={{
+                borderBottom: '1px solid #e9ecef'
+              }}>
+                <span className="fw-medium text-dark">Найрлага</span>
+                <button 
+                  className="btn btn-link p-0 text-decoration-none"
+                  onClick={() => setShowIngredients(!showIngredients)}
+                  style={{ fontSize: '1.2rem', lineHeight: '1' }}
+                >
+                  {showIngredients ? '−' : '+'}
+                </button>
+              </div>
+              {showIngredients && (
+                <div className="ingredients-content py-2">
+                  <p className="text-muted mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+                    {product.ingredients}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* How to Use Section */}
+          {product?.howToUse && (
+            <div className="how-to-use-section mb-3">
+              <div className="d-flex align-items-center mb-2">
+                <span className="fw-medium text-dark">Ашиглах заавар</span>
+                <button 
+                  className="btn btn-link p-0 text-decoration-none"
+                  onClick={() => setShowHowToUse(!showHowToUse)}
+                  style={{ fontSize: '1.2rem', lineHeight: '1' }}
+                >
+                  {showHowToUse ? '−' : '+'}
+                </button>
+              </div>
+              {showHowToUse && (
+                <div className="how-to-use-content py-2">
+                  <p className="text-muted mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+                    {product.howToUse}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           <form onSubmit={(e) => e.preventDefault()}>
             {/* ✅ Size/Color аль нэг нь байвал л swatches үзүүлнэ */}
