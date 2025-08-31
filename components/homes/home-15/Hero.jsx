@@ -33,11 +33,13 @@ export default function Hero() {
               <Image
                 src={elm.bgImage}
                 width="1920"
-                height="600"
+                height="800"
                 alt="Pattern"
-                className="slideshow-bg__img object-fit-contain"
+                className="slideshow-bg__img object-fit-cover"
                 priority={i === 0}
                 loading={i === 0 ? undefined : "lazy"}
+                quality={95}
+                sizes="100vw"
               />
             </div>
             <div className="slideshow-text container position-absolute start-50 top-50 translate-middle">

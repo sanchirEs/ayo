@@ -5,8 +5,8 @@ $slideshow-type2-height: 56rem;
 $slideshow-mobile-height: 34.5rem;
 $slideshow-type3-height: 35rem;
 $slideshow-type3-mobile-height: 26.25rem;
-$slideshow-type4-height: 37.5rem;
-$slideshow-type4-mobile-height: 26.25rem;
+$slideshow-type4-height: 50rem; /* Increased from 37.5rem to 50rem (800px) */
+$slideshow-type4-mobile-height: 34.5rem; /* Increased from 26.25rem to 34.5rem (552px) */
 $slideshow-type5-height: 40.625rem;
 $slideshow-type5-mobile-height: 26.25rem;
 
@@ -96,6 +96,12 @@ $nav-mobile-size: 35px;
 .slideshow-bg__img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: center;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transition: transform 0.3s ease;
 }
 
 .slideshow-character__img {
