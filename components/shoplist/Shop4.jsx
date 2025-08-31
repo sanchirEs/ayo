@@ -20,26 +20,26 @@ import Pagination2 from "../common/Pagination2";
 // Grid-ийн боломжит баганын тоо
 const itemPerRow = [2, 3, 4];
 
-// Frontend sort → backend params map
-function mapSortToParams(value) {
+// Frontend sort → backend sortBy param map (NEW FILTER SYSTEM)
+function mapSortToBackend(value) {
   switch (value) {
     case "price-asc":
-      return { sortField: "price", sortOrder: "asc" };
+      return "price_asc";
     case "price-desc":
-      return { sortField: "price", sortOrder: "desc" };
+      return "price_desc";
     case "name-asc":
-      return { sortField: "name", sortOrder: "asc" };
+      return "name_asc";
     case "name-desc":
-      return { sortField: "name", sortOrder: "desc" };
+      return "name_desc";
     case "rating-desc":
-      return { sortField: "rating", sortOrder: "desc" };
+      return "rating";
     case "popular":
-      return { sortField: "popularity", sortOrder: "desc" };
+      return "popular";
     case "oldest":
-      return { sortField: "createdAt", sortOrder: "asc" };
+      return "newest"; // No specific "oldest" in new API, use newest
     case "newest":
     default:
-      return { sortField: "createdAt", sortOrder: "desc" };
+      return "newest";
   }
 }
 
@@ -55,10 +55,21 @@ export default function Shop4({
   initialPage = 1,
   initialLimit = 12,
   initialSort = "newest",
+  appliedFilters = null, // Filters from ShopLayoutWrapper
+  onFiltersChange = null, // Filter change handler from ShopLayoutWrapper
+  // Debug props
+  _debugShopLayout = false,
+  _debugFilterCount = 0,
+  _debugTimestamp = null,
+  ...otherProps
 }) {
+
+
   const params = useParams();
   const urlCategoryId = params?.categoryId ? parseInt(params.categoryId) : null;
   const categoryId = propCategoryId || urlCategoryId;
+  
+
   
   const { toggleWishlist, isAddedtoWishlist } = useContextElement();
   const { setQuickViewItem } = useContextElement();
@@ -79,14 +90,32 @@ export default function Shop4({
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   
-  // Filter states
-  const [filters, setFilters] = useState({
+  // Enhanced loading states for sophisticated UX (FIXED FOR SSR)
+  const [isFilteringActive, setIsFilteringActive] = useState(false);
+  const [lastFilterUpdate, setLastFilterUpdate] = useState(0);
+  
+  // Use filters from parent component (ShopLayoutWrapper) or fallback to default
+  const filters = appliedFilters || {
+    brands: [], // Array of brand IDs
+    priceMin: null,
+    priceMax: null,
+    attributes: {}, // { color: ["red", "blue"], size: ["M", "L"] }
+    specs: {}, // Add specs support
+    tags: [], // Array of tag strings
+    inStock: true, // Show only in-stock products by default
+    hasDiscount: false,
+    minRating: null,
+    // Backward compatibility
     colors: [],
     sizes: [],
-    brands: [],
     price: [20, 70987],
-    search: ""
-  });
+    // Metadata for debugging
+    _meta: {
+      totalActiveFilters: 0,
+      lastUpdate: 0,
+      filterType: 'default'
+    }
+  };
 
   // ---- category state ----
   const [categoryName, setCategoryName] = useState("");
@@ -127,7 +156,6 @@ export default function Shop4({
             });
           } else if (response.success && response.data === null) {
             // API returned null data (404 handled by API client)
-            console.log('Category data is null, using fallback name');
             setCategoryName("Ангилал");
             // Cache the fallback
             setCategoryCache(prev => {
@@ -140,10 +168,8 @@ export default function Shop4({
           }
         })
         .catch(error => {
-          console.error('Error fetching category:', error);
           // Don't show error for 404, just use fallback name
           if (error.message.includes('404') || error.message.includes('Not Found')) {
-            console.log('Category endpoint not found, using fallback name');
             setCategoryName("Ангилал");
             // Cache the fallback to prevent repeated API calls
             setCategoryCache(prev => {
@@ -166,67 +192,162 @@ export default function Shop4({
     }
   }, [categoryId, categoryCache]);
 
-  // Filter change handler
-  const handleFiltersChange = (newFilters) => {
-    setFilters(newFilters);
-  };
+  // Filter change is now handled by parent component (ShopLayoutWrapper)
+  // No need for local handleFiltersChange since we receive onFiltersChange prop
 
-  // ---- load products from backend ----
-  async function loadProducts({ page = initialPage, limit = initialLimit, sortValue = sort, showLoading = true } = {}) {
+  // ---- ENHANCED load products with sophisticated UX ----
+  async function loadProducts({ 
+    page = initialPage, 
+    limit = initialLimit, 
+    sortValue = sort, 
+    showLoading = true,
+    isFilterChange = false 
+  } = {}) {
+    
+    // Smart loading state management
     if (showLoading) {
-    setLoading(true);
+      setLoading(true);
+    } else if (isFilterChange) {
+      setIsFilteringActive(true); // Show subtle filtering indicator
     }
+    
     setErr("");
+    const requestStartTime = typeof window !== 'undefined' ? Date.now() : 0;
+    
     try {
-      const { sortField, sortOrder } = mapSortToParams(sortValue);
+      const sortBy = mapSortToBackend(sortValue);
+      
+      // Build parameters for new enhanced API
       const params = { 
         page, 
         limit, 
-        sortField, 
-        sortOrder,
-        // Add filter parameters
-        ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
-        ...(filters.sizes.length > 0 && { sizes: filters.sizes.join(',') }),
-        ...(filters.brands.length > 0 && { brands: filters.brands.join(',') }),
-        ...(filters.price[0] !== 20 && { minPrice: filters.price[0] }),
-        ...(filters.price[1] !== 70987 && { maxPrice: filters.price[1] }),
-        ...(filters.search && { search: filters.search })
+        sortBy,
+        fields: "basic", // Basic product info
+        include: "variants,inventory", // Include variants and inventory info
       };
 
-      const res = categoryId
-        ? await api.products.getByCategory(categoryId, params)
-        : await api.products.getAll(params);
+      // Add category filter
+      if (categoryId) {
+        params.categoryId = categoryId;
+      }
 
-      const payload = res?.data ?? res; // {success, data, pagination} эсвэл шууд массив
-      const list =
-        Array.isArray(payload?.data) ? payload.data :
-        Array.isArray(payload?.products) ? payload.products :
-        Array.isArray(payload) ? payload : 
-        Array.isArray(res?.data) ? res.data :
-        Array.isArray(res?.products) ? res.products :
-        Array.isArray(res) ? res : [];
+      // Add brand filters
+      if (filters.brands && filters.brands.length > 0) {
+        params.brands = filters.brands.join(',');
+      }
 
-      const pg = payload?.pagination || res?.pagination || {
-        total: list.length,
-        totalPages: Math.max(1, Math.ceil(list.length / limit)),
-        currentPage: page,
-        limit,
+      // Add price filters
+      if (filters.priceMin !== null) {
+        params.priceMin = filters.priceMin;
+      }
+      if (filters.priceMax !== null) {
+        params.priceMax = filters.priceMax;
+      }
+
+      // Add attribute filters (dynamic attributes from backend)
+      if (filters.attributes && Object.keys(filters.attributes).length > 0) {
+        const attributeStrings = [];
+        Object.entries(filters.attributes).forEach(([key, values]) => {
+          if (Array.isArray(values) && values.length > 0) {
+            values.forEach(value => {
+              // Backend expects format: key:value (single colon)
+              attributeStrings.push(`${key}:${value}`);
+            });
+          }
+        });
+        if (attributeStrings.length > 0) {
+          params.attributes = attributeStrings.join(',');
+        }
+      }
+
+      // Add spec filters (specifications from backend)
+      if (filters.specs && Object.keys(filters.specs).length > 0) {
+        const specStrings = [];
+        Object.entries(filters.specs).forEach(([key, values]) => {
+          if (Array.isArray(values) && values.length > 0) {
+            values.forEach(value => {
+              // Backend expects format: key:value (single colon, not double)
+              // Clean up the key to remove any existing double colons (anywhere in the key)
+              const cleanKey = key.replace(/::+/g, '').trim();
+              const specString = `${cleanKey}:${value}`;
+              specStrings.push(specString);
+            });
+          }
+        });
+        if (specStrings.length > 0) {
+          params.specs = specStrings.join(',');
+        }
+      }
+
+      // Add tag filters
+      if (filters.tags && filters.tags.length > 0) {
+        params.tags = filters.tags.join(',');
+      }
+
+
+
+      // Add stock filter
+      if (filters.inStock) {
+        params.inStock = "true";
+      }
+
+      // Add discount filter
+      if (filters.hasDiscount) {
+        params.hasDiscount = "true";
+      }
+
+      // Add rating filter
+      if (filters.minRating) {
+        params.minRating = filters.minRating;
+      }
+
+
+
+      // Use new enhanced products API
+      const res = await api.products.enhanced(params);
+
+      // Handle response structure from new API
+      const responseData = res?.data || res;
+      const productList = responseData?.products || [];
+      const paginationData = responseData?.pagination || {
+        total: productList.length,
+        totalPages: Math.max(1, Math.ceil(productList.length / limit)),
+        page: page,
+        limit: limit,
+        hasNext: false,
+        hasPrev: false
       };
 
-      setProducts(list);
-      setPagination(pg);
-    } catch (e) {
-      console.error('Error loading products:', e);
+      // Map pagination fields to match current structure
+      const mappedPagination = {
+        total: paginationData.total || 0,
+        totalPages: paginationData.totalPages || 1,
+        currentPage: paginationData.page || page,
+        limit: paginationData.limit || limit,
+        hasNext: paginationData.hasNext || false,
+        hasPrev: paginationData.hasPrev || false
+      };
+
+      // Performance tracking
+      const requestDuration = typeof window !== 'undefined' ? Date.now() - requestStartTime : 0;
       
-      // Handle different types of errors
+      // Update products with smooth transition
+      setProducts(productList);
+      setPagination(mappedPagination);
+      setLastFilterUpdate(typeof window !== 'undefined' ? Date.now() : 0);
+
+    } catch (e) {
+      // Sophisticated error handling
       let errorMessage = "Бүтээгдэхүүн ачаалахад алдаа гарлаа.";
       
-      if (e.message.includes('fetch')) {
-        errorMessage = "Сүлжээний холболт асуудалтай байна. Дахин оролдоно уу.";
+      if (e.message.includes('fetch') || e.name === 'TypeError') {
+        errorMessage = "🌐 Сүлжээний холболт асуудалтай байна. Дахин оролдоно уу.";
       } else if (e.message.includes('500')) {
-        errorMessage = "Серверийн алдаа гарлаа. Дахин оролдоно уу.";
+        errorMessage = "⚠️ Серверийн алдаа гарлаа. Дахин оролдоно уу.";
       } else if (e.message.includes('404')) {
-        errorMessage = "Хүссэн мэдээлэл олдсонгүй.";
+        errorMessage = "🔍 Хүссэн мэдээлэл олдсонгүй.";
+      } else if (e.message.includes('timeout')) {
+        errorMessage = "⏱️ Хүсэлт удаан байна. Дахин оролдоно уу.";
       } else if (e.message) {
         errorMessage = e.message;
       }
@@ -235,7 +356,9 @@ export default function Shop4({
       setProducts([]);
       setPagination((p) => ({ ...p, total: 0, totalPages: 1 }));
     } finally {
+      // Clean up loading states
       setLoading(false);
+      setIsFilteringActive(false);
     }
   }
 
@@ -267,22 +390,40 @@ export default function Shop4({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
 
-  // filters өөрчлөгдөхөд 1-р хуудаснаас эхлүүлэн дахин ачаал
+  // ENHANCED filter change handling
   useEffect(() => {
-    // Skip initial load when filters are empty
-    if (filters.colors.length === 0 && filters.sizes.length === 0 && filters.brands.length === 0 && 
-        filters.price[0] === 20 && filters.price[1] === 70987 && !filters.search) {
+    // Don't process if appliedFilters is null/undefined (initial state)
+    if (!appliedFilters) {
       return;
     }
+    
+    // Check for active filters
+    const hasActiveFilters = filters.brands.length > 0 || 
+        filters.priceMin || filters.priceMax ||
+        Object.keys(filters.attributes || {}).length > 0 ||
+        Object.keys(filters.specs || {}).length > 0 ||
+        (filters.tags || []).length > 0 || 
+        filters.hasDiscount ||
+        filters.minRating ||
+        !filters.inStock; // inStock false is also a filter
+
+    // Always reload products when filters change (even clearing filters)
+    const filterType = filters._meta?.filterType || 'unknown';
+    const isInstantFilter = filterType === 'instant';
+    
+    // For instant filters, show minimal loading; for debounced, show more loading
+    const shouldShowFullLoading = !products.length || !isInstantFilter;
     
     loadProducts({ 
       page: 1, 
       limit: pagination.limit, 
       sortValue: sort, 
-      showLoading: false 
+      showLoading: shouldShowFullLoading,
+      isFilterChange: hasActiveFilters
     });
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.colors, filters.sizes, filters.brands, filters.price, filters.search]);
+  }, [appliedFilters]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -306,39 +447,74 @@ export default function Shop4({
   const canPrev = pagination.currentPage > 1;
   const canNext = pagination.currentPage < pagination.totalPages;
 
- const goPage = (p) => {
-  if (p < 1 || p > pagination.totalPages) return;
-  loadProducts({ 
-    page: p, 
-    limit: pagination.limit, 
-    sortValue: sort, 
-    showLoading: false 
-  });
-};
+  // ENHANCED pagination with smooth transitions
+  const goPage = (p) => {
+    if (p < 1 || p > pagination.totalPages) return;
+    
+    loadProducts({ 
+      page: p, 
+      limit: pagination.limit, 
+      sortValue: sort, 
+      showLoading: false, // Minimal loading for pagination
+      isFilterChange: false 
+    });
+  };
 
-  // ---- helpers to read fields safely ----
+  // ---- helpers to read fields safely (UPDATED FOR NEW API) ----
   function getTitle(p) {
-    return p.title || p.name || `Product #${p.id}`;
+    return p.name || p.title || `Product #${p.id}`;
   }
+  
   function getPrice(p) {
-    return typeof p.price === "number" ? p.price : p.salePrice ?? p.finalPrice ?? 0;
+    // New API returns priceRange object or direct price
+    if (p.priceRange && typeof p.priceRange === 'object') {
+      return p.priceRange.min || p.priceRange.max || 0;
+    }
+    return typeof p.price === "number" ? p.price : 0;
   }
+  
   function getOldPrice(p) {
-    return p.priceOld ?? p.compareAtPrice ?? null;
+    // Check for promotional pricing in new API format
+    if (p.promotional?.hasDiscount && p.promotional?.discountedPrice) {
+      return p.price; // Original price becomes old price
+    }
+    return null;
   }
+  
+  function getDiscountedPrice(p) {
+    // Get discounted price from promotional object
+    if (p.promotional?.hasDiscount && p.promotional?.discountedPrice) {
+      return p.promotional.discountedPrice;
+    }
+    return null;
+  }
+  
   function getImage(p) {
     return (
+      p.primaryImage ||
       p.images?.[0]?.url ||
       p.image ||
       p.thumbnail ||
       "/assets/images/products/p1.jpg"
     );
   }
+  
+  function getRating(p) {
+    if (p.rating && typeof p.rating === 'object') {
+      return {
+        average: p.rating.average || 0,
+        count: p.rating.count || 0
+      };
+    }
+    return {
+      average: p.rating || 0,
+      count: p.reviewsCount || 0
+    };
+  }
 
   return (
-
-    
-      <div >
+    <div>
+        
         <div className="d-flex justify-content-between mb-4 pb-md-2">
           <div className="breadcrumb mb-0 d-none d-md-block flex-grow-1">
             <BreadCumb />
@@ -473,13 +649,29 @@ export default function Shop4({
           </div>
         </div>
 
-        {/* PRODUCTS GRID */}
+
+
+        {/* PRODUCTS GRID WITH SOPHISTICATED LOADING */}
         <div
           className={`products-grid row row-cols-2 row-cols-md-3 row-cols-lg-${selectedColView}`}
           id="products-grid"
+          style={{
+            opacity: isFilteringActive ? 0.7 : 1,
+            transition: 'opacity 0.2s ease'
+          }}
         >
           {loading ? (
-            <div className="text-secondary p-3">Loading…</div>
+            <div className="col-12 text-center py-5">
+              <div className="d-flex flex-column align-items-center">
+                <div className="spinner-border text-primary mb-3" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <h6 className="text-primary mb-2">🔄 Бүтээгдэхүүн ачаалж байна...</h6>
+                <small className="text-muted">
+                  Бүх бүтээгдэхүүн
+                </small>
+              </div>
+            </div>
           ) : err ? (
             <div className="alert alert-danger">
               <div className="d-flex justify-content-between align-items-start">
@@ -496,11 +688,17 @@ export default function Shop4({
           ) : products.length === 0 ? (
             <div className="col-12 text-center py-5">
               <div className="d-flex flex-column align-items-center">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-muted mb-3">
-                  <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                </svg>
-                <h5 className="text-muted mb-2">Бүтээгдэхүүн олдсонгүй</h5>
-                <p className="text-muted mb-0">Одоогоор энэ ангилалд бүтээгдэхүүн байхгүй байна.</p>
+                <div className="empty-state-icon mb-4 p-4 bg-light rounded-circle">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-muted">
+                    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                </div>
+                <h5 className="text-muted mb-2">
+                  Бүтээгдэхүүн олдсонгүй
+                </h5>
+                <p className="text-muted mb-3">
+                  Одоогоор энэ ангилалд бүтээгдэхүүн байхгүй байна.
+                </p>
               </div>
             </div>
           ) : (
@@ -509,8 +707,15 @@ export default function Shop4({
               const title = getTitle(p);
               const price = getPrice(p);
               const priceOld = getOldPrice(p);
+              const discountedPrice = getDiscountedPrice(p);
               const img1 = getImage(p);
               const img2 = p.images?.[1]?.url || img1; // хоёрыг нь слайдлуулна
+              const rating = getRating(p);
+              const inStock = p.inStock || true;
+
+              // Determine which price to show
+              const displayPrice = discountedPrice || price;
+              const showOldPrice = priceOld && discountedPrice;
 
               return (
                 <div key={id} className="product-card-wrapper">
@@ -551,38 +756,39 @@ export default function Shop4({
                         className="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside"
                         onClick={() => addProductToCart(id)}
                         title={isAddedToCartProducts(id) ? "Already Added" : "Add to Cart"}
+                        disabled={!inStock}
                       >
-                        {isAddedToCartProducts(id) ? "Already Added" : "Add To Cart"}
+                        {!inStock ? "Out of Stock" : isAddedToCartProducts(id) ? "Already Added" : "Add To Cart"}
                       </button>
                     </div>
 
                     <div className="pc__info position-relative">
-                      <p className="pc__category">{p.category?.name || p.categoryName || ""}</p>
+                      <p className="pc__category">{p.brand?.name || p.category?.name || p.categoryName || ""}</p>
                       <h6 className="pc__title">
                         <Link href={`/product1_simple/${id}`}>{title}</Link>
                       </h6>
 
                       <div className="product-card__price d-flex">
-                        {priceOld ? (
+                        {showOldPrice ? (
                           <>
                             <span className="money price price-old">${priceOld}</span>
-                            <span className="money price price-sale">${price}</span>
+                            <span className="money price price-sale">${displayPrice}</span>
                           </>
                         ) : (
-                          <span className="money price">${price}</span>
+                          <span className="money price">${displayPrice}</span>
                         )}
                       </div>
 
-                      {p.colors?.length ? (
+                      {p.variants?.length ? (
                         <div className="d-flex align-items-center mt-1"><ColorSelection /></div>
                       ) : null}
 
-                      {typeof p.rating === "number" ? (
+                      {rating.average > 0 ? (
                         <div className="product-card__review d-flex align-items-center">
-                          <div className="reviews-group d-flex"><Star stars={p.rating} /></div>
-                          {typeof p.reviewsCount === "number" && (
+                          <div className="reviews-group d-flex"><Star stars={rating.average} /></div>
+                          {rating.count > 0 && (
                             <span className="reviews-note text-lowercase text-secondary ms-1">
-                              {p.reviewsCount}
+                              {rating.count}
                             </span>
                           )}
                         </div>
@@ -605,18 +811,18 @@ export default function Shop4({
                       </button>
                     </div>
 
-                    {/* Optional labels */}
-                    {p.discont ? (
+                    {/* Optional labels from new API */}
+                    {p.promotional?.hasDiscount ? (
                       <div className="pc-labels position-absolute top-0 start-0 w-100 d-flex justify-content-between">
                         <div className="pc-labels__right ms-auto">
-                          <span className="pc-label pc-label_sale d-block text-white">-{p.discont}%</span>
+                          <span className="pc-label pc-label_sale d-block text-white">-{p.promotional.discountPercent}%</span>
                         </div>
                       </div>
                     ) : null}
-                    {p.isNew ? (
+                    {!inStock ? (
                       <div className="pc-labels position-absolute top-0 start-0 w-100 d-flex justify-content-between">
                         <div className="pc-labels__left">
-                          <span className="pc-label pc-label_new d-block bg-white">NEW</span>
+                          <span className="pc-label pc-label_out-of-stock d-block bg-dark text-white">OUT OF STOCK</span>
                         </div>
                       </div>
                     ) : null}

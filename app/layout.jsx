@@ -25,6 +25,7 @@ import ProductAdditionalInformation from "@/components/asides/ProductAdditionalI
 import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
 import { AuthProvider } from "@/context/AuthContext";
+import { FilterProvider } from "@/context/FilterContext";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
 import Footer1 from "@/components/footers/Footer14";
@@ -110,6 +111,7 @@ export default function RootLayout({ children }) {
   refetchOnWindowFocus={false}
   refetchWhenOffline={false}>
           <AuthProvider>
+            <FilterProvider>
         <Svgs />
         <Context>
          
@@ -143,6 +145,7 @@ export default function RootLayout({ children }) {
           <ProductAdditionalInformation />
           <ProductReviews />
         </Context>
+            </FilterProvider>
         <Toaster position="top-right" />
         <div className="page-overlay" id="pageOverlay"></div>
         <ScrollTop />

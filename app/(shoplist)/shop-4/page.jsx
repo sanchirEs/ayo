@@ -1,4 +1,4 @@
-import Shop4 from "@/components/shoplist/Shop4";
+import ShopLayoutWrapper from "@/components/shoplist/ShopLayoutWrapper";
 import React, { Suspense } from "react";
 
 export const metadata = {
@@ -9,7 +9,7 @@ export default function ShopPage4() {
   return (
     <>
       <Suspense fallback={<div>Loading shop...</div>}>
-        <Shop4 />
+        <ShopLayoutWrapper />
       </Suspense>
     </>
   );

@@ -1,12 +1,29 @@
 "use client";
 
-// Removed unused imports - now using backend attributes
-import { useEffect, useState, useCallback } from "react";
+// Enhanced filter component with sophisticated UX
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Slider from "rc-slider";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { sortingOptions } from "@/data/products/productCategories";
+
+// Smart debounce hook for price and search
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export default function FilterAll({ onFiltersChange }) {
   const params = useParams();
@@ -19,20 +36,33 @@ export default function FilterAll({ onFiltersChange }) {
   const [catError, setCatError] = useState("");
   const [expandedCategories, setExpandedCategories] = useState(new Set());
 
-  // Attributes from backend
-  const [attributes, setAttributes] = useState([]);
-  const [attributesLoading, setAttributesLoading] = useState(true);
-  const [attributesError, setAttributesError] = useState("");
+  // Filter options from backend API (UPDATED FOR REAL STRUCTURE)
+  const [filterOptions, setFilterOptions] = useState({
+    brands: [],
+    priceRanges: [],
+    attributes: {}, // Dynamic attributes like "үнэртэн", "color", "size"
+    specs: {}, // Specifications like "Хэмжээ:"
+    tags: { simple: [], hierarchical: [] }
+  });
+  const [filtersLoading, setFiltersLoading] = useState(true);
+  const [filtersError, setFiltersError] = useState("");
 
-  // Filter states
-  const [activeColors, setActiveColors] = useState([]);
-  const [activeSizes, setActiveSizes] = useState([]);
-  const [activeBrands, setActiveBrands] = useState([]);
+  // Filter states (ENHANCED FOR INSTANT RESPONSE)
+  const [activeBrands, setActiveBrands] = useState([]); // Array of brand IDs
+  const [activeAttributes, setActiveAttributes] = useState({}); // { "үнэртэн": ["Dive in Fig"], "color": ["red"] }
+  const [activeSpecs, setActiveSpecs] = useState({}); // { "Хэмжээ:": ["3 г"] }
+  const [activeTags, setActiveTags] = useState([]); // Array of tag values
   const [searchQuery, setSearchQuery] = useState("");
   const [price, setPrice] = useState([20, 70987]);
+  const [inStock, setInStock] = useState(true);
+  const [hasDiscount, setHasDiscount] = useState(false);
+
+  // Debounced values for smooth UX (only for continuous inputs)
+  const debouncedSearch = useDebounce(searchQuery, 300); // 300ms delay for search
+  const debouncedPrice = useDebounce(price, 500); // 500ms delay for price slider
   
-  // Accordion states
-  const [expandedAccordions, setExpandedAccordions] = useState(new Set(['categories', 'colors', 'sizes', 'brands', 'price']));
+  // Accordion states (DYNAMIC BASED ON AVAILABLE FILTERS)
+  const [expandedAccordions, setExpandedAccordions] = useState(new Set(['categories', 'brands', 'price']));
 
   // Load category tree from backend
   useEffect(() => {
@@ -48,19 +78,16 @@ export default function FilterAll({ onFiltersChange }) {
             setCatTree(payload);
           } else if (payload === null) {
             // API returned null data (404 handled by API client)
-            console.log('Categories data is null, using empty array');
-            setCatTree([]);
-          }
-        }
-      } catch (e) {
-        console.error('Error loading categories:', e);
-        if (alive) {
-          // Don't show error for 404, just use empty categories
-          if (e.message.includes('404') || e.message.includes('Not Found')) {
-            console.log('Categories endpoint not found, using empty categories');
-            setCatTree([]);
-            return;
-          }
+                    setCatTree([]);
+      }
+    }
+  } catch (e) {
+    if (alive) {
+      // Don't show error for 404, just use empty categories
+      if (e.message.includes('404') || e.message.includes('Not Found')) {
+        setCatTree([]);
+        return;
+      }
           
           let errorMessage = "Ангилал ачилт алдаа";
           
@@ -83,35 +110,94 @@ export default function FilterAll({ onFiltersChange }) {
     };
   }, []);
 
-  // Load attributes from backend
+  // Load filter options from new API
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        setAttributesLoading(true);
-        setAttributesError(null);
-        const res = await api.attributes.getAll();
-        const payload = res?.data ?? res;
-        if (alive) {
-          if (Array.isArray(payload)) {
-            setAttributes(payload);
-          } else if (payload === null) {
-            // API returned null data (404 handled by API client)
-            console.log('Attributes data is null, using empty array');
-            setAttributes([]);
-          }
+        setFiltersLoading(true);
+        setFiltersError(null);
+        
+        // Determine context based on current category (matching backend expectations)
+        const context = currentCategoryId ? 'category' : 'homepage';
+        const params = {
+          context,
+          include: 'all' // Get all filter types
+        };
+        
+        // Add categoryId if present
+        if (currentCategoryId) {
+          params.categoryId = currentCategoryId;
         }
-      } catch (e) {
-        console.error('Error loading attributes:', e);
+        
+        const res = await api.filters.getOptions(params);
+        const payload = res?.data ?? res;
+        
         if (alive) {
-          // Don't show error for 404, just use empty attributes
-          if (e.message.includes('404') || e.message.includes('Not Found')) {
-            console.log('Attributes endpoint not found, using empty attributes');
-            setAttributes([]);
-            return;
-          }
+          if (payload && payload.filters) {
+            const newFilterOptions = {
+              brands: payload.filters.brands || [],
+              priceRanges: payload.filters.priceRanges || [],
+              attributes: payload.filters.attributes || {},
+              specs: payload.filters.specs || {}, // Add specs support
+              tags: payload.filters.tags || { simple: [], hierarchical: [] }
+            };
+            
+            setFilterOptions(newFilterOptions);
+            
+            // Auto-expand accordions for available filter types
+            setExpandedAccordions(prev => {
+              const newSet = new Set(prev);
+              newSet.add('categories');
+              newSet.add('brands');
+              newSet.add('price');
+              
+              // Auto-expand attribute accordions
+              Object.keys(newFilterOptions.attributes).forEach(key => {
+                newSet.add(`attribute-${key}`);
+              });
+              
+              // Auto-expand spec accordions
+              Object.keys(newFilterOptions.specs).forEach(key => {
+                newSet.add(`spec-${key}`);
+              });
+              
+              // Auto-expand tags if available
+              if (newFilterOptions.tags.simple?.length > 0 || newFilterOptions.tags.hierarchical?.length > 0) {
+                newSet.add('tags');
+              }
+              
+              // Always expand advanced filters (stock, discount toggles)
+              newSet.add('advanced');
+              
+              return newSet;
+            });
+            
+                  } else {
+          // Fallback to empty structure
+          setFilterOptions({
+            brands: [],
+            priceRanges: [],
+            attributes: {},
+            specs: {},
+            tags: { simple: [], hierarchical: [] }
+          });
+        }
+      }
+    } catch (e) {
+      if (alive) {
+        // Don't show error for 404, just use empty filters
+        if (e.message.includes('404') || e.message.includes('Not Found')) {
+          setFilterOptions({
+            brands: [],
+            priceRanges: [],
+            attributes: {},
+            tags: { simple: [], hierarchical: [] }
+          });
+          return;
+        }
           
-          let errorMessage = "Шинж чанар ачилт алдаа";
+          let errorMessage = "Шүүлтүүр ачиахад алдаа гарлаа";
           
           if (e.message.includes('fetch')) {
             errorMessage = "Сүлжээний холболт асуудалтай байна.";
@@ -121,16 +207,16 @@ export default function FilterAll({ onFiltersChange }) {
             errorMessage = e.message;
           }
           
-          setAttributesError(errorMessage);
+          setFiltersError(errorMessage);
         }
       } finally {
-        if (alive) setAttributesLoading(false);
+        if (alive) setFiltersLoading(false);
       }
     })();
     return () => {
       alive = false;
     };
-  }, []);
+  }, [currentCategoryId]);
 
   // Auto-expand parent when URL changes to a child category
   useEffect(() => {
@@ -139,22 +225,86 @@ export default function FilterAll({ onFiltersChange }) {
     }
   }, [currentCategoryId, catTree]);
 
-  // Notify parent component when filters change
-  const notifyFiltersChange = useCallback(() => {
-    if (onFiltersChange) {
-      onFiltersChange({
-        colors: activeColors,
-        sizes: activeSizes,
-        brands: activeBrands,
-        price: price,
-        search: searchQuery
-      });
-    }
-  }, [activeColors, activeSizes, activeBrands, price, searchQuery]);
+  // Calculate total active filters for sophisticated UX
+  const totalActiveFilters = useMemo(() => {
+    return activeBrands.length + 
+           Object.values(activeAttributes).flat().length +
+           Object.values(activeSpecs).flat().length +
+           activeTags.length +
+           (debouncedPrice[0] !== 20 || debouncedPrice[1] !== 70987 ? 1 : 0) +
+           (debouncedSearch ? 1 : 0) +
+           (!inStock ? 1 : 0) +
+           (hasDiscount ? 1 : 0);
+  }, [activeBrands, activeAttributes, activeSpecs, activeTags, debouncedPrice, debouncedSearch, inStock, hasDiscount]);
 
+  // INSTANT filter notification (for immediate filters)
+  const notifyInstantFilters = useCallback(() => {
+    if (onFiltersChange) {
+      const filterData = {
+        brands: activeBrands,
+        attributes: activeAttributes,
+        specs: activeSpecs, 
+        tags: activeTags,
+        inStock: inStock,
+        hasDiscount: hasDiscount,
+        // Use current values for instant filters, debounced for continuous inputs
+        priceMin: debouncedPrice[0] !== 20 ? debouncedPrice[0] : null,
+        priceMax: debouncedPrice[1] !== 70987 ? debouncedPrice[1] : null,
+        search: debouncedSearch,
+        // Keep old format for backward compatibility
+        colors: activeAttributes.color || [],
+        sizes: activeAttributes.size || [],
+        price: debouncedPrice,
+        // Add metadata for sophisticated UX (FIXED FOR SSR)
+        _meta: {
+          totalActiveFilters,
+          lastUpdate: typeof window !== 'undefined' ? Date.now() : 0,
+          filterType: 'instant'
+        }
+      };
+      
+      onFiltersChange(filterData);
+    }
+  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount, debouncedPrice, debouncedSearch, totalActiveFilters, onFiltersChange]);
+
+  // DEBOUNCED filter notification (for search and price)
+  const notifyDebouncedFilters = useCallback(() => {
+    if (onFiltersChange) {
+      const filterData = {
+        brands: activeBrands,
+        attributes: activeAttributes,
+        specs: activeSpecs,
+        tags: activeTags,
+        inStock: inStock,
+        hasDiscount: hasDiscount,
+        priceMin: debouncedPrice[0] !== 20 ? debouncedPrice[0] : null,
+        priceMax: debouncedPrice[1] !== 70987 ? debouncedPrice[1] : null,
+        search: debouncedSearch,
+        // Keep old format for backward compatibility
+        colors: activeAttributes.color || [],
+        sizes: activeAttributes.size || [],
+        price: debouncedPrice,
+        // Add metadata (FIXED FOR SSR)
+        _meta: {
+          totalActiveFilters,
+          lastUpdate: typeof window !== 'undefined' ? Date.now() : 0,
+          filterType: 'debounced'
+        }
+      };
+      
+      onFiltersChange(filterData);
+    }
+  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount, debouncedPrice, debouncedSearch, totalActiveFilters, onFiltersChange]);
+
+  // Instant updates for immediate filters (brands, attributes, specs, tags, toggles)
   useEffect(() => {
-    notifyFiltersChange();
-  }, [activeColors, activeSizes, activeBrands, price, searchQuery]);
+    notifyInstantFilters();
+  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount]);
+
+  // Debounced updates for continuous filters (search, price)
+  useEffect(() => {
+    notifyDebouncedFilters();
+  }, [debouncedSearch, debouncedPrice]);
 
   // Toggle category expansion - keep parent open when child is selected
   const toggleCategory = (categoryId) => {
@@ -278,29 +428,104 @@ export default function FilterAll({ onFiltersChange }) {
   };
 
   // Filter functions
-  const toggleColor = (colorId) => {
-    if (activeColors.includes(colorId)) {
-      setActiveColors((pre) => [...pre.filter((id) => id !== colorId)]);
-    } else {
-      setActiveColors((pre) => [...pre, colorId]);
-    }
+  // Toggle functions for DYNAMIC FILTER SYSTEM
+  const toggleAttribute = (attributeKey, attributeValue) => {
+    setActiveAttributes((prev) => {
+      const currentValues = prev[attributeKey] || [];
+      const isRemoving = currentValues.includes(attributeValue);
+      
+      let newState;
+      if (isRemoving) {
+        // Remove value
+        const newValues = currentValues.filter(v => v !== attributeValue);
+        if (newValues.length === 0) {
+          // Remove the entire attribute key if no values left
+          const { [attributeKey]: removed, ...rest } = prev;
+          newState = rest;
+        } else {
+          newState = { ...prev, [attributeKey]: newValues };
+        }
+      } else {
+        // Add value
+        newState = { ...prev, [attributeKey]: [...currentValues, attributeValue] };
+      }
+      
+      return newState;
+    });
   };
 
-  const toggleSize = (sizeId) => {
-    if (activeSizes.includes(sizeId)) {
-      setActiveSizes((pre) => [...pre.filter((id) => id !== sizeId)]);
-    } else {
-      setActiveSizes((pre) => [...pre, sizeId]);
-    }
+  const toggleSpec = (specKey, specValue) => {
+    // Clean the spec key to remove double colons that come from backend
+    const cleanSpecKey = specKey.replace(/::+/g, '').trim();
+    
+    setActiveSpecs((prev) => {
+      const currentValues = prev[cleanSpecKey] || [];
+      if (currentValues.includes(specValue)) {
+        // Remove value
+        const newValues = currentValues.filter(v => v !== specValue);
+        if (newValues.length === 0) {
+          // Remove the entire spec key if no values left
+          const { [cleanSpecKey]: removed, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [cleanSpecKey]: newValues };
+      } else {
+        // Add value
+        return { ...prev, [cleanSpecKey]: [...currentValues, specValue] };
+      }
+    });
   };
 
   const toggleBrand = (brandId) => {
     if (activeBrands.includes(brandId)) {
-      setActiveBrands((pre) => [...pre.filter((id) => id !== brandId)]);
+      setActiveBrands((prev) => prev.filter((id) => id !== brandId));
     } else {
-      setActiveBrands((pre) => [...pre, brandId]);
+      setActiveBrands((prev) => [...prev, brandId]);
     }
   };
+
+  const toggleTag = (tagValue) => {
+    if (activeTags.includes(tagValue)) {
+      setActiveTags((prev) => prev.filter((value) => value !== tagValue));
+    } else {
+      setActiveTags((prev) => [...prev, tagValue]);
+    }
+  };
+
+  // SOPHISTICATED filter clear functions
+  const clearAllFilters = useCallback(() => {
+    setActiveBrands([]);
+    setActiveAttributes({});
+    setActiveSpecs({});
+    setActiveTags([]);
+    setSearchQuery("");
+    setPrice([20, 70987]);
+    setInStock(true);
+    setHasDiscount(false);
+  }, []);
+
+  const clearFilterType = useCallback((filterType) => {
+    switch (filterType) {
+      case 'brands':
+        setActiveBrands([]);
+        break;
+      case 'attributes':
+        setActiveAttributes({});
+        break;
+      case 'specs':
+        setActiveSpecs({});
+        break;
+      case 'tags':
+        setActiveTags([]);
+        break;
+      case 'price':
+        setPrice([20, 70987]);
+        break;
+      case 'search':
+        setSearchQuery("");
+        break;
+    }
+  }, []);
 
 // Removed unused useEffect - search is now handled in render
 
@@ -310,7 +535,6 @@ export default function FilterAll({ onFiltersChange }) {
 
   // Toggle accordion
   const toggleAccordion = (accordionId) => {
-    console.log('Toggling accordion:', accordionId);
     setExpandedAccordions(prev => {
       const newSet = new Set(prev);
       if (newSet.has(accordionId)) {
@@ -318,23 +542,43 @@ export default function FilterAll({ onFiltersChange }) {
       } else {
         newSet.add(accordionId);
       }
-      console.log('New expanded accordions:', Array.from(newSet));
       return newSet;
     });
   };
 
-  // Group attributes by type
-  const getAttributesByType = (type) => {
-    return attributes.filter(attr => attr.type === type);
+  // Get filter options from backend API structure (UPDATED FOR REAL DATA)
+  const getBrandOptions = () => {
+    return filterOptions.brands || [];
+  };
+  
+  const getAttributeOptions = () => {
+    return filterOptions.attributes || {};
+  };
+  
+  const getSpecOptions = () => {
+    return filterOptions.specs || {};
+  };
+  
+  const getTagOptions = () => {
+    return filterOptions.tags?.simple || [];
   };
 
-  // Get color attributes
-  const colorAttributes = getAttributesByType('color');
-  const sizeAttributes = getAttributesByType('size');
-  const brandAttributes = getAttributesByType('brand');
+  const getPriceRanges = () => {
+    return filterOptions.priceRanges || [];
+  };
+
+  // Get current filter options
+  const brandOptions = getBrandOptions();
+  const attributeOptions = getAttributeOptions();
+  const specOptions = getSpecOptions();
+  const tagOptions = getTagOptions();
+  const priceRanges = getPriceRanges();
 
   return (
     <>
+
+
+      
       <div className="accordion" id="categories-list">
         <div className="accordion-item mb-4">
           <h5 className="accordion-header" id="accordion-heading-11">
@@ -391,159 +635,170 @@ export default function FilterAll({ onFiltersChange }) {
         {/* /.accordion-item */}
       </div>
       {/* /.accordion-item */}
-      <div className="accordion" id="color-filters">
-        <div className="accordion-item mb-4">
-          <h5 className="accordion-header" id="accordion-heading-1">
-            <button
-              className="accordion-button p-0 border-0 fs-5 text-uppercase"
-              type="button"
-              onClick={() => toggleAccordion('colors')}
-              aria-expanded={expandedAccordions.has('colors')}
-            >
-              Color
-              <svg 
-                className={`accordion-button__icon transition-transform ${expandedAccordions.has('colors') ? 'rotate-180' : ''}`} 
-                viewBox="0 0 14 14"
+
+      {/* DYNAMIC ATTRIBUTES SECTION - Renders all attributes from backend */}
+      {Object.keys(attributeOptions).map((attributeKey) => {
+        const attribute = attributeOptions[attributeKey];
+        const attributeId = `attribute-${attributeKey}`;
+        const isExpanded = expandedAccordions.has(attributeId);
+        const currentValues = activeAttributes[attributeKey] || [];
+        
+        return (
+          <div key={attributeKey} className="accordion" id={`${attributeKey}-filters`}>
+            <div className="accordion-item mb-4">
+              <h5 className="accordion-header">
+                <button
+                  className="accordion-button p-0 border-0 fs-5 text-uppercase"
+                  type="button"
+                  onClick={() => toggleAccordion(attributeId)}
+                  aria-expanded={isExpanded}
+                >
+                  {attribute.name || attributeKey}
+                  <svg 
+                    className={`accordion-button__icon transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    viewBox="0 0 14 14"
+                  >
+                    <g aria-hidden="true" stroke="none" fillRule="evenodd">
+                      <path
+                        className="svg-path-vertical"
+                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                      />
+                      <path
+                        className="svg-path-horizontal"
+                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                      />
+                    </g>
+                  </svg>
+                </button>
+              </h5>
+              <div
+                className={`accordion-collapse border-0 ${isExpanded ? 'show' : 'collapse'}`}
+                style={{
+                  transition: 'all 0.3s ease',
+                  maxHeight: isExpanded ? '300px' : '0',
+                  overflow: 'hidden'
+                }}
               >
-                <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                  <path
-                    className="svg-path-vertical"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                  <path
-                    className="svg-path-horizontal"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                </g>
-              </svg>
-            </button>
-          </h5>
-          <div
-            className={`accordion-collapse border-0 ${expandedAccordions.has('colors') ? 'show' : 'collapse'}`}
-            aria-labelledby="accordion-heading-1"
-            style={{
-              transition: 'all 0.3s ease',
-              maxHeight: expandedAccordions.has('colors') ? '300px' : '0',
-              overflow: 'hidden'
-            }}
-          >
-            <div className="accordion-body px-0 pb-0">
-              {attributesLoading ? (
-                <div className="text-center py-3">
-                  <div className="spinner-border spinner-border-sm text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              ) : attributesError ? (
-                <div className="text-danger small py-2">{attributesError}</div>
-              ) : colorAttributes.length > 0 ? (
-                <div className="d-flex flex-wrap">
-                  {colorAttributes.map((attribute) => (
-                    <div key={attribute.id} className="mb-2">
-                      <h6 className="text-muted small mb-2">{attribute.name}</h6>
-              <div className="d-flex flex-wrap">
-                        {attribute.options.map((option) => (
-                          <button
-                            key={option.id}
-                            onClick={() => toggleColor(option.id)}
-                            className={`swatch-color js-filter me-2 mb-2 ${
-                              activeColors.includes(option.id) ? "swatch_active" : ""
-                            }`}
-                            style={{ 
-                              backgroundColor: option.value,
-                              border: '1px solid #ddd'
-                            }}
-                            title={option.value}
-                  />
-                ))}
-              </div>
+                <div className="accordion-body px-0 pb-0">
+                  {filtersLoading ? (
+                    <div className="text-center py-3">
+                      <div className="spinner-border spinner-border-sm text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
                     </div>
-                  ))}
+                  ) : filtersError ? (
+                    <div className="text-danger small py-2">{filtersError}</div>
+                  ) : attribute.options?.length > 0 ? (
+                    <div className="d-flex flex-wrap">
+                      <div className="mb-2 w-100">
+                        <div className="d-flex flex-wrap">
+                                                     {attribute.options.map((option, index) => (
+                             <button
+                               key={option.id || index}
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 toggleAttribute(attributeKey, option.value);
+                               }}
+                               className={`btn btn-sm btn-outline-secondary mb-2 me-2 js-filter ${
+                                 currentValues.includes(option.value) ? "btn-secondary text-white" : ""
+                               }`}
+                             >
+                               {option.value} {option.count ? `(${option.count})` : ''}
+                             </button>
+                           ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-muted small py-2">{attribute.name || attributeKey} байхгүй</div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-muted small py-2">Өнгө байхгүй</div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-        {/* /.accordion-item */}
-      </div>
-      {/* /.accordion */}
-      <div className="accordion" id="size-filters">
-        <div className="accordion-item mb-4">
-          <h5 className="accordion-header" id="accordion-heading-size">
-            <button
-              className="accordion-button p-0 border-0 fs-5 text-uppercase"
-              type="button"
-              onClick={() => toggleAccordion('sizes')}
-              aria-expanded={expandedAccordions.has('sizes')}
-            >
-              Sizes
-              <svg 
-                className={`accordion-button__icon transition-transform ${expandedAccordions.has('sizes') ? 'rotate-180' : ''}`} 
-                viewBox="0 0 14 14"
+        );
+      })}
+
+      {/* DYNAMIC SPECS SECTION - Renders all specs from backend */}
+      {Object.keys(specOptions).map((specKey) => {
+        const spec = specOptions[specKey];
+        const specId = `spec-${specKey}`;
+        const isExpanded = expandedAccordions.has(specId);
+        const currentValues = activeSpecs[specKey] || [];
+        
+        return (
+          <div key={specKey} className="accordion" id={`${specKey}-filters`}>
+            <div className="accordion-item mb-4">
+              <h5 className="accordion-header">
+                <button
+                  className="accordion-button p-0 border-0 fs-5 text-uppercase"
+                  type="button"
+                  onClick={() => toggleAccordion(specId)}
+                  aria-expanded={isExpanded}
+                >
+                  {spec.type || specKey}
+                  <svg 
+                    className={`accordion-button__icon transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    viewBox="0 0 14 14"
+                  >
+                    <g aria-hidden="true" stroke="none" fillRule="evenodd">
+                      <path
+                        className="svg-path-vertical"
+                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                      />
+                      <path
+                        className="svg-path-horizontal"
+                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                      />
+                    </g>
+                  </svg>
+                </button>
+              </h5>
+              <div
+                className={`accordion-collapse border-0 ${isExpanded ? 'show' : 'collapse'}`}
+                style={{
+                  transition: 'all 0.3s ease',
+                  maxHeight: isExpanded ? '300px' : '0',
+                  overflow: 'hidden'
+                }}
               >
-                <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                  <path
-                    className="svg-path-vertical"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                  <path
-                    className="svg-path-horizontal"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                </g>
-              </svg>
-            </button>
-          </h5>
-          <div
-            className={`accordion-collapse border-0 ${expandedAccordions.has('sizes') ? 'show' : 'collapse'}`}
-            aria-labelledby="accordion-heading-size"
-            style={{
-              transition: 'all 0.3s ease',
-              maxHeight: expandedAccordions.has('sizes') ? '300px' : '0',
-              overflow: 'hidden'
-            }}
-          >
-            <div className="accordion-body px-0 pb-0">
-              {attributesLoading ? (
-                <div className="text-center py-3">
-                  <div className="spinner-border spinner-border-sm text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              ) : attributesError ? (
-                <div className="text-danger small py-2">{attributesError}</div>
-              ) : sizeAttributes.length > 0 ? (
-                <div className="d-flex flex-wrap">
-                  {sizeAttributes.map((attribute) => (
-                    <div key={attribute.id} className="mb-2">
-                      <h6 className="text-muted small mb-2">{attribute.name}</h6>
-              <div className="d-flex flex-wrap">
-                        {attribute.options.map((option) => (
-                          <button
-                            key={option.id}
-                            onClick={() => toggleSize(option.id)}
-                            className={`swatch-size btn btn-sm btn-outline-light mb-2 me-2 js-filter ${
-                              activeSizes.includes(option.id) ? "swatch_active" : ""
-                            }`}
-                          >
-                            {option.value}
-                          </button>
-                ))}
-              </div>
+                <div className="accordion-body px-0 pb-0">
+                  {filtersLoading ? (
+                    <div className="text-center py-3">
+                      <div className="spinner-border spinner-border-sm text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
                     </div>
-                  ))}
+                  ) : filtersError ? (
+                    <div className="text-danger small py-2">{filtersError}</div>
+                  ) : spec.values?.length > 0 ? (
+                    <div className="d-flex flex-wrap">
+                      <div className="mb-2 w-100">
+                        <div className="d-flex flex-wrap">
+                          {spec.values.map((option, index) => (
+                            <button
+                              key={index}
+                              onClick={() => toggleSpec(specKey, option.value)}
+                              className={`btn btn-sm btn-outline-info mb-2 me-2 js-filter ${
+                                currentValues.includes(option.value) ? "btn-info text-white" : ""
+                              }`}
+                            >
+                              {option.value} {option.count ? `(${option.count})` : ''}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-muted small py-2">{spec.type || specKey} байхгүй</div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-muted small py-2">Хэмжээ байхгүй</div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-        {/* /.accordion-item */}
-      </div>
-      {/* /.accordion */}
+        );
+      })}
       <div className="accordion" id="brand-filters">
         <div className="accordion-item mb-4">
           <h5 className="accordion-header" id="accordion-heading-brand">
@@ -590,39 +845,40 @@ export default function FilterAll({ onFiltersChange }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              {attributesLoading ? (
+              {filtersLoading ? (
                 <div className="text-center py-3">
                   <div className="spinner-border spinner-border-sm text-primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
-              ) : attributesError ? (
-                <div className="text-danger small py-2">{attributesError}</div>
-              ) : brandAttributes.length > 0 ? (
-              <ul className="multi-select__list list-unstyled">
-                  {brandAttributes.map((attribute) => (
-                    <div key={attribute.id} className="mb-3">
-                      <h6 className="text-muted small mb-2">{attribute.name}</h6>
-                      {attribute.options
-                        .filter((option) =>
-                          option.value.toLowerCase().includes(searchQuery.toLowerCase())
-                        )
-                        .map((option) => (
-                          <li
-                            key={option.id}
-                            onClick={() => toggleBrand(option.id)}
-                      className={`search-suggestion__item multi-select__item text-primary js-search-select js-multi-select ${
-                              activeBrands.includes(option.id)
-                          ? "mult-select__item_selected"
-                          : ""
-                      }`}
-                    >
-                            <span className="me-auto">{option.value}</span>
-                    </li>
-                        ))}
-                    </div>
-                  ))}
-              </ul>
+              ) : filtersError ? (
+                <div className="text-danger small py-2">{filtersError}</div>
+              ) : brandOptions.length > 0 ? (
+                <ul className="multi-select__list list-unstyled">
+                  {brandOptions
+                    .filter((brand) =>
+                      brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((brand) => (
+                                             <li
+                         key={brand.id}
+                         onClick={(e) => {
+                           e.preventDefault();
+                           e.stopPropagation();
+                           toggleBrand(brand.id);
+                         }}
+                         className={`search-suggestion__item multi-select__item text-primary js-search-select js-multi-select ${
+                           activeBrands.includes(brand.id)
+                             ? "mult-select__item_selected"
+                             : ""
+                         }`}
+                         style={{ cursor: 'pointer' }}
+                       >
+                         <span className="me-auto">{brand.name}</span>
+                         <span className="text-muted small">({brand.count || 0})</span>
+                       </li>
+                    ))}
+                </ul>
               ) : (
                 <div className="text-muted small py-2">Брэнд байхгүй</div>
               )}
@@ -669,104 +925,187 @@ export default function FilterAll({ onFiltersChange }) {
             }}
           >
 
-            <div className="mt-2">
-            <Slider
-              range
-              formatLabel={() => ``}
-              max={100000}
-              min={0}
-              defaultValue={price}
-              onChange={(value) => handleOnChange(value)}
-              id="slider"
-            />
-            </div>
-           
-            <div className="price-range__info d-flex align-items-center mt-2">
-              <div className="me-auto">
-                <span className="text-secondary">Min Price: </span>
-                <span className="price-range__min">${price[0]}</span>
+            {/* Show predefined price ranges if available, otherwise show slider */}
+            {priceRanges.length > 0 ? (
+              <div className="price-ranges">
+                {priceRanges.map((range, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setPrice([range.min, range.max]);
+                    }}
+                    className={`btn btn-sm btn-outline-success w-100 mb-2 text-start ${
+                      price[0] === range.min && price[1] === range.max ? "btn-success text-white" : ""
+                    }`}
+                  >
+                    {range.label} ({range.count})
+                  </button>
+                ))}
               </div>
+            ) : (
               <div>
-                <span className="text-secondary">Max Price: </span>
-                <span className="price-range__max">${price[1]}</span>
+                <div className="mt-2">
+                  <Slider
+                    range
+                    formatLabel={() => ``}
+                    max={100000}
+                    min={0}
+                    defaultValue={price}
+                    onChange={(value) => handleOnChange(value)}
+                    id="slider"
+                  />
+                </div>
+                
+                <div className="price-range__info d-flex align-items-center mt-2">
+                  <div className="me-auto">
+                    <span className="text-secondary">Min Price: </span>
+                    <span className="price-range__min">${price[0]}</span>
+                  </div>
+                  <div>
+                    <span className="text-secondary">Max Price: </span>
+                    <span className="price-range__max">${price[1]}</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         {/* /.accordion-item */}
       </div>
       {/* /.accordion */}
+
+             {/* TAGS SECTION - If tags are available */}
+       {tagOptions.length > 0 && (
+         <div className="accordion" id="tag-filters">
+           <div className="accordion-item mb-4">
+             <h5 className="accordion-header">
+               <button
+                 className="accordion-button p-0 border-0 fs-5 text-uppercase"
+                 type="button"
+                 onClick={() => toggleAccordion('tags')}
+                 aria-expanded={expandedAccordions.has('tags')}
+               >
+                 🏷️ TAGS
+                 <svg 
+                   className={`accordion-button__icon transition-transform ${expandedAccordions.has('tags') ? 'rotate-180' : ''}`} 
+                   viewBox="0 0 14 14"
+                 >
+                   <g aria-hidden="true" stroke="none" fillRule="evenodd">
+                     <path
+                       className="svg-path-vertical"
+                       d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                     />
+                     <path
+                       className="svg-path-horizontal"
+                       d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                     />
+                   </g>
+                 </svg>
+               </button>
+             </h5>
+             <div
+               className={`accordion-collapse border-0 ${expandedAccordions.has('tags') ? 'show' : 'collapse'}`}
+               style={{
+                 transition: 'all 0.3s ease',
+                 maxHeight: expandedAccordions.has('tags') ? '300px' : '0',
+                 overflow: 'hidden'
+               }}
+             >
+               <div className="accordion-body px-0 pb-0">
+                 <div className="d-flex flex-wrap">
+                   {tagOptions.map((tag, index) => (
+                     <button
+                       key={tag.id || index}
+                       onClick={() => toggleTag(tag.value || tag.name || tag.tag || tag)}
+                       className={`btn btn-sm btn-outline-warning mb-2 me-2 js-filter ${
+                         activeTags.includes(tag.value || tag.name || tag.tag || tag) ? "btn-warning text-white" : ""
+                       }`}
+                     >
+                       {tag.name || tag.value || tag.tag || tag} {tag.count ? `(${tag.count})` : ''}
+                     </button>
+                   ))}
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       )}
+
+       {/* STOCK & DISCOUNT TOGGLES - Professional toggles */}
+       <div className="accordion" id="advanced-filters">
+         <div className="accordion-item mb-4">
+           <h5 className="accordion-header">
+             <button
+               className="accordion-button p-0 border-0 fs-5 text-uppercase"
+               type="button"
+               onClick={() => toggleAccordion('advanced')}
+               aria-expanded={expandedAccordions.has('advanced')}
+             >
+               ⚙️ НЭМЭЛТ ШҮҮЛТҮҮР
+               <svg 
+                 className={`accordion-button__icon transition-transform ${expandedAccordions.has('advanced') ? 'rotate-180' : ''}`} 
+                 viewBox="0 0 14 14"
+               >
+                 <g aria-hidden="true" stroke="none" fillRule="evenodd">
+                   <path
+                     className="svg-path-vertical"
+                     d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                   />
+                   <path
+                     className="svg-path-horizontal"
+                     d="M14,6 L14,8 L0,8 L0,6 L14,6"
+                   />
+                 </g>
+               </svg>
+             </button>
+           </h5>
+           <div
+             className={`accordion-collapse border-0 ${expandedAccordions.has('advanced') ? 'show' : 'collapse'}`}
+             style={{
+               transition: 'all 0.3s ease',
+               maxHeight: expandedAccordions.has('advanced') ? '200px' : '0',
+               overflow: 'hidden'
+             }}
+           >
+             <div className="accordion-body px-0 pb-0">
+               <div className="row g-3">
+                 <div className="col-6">
+                   <div className="form-check form-switch">
+                     <input
+                       className="form-check-input"
+                       type="checkbox"
+                       checked={inStock}
+                       onChange={(e) => setInStock(e.target.checked)}
+                       id="inStockSwitch"
+                     />
+                     <label className="form-check-label fw-medium" htmlFor="inStockSwitch">
+                       📦 Нөөцтэй
+                     </label>
+                   </div>
+                 </div>
+                 <div className="col-6">
+                   <div className="form-check form-switch">
+                     <input
+                       className="form-check-input"
+                       type="checkbox"
+                       checked={hasDiscount}
+                       onChange={(e) => setHasDiscount(e.target.checked)}
+                       id="hasDiscountSwitch"
+                     />
+                     <label className="form-check-label fw-medium" htmlFor="hasDiscountSwitch">
+                       🏷️ Хямдралтай
+                     </label>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
       
       {/* Sorting Filter - Removed, now handled in Shop4 component */}
-      
-      <div className="filter-active-tags pt-2">
-        {/* Active color filters */}
-        {activeColors.map((colorId) => {
-          const colorAttribute = colorAttributes.find(attr => 
-            attr.options.some(opt => opt.id === colorId)
-          );
-          const colorOption = colorAttribute?.options.find(opt => opt.id === colorId);
-          return colorOption ? (
-            <button
-              key={`color-${colorId}`}
-              onClick={() => toggleColor(colorId)}
-              className="filter-tag d-inline-flex align-items-center mb-3 me-3 text-uppercase js-filter"
-            >
-              <i className="btn-close-xs d-inline-block" />
-              <span className="ms-2">Өнгө: {colorOption.value}</span>
-            </button>
-          ) : null;
-        })}
+             
 
-        {/* Active size filters */}
-        {activeSizes.map((sizeId) => {
-          const sizeAttribute = sizeAttributes.find(attr => 
-            attr.options.some(opt => opt.id === sizeId)
-          );
-          const sizeOption = sizeAttribute?.options.find(opt => opt.id === sizeId);
-          return sizeOption ? (
-            <button
-              key={`size-${sizeId}`}
-              onClick={() => toggleSize(sizeId)}
-              className="filter-tag d-inline-flex align-items-center mb-3 me-3 text-uppercase js-filter"
-            >
-              <i className="btn-close-xs d-inline-block" />
-              <span className="ms-2">Хэмжээ: {sizeOption.value}</span>
-            </button>
-          ) : null;
-        })}
-
-        {/* Active brand filters */}
-        {activeBrands.map((brandId) => {
-          const brandAttribute = brandAttributes.find(attr => 
-            attr.options.some(opt => opt.id === brandId)
-          );
-          const brandOption = brandAttribute?.options.find(opt => opt.id === brandId);
-          return brandOption ? (
-            <button
-              key={`brand-${brandId}`}
-              onClick={() => toggleBrand(brandId)}
-              className="filter-tag d-inline-flex align-items-center mb-3 me-3 text-uppercase js-filter"
-            >
-              <i className="btn-close-xs d-inline-block" />
-              <span className="ms-2">Брэнд: {brandOption.value}</span>
-            </button>
-          ) : null;
-        })}
-
-        {/* Price range filter */}
-        {(price[0] !== 20 || price[1] !== 70987) && (
-          <button
-            onClick={() => setPrice([20, 70987])}
-            className="filter-tag d-inline-flex align-items-center mb-3 me-3 text-uppercase js-filter"
-          >
-            <i className="btn-close-xs d-inline-block" />
-            <span className="ms-2">Үнэ: ${price[0]} - ${price[1]}</span>
-          </button>
-        )}
-
-        {/* Sorting filter - Removed, now handled in Shop4 component */}
-      </div>
     </>
   );
 }
