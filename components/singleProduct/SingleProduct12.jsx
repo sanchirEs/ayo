@@ -26,9 +26,7 @@ export default function SingleProduct12({ product }) {
     product?.variants?.find((v) => v.isDefault) || product?.variants?.[0] || null;
 
   const price =
-    (selectedVariant ? Number(selectedVariant.price) : 
-     defaultVariant ? Number(defaultVariant.price) : 
-     Number(product?.price || 0)) || 0;
+    (defaultVariant ? Number(defaultVariant.price) : Number(product?.price || 0)) || 0;
 
   // ✅ Нийт үлдэгдэл (бүх variant + product level)
   const totalStock = useMemo(() => {
@@ -43,26 +41,18 @@ export default function SingleProduct12({ product }) {
     return vSum + pSum;
   }, [product]);
 
-  // ✅ Одоогоор сонгогдсон variant-ын үлдэгдэл, байхгүй бол default variant-ыг ашиглая
+  // ✅ Одоогоор сонгогдсон (default) variant-ын үлдэгдэл, байхгүй бол бүх үлдэгдлийг ашиглая
   const selectedStock = useMemo(() => {
-    if (selectedVariant?.inventory?.quantity != null) {
-      return Number(selectedVariant.inventory.quantity);
-    }
     if (defaultVariant?.inventory?.quantity != null) {
       return Number(defaultVariant.inventory.quantity);
     }
     return totalStock;
-  }, [selectedVariant, defaultVariant, totalStock]);
+  }, [defaultVariant, totalStock]);
 
   const outOfStock = selectedStock <= 0;
 
   // cart helpers
-  const isIncludeCard = () => {
-    const currentVariantId = selectedVariant?.id || defaultVariant?.id;
-    return cartProducts.find((elm) => 
-      elm.id === product.id && elm.variantId === currentVariantId
-    );
-  };
+  const isIncludeCard = () => cartProducts.find((elm) => elm.id == product.id);
 
   const clampQty = (q) => {
     // 1-ээс багагүй, selectedStock-оос ихгүй
@@ -79,10 +69,7 @@ export default function SingleProduct12({ product }) {
     const qty = clampQty(q);
     const existed = isIncludeCard();
     if (existed) {
-      const currentVariantId = selectedVariant?.id || defaultVariant?.id;
-      const items = cartProducts.map((it) => 
-        (it.id === id && it.variantId === currentVariantId) ? { ...it, quantity: qty } : it
-      );
+      const items = cartProducts.map((it) => (it.id === id ? { ...it, quantity: qty } : it));
       setCartProducts(items);
     } else {
       setQuantity(qty);
@@ -101,10 +88,10 @@ export default function SingleProduct12({ product }) {
       name: product.name,
       price: price,
       quantity: safeQty,
-      image: (selectedVariant?.images?.[0]?.imageUrl || defaultVariant?.images?.[0]?.imageUrl || images[0]) || "/images/placeholder-330x400.png",
-      sku: selectedVariant?.sku || defaultVariant?.sku || product?.sku || "",
-      variantId: selectedVariant?.id || defaultVariant?.id || null,
-      attributes: (selectedVariant?.attributes || defaultVariant?.attributes || []).map((a) => ({
+      image: images[0] || "/images/placeholder-330x400.png",
+      sku: defaultVariant?.sku || product?.sku || "",
+      variantId: defaultVariant?.id || null,
+      attributes: (defaultVariant?.attributes || []).map((a) => ({
         name: a?.option?.attribute?.name ?? "",
         value: a?.option?.value ?? "",
       })),
@@ -371,7 +358,7 @@ export default function SingleProduct12({ product }) {
           {/* How to Use Section */}
           {product?.howToUse && (
             <div className="how-to-use-section mb-3">
-              <div className="d-flex justify-content-between align-items-center py-2">
+              <div className="d-flex align-items-center mb-2">
                 <span className="fw-medium text-dark">Ашиглах заавар</span>
                 <button 
                   className="btn btn-link p-0 text-decoration-none"
