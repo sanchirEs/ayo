@@ -8,9 +8,14 @@ const countries = [
   "Mongolia",
 ];
 
-// Mongolian provinces/cities
-const mongolianProvinces = [
+// Region types
+const regionTypes = [
   "Улаанбаатар",
+  "Хөдөө орон нутаг"
+];
+
+// Mongolian provinces (excluding Ulaanbaatar)
+const mongolianProvinces = [
   "Архангай",
   "Баян-Өлгий",
   "Баянхонгор",
@@ -32,6 +37,19 @@ const mongolianProvinces = [
   "Ховд",
   "Хөвсгөл",
   "Хэнтий"
+];
+
+// Ulaanbaatar districts
+const ulaanbaatarDistricts = [
+  "Баянгол дүүрэг",
+  "Баянзүрх дүүрэг", 
+  "Сүхбаатар дүүрэг",
+  "Хан-Уул дүүрэг",
+  "Чингэлтэй дүүрэг",
+  "Сонгинохайрхан дүүрэг",
+  "Багануур дүүрэг",
+  "Багахангай дүүрэг",
+  "Налайх дүүрэг"
 ];
 
 import { useContextElement } from "@/context/Context";
@@ -57,6 +75,7 @@ export default function Checkout() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
+  const [showRegionTypeDropdown, setShowRegionTypeDropdown] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [addressMode, setAddressMode] = useState('new'); // 'new' or 'existing'
   const [hasSelectedExistingAddress, setHasSelectedExistingAddress] = useState(false);
@@ -73,10 +92,10 @@ export default function Checkout() {
   
   // Form states
   const [formData, setFormData] = useState({
-    country: "Mongolia",
+    country: "", // Will store the specific district/province
     addressLine1: "",
     addressLine2: "",
-    city: "",
+    city: "", // Will store region type (Улаанбаатар or Хөдөө орон нутаг)
     postalCode: "",
     phone: "",
     userId: session?.user?.userId
@@ -425,7 +444,7 @@ export default function Checkout() {
       setIsProcessingPayment(true);
       
       // Validate required fields
-      if (!formData.addressLine1 || !formData.city || !formData.phone) {
+      if (!formData.addressLine1 || !formData.city || !formData.country || !formData.phone) {
         alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
         return;
       }
@@ -591,7 +610,7 @@ export default function Checkout() {
       setIsProcessingPayment(true);
       
       // Validate required fields
-      if (!formData.addressLine1 || !formData.city || !formData.phone) {
+      if (!formData.addressLine1 || !formData.city || !formData.country || !formData.phone) {
         alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
         return;
       }
@@ -749,7 +768,7 @@ export default function Checkout() {
                 <i className={`me-2 ${justSavedAddress ? 'fas fa-check-circle' : 'fas fa-map-marker-alt'}`}></i>
                 <strong>
                   {justSavedAddress ? 'Шинээр хадгалсан хаяг:' : 'Сонгосон хаяг:'}
-                </strong> {selectedAddress?.addressLine1}, {selectedAddress?.city}
+                </strong> {selectedAddress?.addressLine1}, {selectedAddress?.country}
                 {justSavedAddress && (
                   <span className="ms-2 badge bg-success">Шинэ</span>
                 )}
@@ -859,6 +878,109 @@ export default function Checkout() {
                 <label htmlFor="checkout_phone">Утасны дугаар *</label>
               </div>
             </div>
+             {/* Region Type Selection */}
+             <div className="col-md-12">
+              <div className="form-floating my-3">
+                <div className={`form-label-fixed hover-container ${
+                  showRegionTypeDropdown ? "js-content_visible" : ""
+                }`}>
+                  <label htmlFor="checkout_region_type" className="form-label">
+                    Бүс нутаг *
+                  </label>
+                  <div className="js-hover__open">
+                    <input
+                      type="text"
+                      className="form-control form-control-lg search-field__actor search-field__arrow-down"
+                      id="checkout_region_type"
+                      value={formData.city}
+                      readOnly
+                      placeholder="Улаанбаатар эсвэл хөдөө орон нутаг сонгоно уу..."
+                      onClick={() => setShowRegionTypeDropdown((prev) => !prev)}
+                    />
+                  </div>
+                  {showRegionTypeDropdown && (
+                    <div className="filters-container js-hidden-content mt-2">
+                      <ul className="search-suggestion list-unstyled">
+                        {regionTypes.map((regionType, i) => (
+                          <li
+                            onClick={() => {
+                              setFormData({...formData, city: regionType, country: ""});
+                              setShowRegionTypeDropdown(false);
+                              setShowProvinceDropdown(false);
+                            }}
+                            key={i}
+                            className="search-suggestion__item js-search-select"
+                            style={{ cursor: 'pointer', padding: '8px 12px' }}
+                          >
+                            {regionType}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Specific Location Selection */}
+            {formData.city && (
+              <div className="col-md-12">
+                <div className="form-floating my-3">
+                  <div className={`form-label-fixed hover-container ${
+                    showProvinceDropdown ? "js-content_visible" : ""
+                  }`}>
+                    <label htmlFor="checkout_location" className="form-label">
+                      {formData.city === "Улаанбаатар" ? "Дүүрэг *" : "Аймаг *"}
+                    </label>
+                    <div className="js-hover__open">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg search-field__actor search-field__arrow-down"
+                        id="checkout_location"
+                        value={formData.country}
+                        readOnly
+                        placeholder={formData.city === "Улаанбаатар" ? "Дүүрэг сонгоно уу..." : "Аймаг сонгоно уу..."}
+                        onClick={() => setShowProvinceDropdown((prev) => !prev)}
+                      />
+                    </div>
+                    {showProvinceDropdown && (
+                      <div className="filters-container js-hidden-content mt-2">
+                        <div className="search-field__input-wrapper">
+                          <input
+                            type="text"
+                            className="search-field__input form-control form-control-sm bg-lighter border-lighter"
+                            placeholder="Хайх..."
+                            onChange={(e) => {
+                              setSearchQuery(e.target.value);
+                            }}
+                          />
+                        </div>
+                        <ul className="search-suggestion list-unstyled">
+                          {(formData.city === "Улаанбаатар" ? ulaanbaatarDistricts : mongolianProvinces)
+                            .filter((location) =>
+                              location.toLowerCase().includes(searchQuery.toLowerCase())
+                            )
+                            .map((location, i) => (
+                              <li
+                                onClick={() => {
+                                  setFormData({...formData, country: location});
+                                  setShowProvinceDropdown(false);
+                                  setSearchQuery("");
+                                }}
+                                key={i}
+                                className="search-suggestion__item js-search-select"
+                                style={{ cursor: 'pointer', padding: '8px 12px' }}
+                              >
+                                {location}
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="col-md-12">
               <div className="form-floating mt-3 mb-3">
                 <input
@@ -876,69 +998,14 @@ export default function Checkout() {
                   type="text"
                   className="form-control"
                   id="checkout_street_address_2"
-                  placeholder="Нэмэлт мэдээлэл (Хаягийн талаар өөр бусад мэдээлэл оруулах боломжтой)"
+                  placeholder="Нэмэлт мэдээлэл"
                   value={formData.addressLine2}
                   onChange={(e) => setFormData({...formData, addressLine2: e.target.value})}
                 />
-                <label htmlFor="checkout_street_address_2">Нэмэлт мэдээлэл (Хаягийн талаар өөр бусад мэдээлэл оруулах боломжтой)</label>
+                <label htmlFor="checkout_street_address_2">Нэмэлт мэдээлэл</label>
               </div>
             </div>
-            <div className="col-md-12">
-              <div className="form-floating my-3">
-                <div className={`form-label-fixed hover-container ${
-                  showProvinceDropdown ? "js-content_visible" : ""
-                }`}>
-                  <label htmlFor="checkout_city" className="form-label">
-                    Аймаг / Хот *
-                  </label>
-                  <div className="js-hover__open">
-                    <input
-                      type="text"
-                      className="form-control form-control-lg search-field__actor search-field__arrow-down"
-                      id="checkout_city"
-                      value={formData.city}
-                      readOnly
-                      placeholder="Аймаг эсвэл хот сонгоно уу..."
-                      onClick={() => setShowProvinceDropdown((prev) => !prev)}
-                    />
-                  </div>
-                  {showProvinceDropdown && (
-                    <div className="filters-container js-hidden-content mt-2">
-                      <div className="search-field__input-wrapper">
-                        <input
-                          type="text"
-                          className="search-field__input form-control form-control-sm bg-lighter border-lighter"
-                          placeholder="Хайх..."
-                          onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                          }}
-                        />
-                      </div>
-                      <ul className="search-suggestion list-unstyled">
-                        {mongolianProvinces
-                          .filter((province) =>
-                            province.toLowerCase().includes(searchQuery.toLowerCase())
-                          )
-                          .map((province, i) => (
-                            <li
-                              onClick={() => {
-                                setFormData({...formData, city: province});
-                                setShowProvinceDropdown(false);
-                                setSearchQuery("");
-                              }}
-                              key={i}
-                              className="search-suggestion__item js-search-select"
-                              style={{ cursor: 'pointer', padding: '8px 12px' }}
-                            >
-                              {province}
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+           
             <div className="col-md-12">
               <div className="form-floating my-3">
                 <input
@@ -949,7 +1016,7 @@ export default function Checkout() {
                   value={formData.postalCode}
                   onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                 />
-                <label htmlFor="checkout_zipcode">Шуудангийн код *</label>
+                <label htmlFor="checkout_zipcode">Шуудангийн код</label>
               </div>
             </div>
             {/* <div className="col-md-12">
@@ -1494,7 +1561,6 @@ export default function Checkout() {
                        addressLine2: selectedAddress.addressLine2 || "",
                        city: selectedAddress.city,
                        postalCode: selectedAddress.postalCode,
-                       province: selectedAddress.province || "",
                        phone: selectedAddress.mobile,
                        email: formData.email
                      });

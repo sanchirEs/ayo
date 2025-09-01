@@ -1,5 +1,49 @@
 "use client";
 
+// Region types
+const regionTypes = [
+  "Улаанбаатар",
+  "Хөдөө орон нутаг"
+];
+
+// Mongolian provinces (excluding Ulaanbaatar)
+const mongolianProvinces = [
+  "Архангай",
+  "Баян-Өлгий",
+  "Баянхонгор",
+  "Булган",
+  "Говь-Алтай",
+  "Говьсүмбэр",
+  "Дархан-Уул",
+  "Дорноговь",
+  "Дорнод",
+  "Дундговь",
+  "Завхан",
+  "Орхон",
+  "Өвөрхангай",
+  "Өмнөговь",
+  "Сүхбаатар",
+  "Сэлэнгэ",
+  "Төв",
+  "Увс",
+  "Ховд",
+  "Хөвсгөл",
+  "Хэнтий"
+];
+
+// Ulaanbaatar districts
+const ulaanbaatarDistricts = [
+  "Баянгол дүүрэг",
+  "Баянзүрх дүүрэг", 
+  "Сүхбаатар дүүрэг",
+  "Хан-Уул дүүрэг",
+  "Чингэлтэй дүүрэг",
+  "Сонгинохайрхан дүүрэг",
+  "Багануур дүүрэг",
+  "Багахангай дүүрэг",
+  "Налайх дүүрэг"
+];
+
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useUserAddresses } from "@/hooks/useUserAddresses";
@@ -15,13 +59,16 @@ export default function EditAddress() {
   const [formData, setFormData] = useState({
     addressLine1: "",
     addressLine2: "",
-    city: "",
+    city: "", // Will store region type (Улаанбаатар or Хөдөө орон нутаг)
     postalCode: "",
-    country: "",
+    country: "", // Will store the specific district/province
     mobile: "",
     isDefault: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRegionTypeDropdown, setShowRegionTypeDropdown] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
 
 
@@ -35,6 +82,9 @@ export default function EditAddress() {
       mobile: "",
       isDefault: false
     });
+    setShowRegionTypeDropdown(false);
+    setShowLocationDropdown(false);
+    setSearchQuery("");
   };
 
   const handleAddNew = () => {
@@ -65,10 +115,16 @@ export default function EditAddress() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Create a new object with country set to Mongolia
+    // Validate required fields
+    if (!formData.addressLine1 || !formData.city || !formData.country || !formData.mobile) {
+      alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Create a new object maintaining our location structure
     const submitData = {
-      ...formData,
-      country: "Mongolia"
+      ...formData
     };
 
     console.log("submitData", submitData);
@@ -129,6 +185,7 @@ export default function EditAddress() {
           <h4 className="mb-0">Миний хаягууд</h4>
           <button 
             className="btn btn-primary"
+            style={{backgroundColor: "#495D35"}}
             onClick={handleAddNew}
           >
             + Шинэ хаяг нэмэх
@@ -148,7 +205,7 @@ export default function EditAddress() {
                 <tr>
                   <th>№</th>
                   <th>Хаяг</th>
-                  <th>Хот</th>
+                  <th>Аймаг/Дүүрэг</th>
                   <th>Утас</th>
                   <th>Үйлдэл</th>
                 </tr>
@@ -165,8 +222,8 @@ export default function EditAddress() {
                         )}
                       </div>
                     </td>
-                    <td>{address.city}</td>
-                    {/* <td>{address.country}</td> */}
+                    <td>{address.country || address.city}</td>
+                    {/* Display specific location (district/province) or fallback to city */}
                     <td>{address.mobile}</td>
                    
                     <td>
@@ -174,6 +231,7 @@ export default function EditAddress() {
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-primary"
+                          
                           onClick={() => handleEdit(address)}
                           title="Засах"
                         >
@@ -240,38 +298,108 @@ export default function EditAddress() {
               </div>
               <form onSubmit={handleSubmit}>
                                  <div className="modal-body">
-                   <div className="row">
+
+
+                                 <div className="row">
                      <div className="col-md-6 mb-3">
-                       <label className="form-label">Хаяг 1 *</label>
-                       <input
-                         type="text"
-                         className="form-control"
-                         value={formData.addressLine1}
-                         onChange={(e) => setFormData({...formData, addressLine1: e.target.value})}
-                         required
-                       />
+                       <label className="form-label">Бүс нутаг *</label>
+                       <div className={`form-label-fixed hover-container ${
+                         showRegionTypeDropdown ? "js-content_visible" : ""
+                       }`}>
+                         <div className="js-hover__open">
+                           <input
+                             type="text"
+                             className="form-control search-field__actor search-field__arrow-down"
+                             value={formData.city}
+                             readOnly
+                             placeholder="Улаанбаатар эсвэл хөдөө орон нутаг"
+                             onClick={() => setShowRegionTypeDropdown((prev) => !prev)}
+                             required
+                           />
+                         </div>
+                         {showRegionTypeDropdown && (
+                           <div className="filters-container js-hidden-content mt-2">
+                             <ul className="search-suggestion list-unstyled">
+                               {regionTypes.map((regionType, i) => (
+                                 <li
+                                   onClick={() => {
+                                     setFormData({...formData, city: regionType, country: ""});
+                                     setShowRegionTypeDropdown(false);
+                                     setShowLocationDropdown(false);
+                                   }}
+                                   key={i}
+                                   className="search-suggestion__item js-search-select"
+                                   style={{ cursor: 'pointer', padding: '8px 12px' }}
+                                 >
+                                   {regionType}
+                                 </li>
+                               ))}
+                             </ul>
+                           </div>
+                         )}
+                       </div>
                      </div>
-                     <div className="col-md-6 mb-3">
-                       <label className="form-label">Хаяг 2</label>
-                       <input
-                         type="text"
-                         className="form-control"
-                         value={formData.addressLine2}
-                         onChange={(e) => setFormData({...formData, addressLine2: e.target.value})}
-                       />
-                     </div>
+                     
+                     {/* Specific Location Selection */}
+                     {formData.city && (
+                       <div className="col-md-6 mb-3">
+                         <label className="form-label">
+                           {formData.city === "Улаанбаатар" ? "Дүүрэг *" : "Аймаг *"}
+                         </label>
+                         <div className={`form-label-fixed hover-container ${
+                           showLocationDropdown ? "js-content_visible" : ""
+                         }`}>
+                           <div className="js-hover__open">
+                             <input
+                               type="text"
+                               className="form-control search-field__actor search-field__arrow-down"
+                               value={formData.country}
+                               readOnly
+                               placeholder={formData.city === "Улаанбаатар" ? "Дүүрэг сонгоно уу..." : "Аймаг сонгоно уу..."}
+                               onClick={() => setShowLocationDropdown((prev) => !prev)}
+                               required
+                             />
+                           </div>
+                           {showLocationDropdown && (
+                             <div className="filters-container js-hidden-content mt-2">
+                               <div className="search-field__input-wrapper">
+                                 <input
+                                   type="text"
+                                   className="search-field__input form-control form-control-sm bg-lighter border-lighter"
+                                   placeholder="Хайх..."
+                                   onChange={(e) => {
+                                     setSearchQuery(e.target.value);
+                                   }}
+                                 />
+                               </div>
+                               <ul className="search-suggestion list-unstyled">
+                                 {(formData.city === "Улаанбаатар" ? ulaanbaatarDistricts : mongolianProvinces)
+                                   .filter((location) =>
+                                     location.toLowerCase().includes(searchQuery.toLowerCase())
+                                   )
+                                   .map((location, i) => (
+                                     <li
+                                       onClick={() => {
+                                         setFormData({...formData, country: location});
+                                         setShowLocationDropdown(false);
+                                         setSearchQuery("");
+                                       }}
+                                       key={i}
+                                       className="search-suggestion__item js-search-select"
+                                       style={{ cursor: 'pointer', padding: '8px 12px' }}
+                                     >
+                                       {location}
+                                     </li>
+                                   ))}
+                               </ul>
+                             </div>
+                           )}
+                         </div>
+                       </div>
+                     )}
                    </div>
+
                    <div className="row">
-                     <div className="col-md-6 mb-3">
-                       <label className="form-label">Хот *</label>
-                       <input
-                         type="text"
-                         className="form-control"
-                         value={formData.city}
-                         onChange={(e) => setFormData({...formData, city: e.target.value})}
-                         required
-                       />
-                     </div>
                      <div className="col-md-6 mb-3">
                        <label className="form-label">Утасны дугаар *</label>
                        <input
@@ -282,8 +410,6 @@ export default function EditAddress() {
                          required
                        />
                      </div>
-                   </div>
-                   <div className="row">
                      <div className="col-md-6 mb-3">
                        <label className="form-label">Шуудангийн код</label>
                        <input
@@ -304,6 +430,29 @@ export default function EditAddress() {
                        />
                      </div> */}
                    </div>
+                   <div className="row">
+                     <div className="col-md-6 mb-3">
+                       <label className="form-label">Хаяг *</label>
+                       <input
+                         type="text"
+                         className="form-control"
+                         value={formData.addressLine1}
+                         onChange={(e) => setFormData({...formData, addressLine1: e.target.value})}
+                         required
+                       />
+                     </div>
+                     <div className="col-md-6 mb-3">
+                       <label className="form-label">Нэмэлт мэдээлэл</label>
+                       <input
+                         type="text"
+                         className="form-control"
+                         value={formData.addressLine2}
+                         onChange={(e) => setFormData({...formData, addressLine2: e.target.value})}
+                       />
+                     </div>
+                   </div>
+               
+                
                  
                  </div>
                 <div className="modal-footer">

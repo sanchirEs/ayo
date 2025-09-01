@@ -217,7 +217,7 @@ export default function SingleProduct12({ product }) {
           {/* Product Variants */}
           {product?.variants && product.variants.length > 0 && (
             <div className="product-variants mb-4">
-              <h6 className="fw-semibold mb-3 text-dark">Барааны хувилбарууд</h6>
+              {/* <h6 className="fw-semibold mb-3 text-dark">Бараа</h6> */}
               
               {/* Variant Type Selection (e.g., Color, Scent) */}
               {(() => {
@@ -453,6 +453,7 @@ export default function SingleProduct12({ product }) {
                 <button
                   type="submit"
                   className="btn btn-primary btn-addtocart js-open-aside"
+                  style={{backgroundColor:"#495D35"}}
                   onClick={addToCart}
                   disabled={outOfStock}
                 >
@@ -531,7 +532,7 @@ export default function SingleProduct12({ product }) {
       </div>
 
       {/* tabs */}
-      <div className="product-single__details-tab">
+      <div className="product-single__details-tab mt-4">
         <ul className="nav nav-tabs" id="myTab1" role="tablist">
           {/* <li className="nav-item" role="presentation">
             <a
@@ -548,7 +549,7 @@ export default function SingleProduct12({ product }) {
           </li> */}
           <li className="nav-item" role="presentation">
             <a
-              className="nav-link nav-link_underscore"
+              className="nav-link nav-link_underscore text-center"
               id="tab-reviews-tab"
               data-bs-toggle="tab"
               href="#tab-reviews"

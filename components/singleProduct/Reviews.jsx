@@ -328,7 +328,7 @@ export default function Reviews({ productId, productName }) {
             {submitErr && <div className="text-danger small mb-2">{submitErr}</div>}
 
             <div className="d-flex flex-column flex-sm-row gap-2">
-              <button type="submit" className="btn btn-primary btn-sm flex-fill" disabled={submitting || myRating === 0}>
+              <button type="submit" className="btn btn-primary btn-sm flex-fill" style={{backgroundColor:"#495D35"}} disabled={submitting || myRating === 0}>
                 {submitting ? (editing ? "Шинэчилж байна..." : "Илгээж байна...") : (editing ? "Шинэчлэх" : "Илгээх")}
               </button>
               {editing && (
