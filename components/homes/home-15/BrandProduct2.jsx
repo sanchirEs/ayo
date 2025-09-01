@@ -90,7 +90,8 @@ export default function BrandProduct2() {
       return (
       <section className="converse-brand-section">
         {/* Desktop: Hero-style banner with background image */}
-        <div className="d-none d-lg-block">
+        {/* d-none d-lg-block */} {/*mobile deer haragdahgui bolgono */}
+        <div className="">
           <div className="overflow-hidden position-relative h-100">
             <div className="slideshow-bg ">
               <Image
@@ -120,7 +121,7 @@ export default function BrandProduct2() {
        </div>
            
        {/* Mobile: Show only banner with clickable area */}
-       <div className="d-lg-none">
+       {/* <div className="d-lg-none">
          <Link href="/shop" className="converse-mobile-banner">
            <div className="converse-mobile-bg">
              <img
@@ -131,7 +132,7 @@ export default function BrandProduct2() {
              />
            </div>
          </Link>
-                </div>
+                </div> */}
        </section>
   );
 }
