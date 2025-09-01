@@ -13,7 +13,7 @@ import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 
 export default function SingleProduct12({ product }) {
-  const { cartProducts, setCartProducts } = useContextElement();
+  const { toggleWishlist, isAddedtoWishlist, cartProducts, setCartProducts } = useContextElement();
   const [quantity, setQuantity] = useState(1);
   const [warn, setWarn] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -75,7 +75,7 @@ export default function SingleProduct12({ product }) {
       setQuantity(qty);
     }
   };
-
+  const isInWishlist = isAddedtoWishlist(product.id);
   const addToCart = () => {
     if (outOfStock) return;
     if (isIncludeCard()) return;
@@ -100,6 +100,9 @@ export default function SingleProduct12({ product }) {
     setCartProducts((prev) => [...prev, item]);
   };
 
+  const handleWishlistToggle = async () => {
+    await toggleWishlist(product.id);
+  };
   // Вариантуудаас атрибутуудын нэрсийг цуглуулах
   const attributeNameSet = useMemo(() => {
     const s = new Set();
@@ -358,7 +361,7 @@ export default function SingleProduct12({ product }) {
           {/* How to Use Section */}
           {product?.howToUse && (
             <div className="how-to-use-section mb-3">
-              <div className="d-flex align-items-center mb-2">
+              <div className="d-flex justify-content-between align-items-center py-2">
                 <span className="fw-medium text-dark">Ашиглах заавар</span>
                 <button 
                   className="btn btn-link p-0 text-decoration-none"
@@ -475,12 +478,38 @@ export default function SingleProduct12({ product }) {
           </form>
 
           <div className="product-single__addtolinks">
-            <a href="#" className="menu-link menu-link_us-s add-to-wishlist">
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <a
+            className={`menu-link menu-link_us-s add-to-wishlist ${
+              isInWishlist ? "active" : ""
+            }`}
+            onClick={handleWishlistToggle}
+            title={
+              isInWishlist
+                ? "Хүслийн жагсаалтаас хасах"
+                : "Хүслийн жагсаалтад нэмэх"
+            }
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              {isInWishlist ? (
+                // Filled heart
+                <path
+                  d="M10 18s-6-4.35-9-8.35C-2 5.9 2.5 1 7.5 3.5 9.24 4.4 10 6 10 6s.76-1.6 2.5-2.5C17.5 1 22 5.9 19 9.65 16 13.65 10 18 10 18z"
+                  fill="red"
+                />
+              ) : (
+                // Outline heart (stroke only)
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <use href="#icon_heart" />
               </svg>
-              <span>Add to Wishlist</span>
-            </a>
+              )}
+            </svg>
+            <span>
+              {isInWishlist ? "Хүслийн жагсаалтаас хасах" : "Хүслийн жагсаалтад нэмэх"}
+            </span>
+          </a>
+
+          
+            
             <ShareComponent title={product?.name || "Product"} />
           </div>
 

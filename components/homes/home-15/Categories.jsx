@@ -127,7 +127,7 @@ export default function Categories() {
               <SwiperSlide key={category.id || i} className="swiper-slide product-card">
                 <div className="text-center">
                   <Link
-                    href={`/shop-1?category=${category.id}`}
+                    href={`/shop/${category.id}`}
                     className="category-link d-block"
                   >
                     <div className="category-image-wrapper mb-3">

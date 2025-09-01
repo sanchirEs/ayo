@@ -316,7 +316,7 @@ body {
 /* Match mega-menu (All Categories) text to main nav font */
 .mega-menu--allcats .sub-menu__title,
 .mega-menu--allcats .menu-link {
-  font-size: 1.125rem !important;        /* same as .navigation__link */
+  font-size: 0.95rem !important;        /* reduced from 1.125rem */
   font-weight: 400 !important;        /* non-bold */
   letter-spacing: 0.2px;              /* match spacing */
   text-transform: uppercase;          /* align with nav */
@@ -419,7 +419,7 @@ body {
 
 /* Right pane CategoryList: slightly smaller text for nested items */
 .mega-menu--allcats .allcats__right .sub-menu__list .menu-link {
-  font-size: 0.9rem;   /* a touch smaller than 1rem */
+  font-size: 0.85rem;   /* reduced from 0.9rem */
   line-height: 1.4;
 }
 
