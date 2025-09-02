@@ -19,7 +19,7 @@ export default function ShopFilter() {
   }, []);
 
   // Use the filter context for shared state
-  const { handleFiltersChange } = useFilterContext();
+  const { handleFiltersChange, clearAllFilters } = useFilterContext();
 
   console.log('🚨 SHOP FILTER (Mobile): Component rendered with context handler:', !!handleFiltersChange);
 
@@ -38,6 +38,54 @@ export default function ShopFilter() {
         <FilterAll onFiltersChange={handleFiltersChange} />
       </div>
       {/* /.aside-content */}
+      
+      {/* Filter Action Buttons */}
+      <div className="aside-footer" style={{
+        borderTop: '1px solid #e9ecef',
+        padding: '16px',
+        position: 'sticky',
+        bottom: 0,
+        backgroundColor: 'white'
+      }}>
+        <div className="d-flex gap-3">
+          <button
+            className="btn btn-outline-secondary flex-fill"
+            style={{
+              border: '1px solid #6c757d',
+              color: '#6c757d',
+              backgroundColor: 'white',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontWeight: '500'
+            }}
+            onClick={() => {
+              // Clear all filters
+              clearAllFilters();
+              console.log('Clear filters clicked');
+            }}
+          >
+            Цэвэрлэх
+          </button>
+          <button
+            className="btn btn-dark flex-fill"
+            style={{
+              backgroundColor: '#212529',
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontWeight: '500',
+              border: 'none'
+            }}
+            onClick={() => {
+              // Done logic here
+              console.log('Done clicked');
+              closeModalShopFilter();
+            }}
+          >
+            Шүүх
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { sortingOptions } from "@/data/products/productCategories";
+import { useContextElement } from "@/context/Context";
 
 // Smart debounce hook for price and search
 function useDebounce(value, delay) {
@@ -28,6 +29,7 @@ function useDebounce(value, delay) {
 export default function FilterAll({ onFiltersChange }) {
   const params = useParams();
   const router = useRouter();
+  const { setCurrentCategory } = useContextElement();
   const currentCategoryId = params?.categoryId ? parseInt(params.categoryId) : null;
   
   // Category tree state
@@ -406,6 +408,13 @@ export default function FilterAll({ onFiltersChange }) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                // Save category info to context
+                setCurrentCategory({
+                  id: category.id,
+                  name: category.name
+                });
+                
                 // Auto-expand parent if this is a child category
                 if (level > 0) {
                   expandParentIfChildSelected(category.id);

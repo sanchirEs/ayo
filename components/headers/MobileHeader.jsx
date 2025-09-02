@@ -48,6 +48,7 @@ export default function MobileHeader() {
       className={`header-mobile header_sticky ${
         scrollDirection == "up" ? "header_sticky-active" : "position-absolute"
       } `}
+      style={{ backgroundColor: "#F4F7F5" }}
     >
       <div className="container d-flex align-items-center h-100">
         <a className="mobile-nav-activator d-block position-relative" href="#">
@@ -97,8 +98,8 @@ export default function MobileHeader() {
       </div>
       {/* <!-- /.container --> */}
 
-      <nav className="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto">
-        <div className="container">
+      <nav className="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto" >
+        <div className="container" style={{ backgroundColor: "#F4F7F5" }}>
           <form
             onSubmit={(e) => e.preventDefault()}
             className="search-field position-relative mt-4 mb-3"
@@ -139,7 +140,7 @@ export default function MobileHeader() {
         </div>
         {/* <!-- /.container --> */}
 
-        <div className="container">
+        <div className="container" style={{ backgroundColor: "#F4F7F5" }}>
           <div className="overflow-hidden">
             <ul className="navigation__list list-unstyled position-relative">
               <MobileNav />

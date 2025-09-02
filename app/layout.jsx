@@ -15,7 +15,7 @@ import SiteMap from "@/components/modals/SiteMap";
 import NewsLetter from "@/components/modals/NewsLetter";
 import CookieContainer from "@/components/common/CookieContainer";
 import Header14 from "@/components/headers/Header14";
-import MobileHeader from "@/components/headers/MobileHeader";
+import HeaderWrapper from "@/components/headers/HeaderWrapper";
 import SizeGuide from "@/components/modals/SizeGuide";
 import Delivery from "@/components/modals/Delivery";
 import CustomerLogin from "@/components/asides/CustomerLogin";
@@ -29,8 +29,11 @@ import { FilterProvider } from "@/context/FilterContext";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
 import Footer1 from "@/components/footers/Footer14";
+import { useShopRoute } from "@/hooks/useShopRoute";
 
 export default function RootLayout({ children }) {
+  const { isShopRoute } = useShopRoute();
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Import the script only on the client side
@@ -158,11 +161,15 @@ export default function RootLayout({ children }) {
             backgroundColor: 'white'
           }}>
             <Header14 />
-            <MobileHeader />
+            <HeaderWrapper />
           </div>
             {children}
-            <Footer1 />
-            <MobileFooter1 />
+            {!isShopRoute && (
+              <>
+                <Footer1 />
+                <MobileFooter1 />
+              </>
+            )}
           </main>
         
           {/* //modals and asides */}

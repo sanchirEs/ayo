@@ -1348,3 +1348,29 @@ html, body, div, span, p, a, h1, h2, h3, h4, h5, h6, button, input, textarea, se
 .theme-15 [class*="description"] {
   font-family: "Noto Sans", sans-serif !important;
 }
+
+/* Category Header Styles */
+.category-header {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category-header .btn-link:hover {
+  color: #495057 !important;
+}
+
+.category-header .btn-link:focus {
+  box-shadow: none;
+}
+
+.category-header h5 {
+  line-height: 1.2;
+}
+
+.category-header .badge {
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
