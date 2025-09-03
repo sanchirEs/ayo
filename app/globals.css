@@ -1374,3 +1374,29 @@ html, body, div, span, p, a, h1, h2, h3, h4, h5, h6, button, input, textarea, se
   align-items: center;
   justify-content: center;
 }
+
+/* Product Header Styles */
+.product-header {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-header .btn-link:hover {
+  color: #495057 !important;
+}
+
+.product-header .btn-link:focus {
+  box-shadow: none;
+}
+
+.product-header h5 {
+  line-height: 1.2;
+}
+
+.product-header .badge {
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

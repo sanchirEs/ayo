@@ -1,15 +1,18 @@
 "use client";
-
 import { useShopRoute } from "@/hooks/useShopRoute";
 import MobileHeader from "./MobileHeader";
 import CategoryHeader from "../shoplist/CategoryHeader";
+import ProductHeader from "../shoplist/ProductHeader";
 
 export default function HeaderWrapper() {
-  const { isShopRoute, categoryId } = useShopRoute();
+  const { isShopRoute, isProductRoute, categoryId, productId } = useShopRoute();
   
-  // Show CategoryHeader on shop routes, MobileHeader on other routes
   if (isShopRoute) {
     return <CategoryHeader categoryId={categoryId} />;
+  }
+  
+  if (isProductRoute) {
+    return <ProductHeader productId={productId} />;
   }
   
   return <MobileHeader />;

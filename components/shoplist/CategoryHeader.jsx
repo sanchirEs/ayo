@@ -44,7 +44,9 @@ export default function CategoryHeader({ categoryId }) {
       zIndex: 1000,
       backgroundColor: "#F4F7F5",
       borderBottom: '1px solid #e9ecef',
-      padding: '12px 16px'
+      padding: '12px 16px',
+       boxShadow: '0 2px 2px rgba(220, 229, 224, 0.1)'
+      
     }}>
       {/* Main header bar */}
       <div className="d-flex align-items-center justify-content-between mb-2 mt-2">

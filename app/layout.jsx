@@ -32,7 +32,7 @@ import Footer1 from "@/components/footers/Footer14";
 import { useShopRoute } from "@/hooks/useShopRoute";
 
 export default function RootLayout({ children }) {
-  const { isShopRoute } = useShopRoute();
+  const { isShopRoute, isProductRoute } = useShopRoute();
   
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -164,7 +164,7 @@ export default function RootLayout({ children }) {
             <HeaderWrapper />
           </div>
             {children}
-            {!isShopRoute && (
+            {!isShopRoute && !isProductRoute && (
               <>
                 <Footer1 />
                 <MobileFooter1 />
