@@ -7,6 +7,7 @@ export function useShopRoute() {
   return useMemo(() => {
     const isShopRoute = pathname.startsWith('/shop/');
     const isProductRoute = pathname.startsWith('/product1_simple/');
+    const isCartRoute = pathname.startsWith('/shop_cart');
     let categoryId = null;
     let productId = null;
     
@@ -27,6 +28,7 @@ export function useShopRoute() {
     return {
       isShopRoute,
       isProductRoute,
+      isCartRoute,
       categoryId,
       productId,
       pathname
