@@ -59,9 +59,9 @@ export default function EditAddress() {
   const [formData, setFormData] = useState({
     addressLine1: "",
     addressLine2: "",
-    city: "", // Will store region type (Улаанбаатар or Хөдөө орон нутаг)
+    city: "",
     postalCode: "",
-    country: "", // Will store the specific district/province
+    country: "",
     mobile: "",
     isDefault: false
   });
@@ -69,6 +69,7 @@ export default function EditAddress() {
   const [showRegionTypeDropdown, setShowRegionTypeDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
 
 
 
@@ -120,11 +121,11 @@ export default function EditAddress() {
       alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
       setIsSubmitting(false);
       return;
-    }
-
-    // Create a new object maintaining our location structure
+    }   
+    
+    // Create a new object maintaining our location structure // Create a new object with country set to Mongolia
     const submitData = {
-      ...formData
+      ...formData,
     };
 
     console.log("submitData", submitData);
@@ -231,7 +232,7 @@ export default function EditAddress() {
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-primary"
-                          
+
                           onClick={() => handleEdit(address)}
                           title="Засах"
                         >
@@ -409,7 +410,7 @@ export default function EditAddress() {
                          onChange={(e) => setFormData({...formData, mobile: e.target.value})}
                          required
                        />
-                     </div>
+                     </div>               
                      <div className="col-md-6 mb-3">
                        <label className="form-label">Шуудангийн код</label>
                        <input
@@ -451,9 +452,9 @@ export default function EditAddress() {
                        />
                      </div>
                    </div>
-               
-                
-                 
+
+        
+            
                  </div>
                 <div className="modal-footer">
                   <button

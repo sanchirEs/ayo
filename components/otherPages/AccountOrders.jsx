@@ -8,6 +8,7 @@ export default function AccountOrders() {
   const { orders, loading, error, pagination, fetchOrders, cancelOrder } = useUserOrders();
   const [cancellingOrder, setCancellingOrder] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
 
 
@@ -85,6 +86,20 @@ export default function AccountOrders() {
     fetchOrders(page);
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest('.position-relative')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   // Filter orders based on active tab
   const filteredOrders = orders ? orders.filter(order => {
     if (activeTab === 'all') return true;
@@ -102,7 +117,7 @@ export default function AccountOrders() {
 
   if (loading) {
     return (
-      <div className="col-lg-9">
+      <div className="col-12 col-lg-9">
         <div className="page-content">
           <div className="text-center py-5">
             <div className="spinner-border" role="status">
@@ -115,7 +130,7 @@ export default function AccountOrders() {
   }
 
   return (
-    <div className="col-lg-9">
+    <div className="col-12 col-lg-9">
       <div className="page-content my-account__orders-list">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 className="mb-0">Миний захиалгууд</h4>
@@ -124,28 +139,131 @@ export default function AccountOrders() {
           </div>
         </div>
 
-        {/* Status Tabs */}
+        {/* Status Selection */}
         <div className="mb-4">
-          {/* Tab Summary */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              {/* <h6 className="mb-1">
-                {activeTab === 'all' ? 'Бүх захиалгууд' : `${getStatusText(activeTab)} захиалгууд`}
-              </h6> */}
-              <small className="text-muted">
-                {filteredOrders.length} захиалга олдлоо
-              </small>
-            </div>
-            {/* {activeTab !== 'all' && (
-              <button 
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => setActiveTab('all')}
-              >
-                <i className="fas fa-times me-1"></i>
-                Шүүлт цуцлах
+          {/* Mobile Custom Dropdown */}
+          <div className="d-lg-none mb-3">
+            {/* <label className="form-label fw-medium mb-2">Захиалгын статус сонгох</label> */}
+            <div className="position-relative">
+              {/* Dropdown Button */}
+              <button
+                className="btn w-100 text-start d-flex justify-content-between align-items-center"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                style={{
+                  backgroundColor: '#495D35',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  fontSize: '14px',
+                  color: '#495057',
+                  color: '#fff'
+                }}
+                              >
+                  {activeTab === 'all' ? (
+                    <span>Захиалгын статус сонгох</span>
+                  ) : (
+                    <span>{getStatusText(activeTab)}</span>
+                  )}
+                  <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                  style={{ 
+                    transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                >
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
               </button>
-            )} */}
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div 
+                  className="position-absolute w-100"
+                  style={{
+                    top: '100%',
+                    left: 0,
+                    zIndex: 1000,
+                    backgroundColor: '#f4f7f5',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    marginTop: '4px'
+                  }}
+                >
+                  {[
+                    { value: 'all', label: 'Бүгд' },
+                    { value: 'PENDING', label: 'Хүлээгдэж буй' },
+                    { value: 'PROCESSING', label: 'Боловсруулж буй' },
+                    { value: 'SHIPPED', label: 'Илгээгдсэн' },
+                    { value: 'DELIVERED', label: 'Хүргэгдсэн' },
+                    { value: 'CANCELLED', label: 'Цуцлагдсан' }
+                  ].map((option, index) => (
+                    <div key={option.value}>
+                      <button
+                        className="btn w-100 text-start d-flex align-items-center"
+                        onClick={() => {
+                          setActiveTab(option.value);
+                          setIsDropdownOpen(false);
+                        }}
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          padding: '12px 16px',
+                          fontSize: '14px',
+                          color: activeTab === option.value ? '#495D35' : '#495057',
+                          fontWeight: activeTab === option.value ? '600' : '400',
+                          position: 'relative'
+                        }}
+                      >
+                        {/* Active indicator dot */}
+                        {activeTab === option.value && (
+                          <div
+                            style={{
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              backgroundColor: '#dc3545',
+                              marginRight: '12px',
+                              flexShrink: 0
+                            }}
+                          />
+                        )}
+                        {activeTab !== option.value && (
+                          <div style={{ width: '8px', marginRight: '12px', flexShrink: 0 }} />
+                        )}
+                        <span>{option.label}</span>
+                      </button>
+                      {index < 5 && (
+                        <hr 
+                          style={{ 
+                            margin: 0, 
+                            border: 'none', 
+                            borderTop: '1px solid #e9ecef' 
+                          }} 
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Desktop Tabs */}
+          <div className="d-none d-lg-block">
+            {/* Tab Summary */}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <small className="text-muted">
+                  {filteredOrders.length} захиалга олдлоо
+                </small>
+              </div>
+            </div>
           <ul className="nav nav-tabs flex-wrap" id="orderTabs" role="tablist" style={{ borderBottom: '2px solid #dee2e6' }}>
             <li className="nav-item" role="presentation">
                                               <button
@@ -274,6 +392,7 @@ export default function AccountOrders() {
               </button>
             </li>
           </ul>
+          </div>
         </div>
 
         {error && (
@@ -284,7 +403,102 @@ export default function AccountOrders() {
 
         {filteredOrders && filteredOrders.length > 0 ? (
           <>
-            <div className="table-responsive">
+            {/* Mobile Card Layout */}
+            <div className="d-lg-none">
+              {filteredOrders.map((order) => (
+                <div 
+                  key={order.id}
+                  className="card mb-3"
+                  style={{
+                    border: '1px solid #e9ecef',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={() => window.location.href = `/account_orders/${order.id}`}
+                  onMouseEnter={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)'}
+                  onMouseLeave={(e) => e.target.style.boxShadow = 'none'}
+                >
+                  <div className="card-body p-3">
+                    {/* Order Header */}
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <h6 className="mb-1 fw-bold">#{order.id}</h6>
+                        <small className="text-muted">{formatDate(order.createdAt)}</small>
+                      </div>
+                      <span className="badge" style={getStatusBadgeStyle(order.status)}>
+                        {getStatusText(order.status)}
+                      </span>
+                    </div>
+
+                    {/* Order Items Count */}
+                    {order.orderItems && (
+                      <div className="mb-2">
+                        <small className="text-muted">
+                          {order.orderItems.length} бараа
+                        </small>
+                      </div>
+                    )}
+
+                    {/* Payment Status */}
+                    {order.payment && (
+                      <div className="mb-2">
+                        <small 
+                          className="d-flex align-items-center"
+                          style={{ color: "#495D35" }}
+                        >
+                          {order.payment.status === 'COMPLETED' ? (
+                            <>
+                              <i className="fas fa-check-circle me-1"></i>
+                              Төлбөр төлөгдсөн
+                            </>
+                          ) : order.payment.status === 'PENDING' ? (
+                            <>
+                              <i className="fas fa-clock me-1"></i>
+                              Төлбөр хүлээгдэж буй
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-times-circle me-1"></i>
+                              Төлбөр амжилтгүй
+                            </>
+                          )}
+                        </small>
+                      </div>
+                    )}
+
+                    {/* Order Total and Action */}
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong className="fs-5" style={{ color: '#495D35' }}>
+                          {formatPrice(order.total)}
+                        </strong>
+                      </div>
+                      <button 
+                        className="btn btn-sm"
+                        style={{
+                          border: '1px solid #495D35',
+                          color: '#495D35',
+                          backgroundColor: 'transparent',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          fontSize: '12px'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/account_orders/${order.id}`;
+                        }}
+                      >
+                        Дэлгэрэнгүй
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table Layout */}
+            <div className="d-none d-lg-block table-responsive">
               <table className="orders-table">
                 <thead>
                   <tr>

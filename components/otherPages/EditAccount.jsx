@@ -55,7 +55,7 @@ export default function EditAccount() {
   const safeEmail = user?.email || "";
 
   return (
-    <div className="col-lg-9">
+    <div className="col-12 col-lg-9">
       <div className="page-content my-account__edit">
         {/* ============== Профайл мэдээлэл шинэчлэх ============== */}
         <div className="my-account__edit-form mb-5">

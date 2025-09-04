@@ -139,7 +139,7 @@ const setQuantity = (id, q) => {
             })}
           </div>
         ) : (
-          <div className="fs-18 mt-5 px-5">Таны сагс хоосон байна. Худалдаж эхлээрэй!</div>
+          <div className="fs-18 mt-5 px-5">Таны сагс хоосон байна.</div>
         )}
 
         <div className="cart-drawer-actions position-absolute start-0 bottom-0 w-100">

@@ -12,7 +12,7 @@ export default function AccountEditPage() {
       <main className="page-wrapper">
         <div className="mb-4 pb-4"></div>
         <section className="my-account container">
-          <h2 className="page-title">Профайл дэлгэрэнгүй</h2>
+          <h2 className="page-title d-none d-lg-block">Профайл дэлгэрэнгүй</h2>
           <div className="row">
             <DashboardSidebar />
             <EditAccount />

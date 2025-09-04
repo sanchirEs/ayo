@@ -1,15 +1,32 @@
 import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import MobileDashboardSidebar from "@/components/otherPages/MobileDashboardSidebar";
 
 export default function MobileFooter1() {
   const [showFooter, setShowFooter] = useState(false);
+  const [showDashboardSidebar, setShowDashboardSidebar] = useState(false);
   const { wishList } = useContextElement();
+  
   useEffect(() => {
     setShowFooter(true);
   }, []);
 
+  const handleProfileClick = (e) => {
+    e.preventDefault();
+    setShowDashboardSidebar(true);
+  };
+
+  const closeDashboardSidebar = () => {
+    setShowDashboardSidebar(false);
+  };
+
+  const openDashboardSidebar = () => {
+    setShowDashboardSidebar(true);
+  };
+
   return (
+    <>
     <footer
       className={`footer-mobile container w-100 px-5 d-md-none bg-body ${
         showFooter ? "position-fixed footer-mobile_initialized" : ""
@@ -37,9 +54,10 @@ export default function MobileFooter1() {
         {/* <!-- /.col-3 --> */}
 
         <div className="col-4">
-          <Link
-            href="/account_edit"
-            className="footer-mobile__link d-flex flex-column align-items-center"
+          <button
+            onClick={handleProfileClick}
+            className="footer-mobile__link d-flex flex-column align-items-center border-0 bg-transparent"
+            style={{ width: '100%' }}
           >
              <svg
               
@@ -53,7 +71,7 @@ export default function MobileFooter1() {
               <use href="#icon_user" />
             </svg>
             <span>Профайл</span>
-          </Link>
+          </button>
         </div>
         {/* <!-- /.col-3 --> */}
 
@@ -84,5 +102,25 @@ export default function MobileFooter1() {
       </div>
       {/* <!-- /.row --> */}
     </footer>
+
+    {/* Dashboard Sidebar - CartDrawer Style */}
+    <div className={`aside aside_left overflow-hidden ${showDashboardSidebar ? 'aside_visible' : ''}`} id="dashboardSidebar">
+      <div className="aside-header d-flex align-items-center">
+        <h3 className="text-uppercase fs-6 mb-0">
+          Миний профайл
+        </h3>
+        <button onClick={closeDashboardSidebar} className="btn-close-lg js-close-aside btn-close-aside ms-auto" />
+      </div>
+
+      <div className="aside-content">
+        <MobileDashboardSidebar onClose={closeDashboardSidebar} />
+      </div>
+    </div>
+
+    {/* Overlay */}
+    {showDashboardSidebar && (
+      <div id="dashboardSidebarOverlay" onClick={closeDashboardSidebar} className="page-overlay" />
+    )}
+  </>
   );
 }

@@ -110,7 +110,7 @@ export default function AccountWishlist() {
 
   if (loading) {
     return (
-      <div className="col-lg-9">
+      <div className="col-12 col-lg-9">
         <div className="page-content my-account__wishlist">
           <div className="text-center py-5">
             <div className="spinner-border text-primary" role="status">
@@ -125,7 +125,7 @@ export default function AccountWishlist() {
 
   if (error) {
     return (
-      <div className="col-lg-9">
+      <div className="col-12 col-lg-9">
         <div className="page-content my-account__wishlist">
           <div className="text-center py-5">
             <div className="text-danger mb-3">{error}</div>
@@ -142,7 +142,7 @@ export default function AccountWishlist() {
   }
 
   return (
-    <div className="col-lg-9">
+    <div className="col-12 col-lg-9">
       <div className="page-content my-account__wishlist">
         {/* Header */}
         <div className="d-flex align-items-center mb-4">

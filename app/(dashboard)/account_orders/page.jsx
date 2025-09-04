@@ -11,7 +11,7 @@ export default function AccountOrderPage() {
     <>
       <div className="mb-4 pb-4"></div>
       <section className="my-account container" style={{backgroundColor: "#FBFFFC"}}>
-        <h2 className="page-title py-3">Миний захиалгууд</h2>
+        <h2 className="page-title py-3 d-none d-lg-block">Миний захиалгууд</h2>
         <div className="row">
           <DashboardSidebar />
           <Suspense fallback={<div>Loading orders...</div>}>
