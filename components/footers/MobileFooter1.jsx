@@ -38,20 +38,21 @@ export default function MobileFooter1() {
 
         <div className="col-4">
           <Link
-            href="/shop-1"
+            href="/account_edit"
             className="footer-mobile__link d-flex flex-column align-items-center"
           >
-            <svg
+             <svg
+              
               className="d-block"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <use href="#icon_hanger" />
+              <use href="#icon_user" />
             </svg>
-            <span>Shop</span>
+            <span>Профайл</span>
           </Link>
         </div>
         {/* <!-- /.col-3 --> */}
