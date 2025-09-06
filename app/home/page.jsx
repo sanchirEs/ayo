@@ -74,7 +74,7 @@ export default function HomePage15() {
           
           
           {/* Discounted Products - Хямдралтай бараанууд */}
-          <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
+          {/* <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div> */}
           <ConditionalDiscountedProducts />
 
           {/* Brand Product Section - Converse брэнд */}

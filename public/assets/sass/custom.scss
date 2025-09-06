@@ -1037,3 +1037,45 @@ body {
 * {
   font-family: "Noto Sans", sans-serif !important;
 }
+
+/* Payment Method Section Styles */
+.payment-methods-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.payment-method-card {
+  flex: 1;
+  max-width: 40%;
+}
+
+.payment-method-section-compact .container {
+  padding: 0 20px;
+}
+
+@media (max-width: 991px) {
+  .payment-methods-wrapper {
+    display: block;
+    gap: 0;
+    padding: 0;
+  }
+  
+  .payment-method-card {
+    padding: 5px 10px;
+    flex: none;
+    max-width: 100%;
+    margin-bottom: 16px;
+    padding-bottom: 0;
+  }
+  
+  .payment-method-card:last-child {
+    margin-bottom: 0;
+  }
+  
+  .payment-method-section-compact .container {
+    padding: 0;
+  }
+}

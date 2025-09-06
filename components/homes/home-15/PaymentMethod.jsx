@@ -6,14 +6,8 @@ export default function PaymentMethod() {
   return (
     <section className="payment-method-section-compact">
       <div className="container">
-        <div className="payment-methods-wrapper" style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          gap: '16px', 
-          flexWrap: 'wrap' 
-        }}>
-          <div className="payment-method-card" style={{ flex: '1', maxWidth: '40%' }}>
+        <div className="payment-methods-wrapper">
+          <div className="payment-method-card">
             <Image
               src="/assets/images/payment/storepay_web.webp"
               alt="Storepay Payment Method"
@@ -24,7 +18,7 @@ export default function PaymentMethod() {
               priority
             />
           </div>
-          <div className="payment-method-card" style={{ flex: '1', maxWidth: '40%' }}>
+          <div className="payment-method-card">
             <Image
               src="/assets/images/payment/pocket_web.webp"
               alt="Pocket Payment Method"
