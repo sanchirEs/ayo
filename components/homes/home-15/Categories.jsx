@@ -11,6 +11,22 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
+  // List of all available category images from the folder
+  const categoryImages = [
+    '/assets/images/categories/АМПУЛЬ.png',
+    '/assets/images/categories/БИЕИЙН ТОС.png',
+    '/assets/images/categories/БИЕИЙН ШИНГЭН САВАН.png',
+    '/assets/images/categories/ГАРЫН ТОС.png',
+    '/assets/images/categories/МАСК.png',
+    '/assets/images/categories/НАРНЫ ТОС.png',
+    '/assets/images/categories/НҮҮРНИЙ ТОС.png',
+    '/assets/images/categories/ТОНЕР.png',
+    '/assets/images/categories/УРУУЛЫН БАЛМ.png',
+    '/assets/images/categories/ҮНЭРТЭН.png',
+    '/assets/images/categories/ШАМПУНЬ.png',
+    '/assets/images/categories/ШҮДНИЙ ОО.png'
+  ];
+
   useEffect(() => {
     let mounted = true;
     // Use homepageService to get categories
@@ -33,10 +49,11 @@ export default function Categories() {
 
   const swiperOptions = {
     autoplay: {
-      delay: 5000,
+      delay: 4000,
+      disableOnInteraction: false,
     },
-    slidesPerView: 4,
-    slidesPerGroup: 4,
+    slidesPerView: 8,
+    slidesPerGroup: 1,
     effect: "none",
     loop: true,
     pagination: false,
@@ -48,19 +65,28 @@ export default function Categories() {
     breakpoints: {
       320: {
         slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 14,
+        slidesPerGroup: 1,
+        spaceBetween: 16,
+      },
+      480: {
+        slidesPerView: 3,
+        slidesPerGroup: 1,
+        spaceBetween: 20,
       },
       768: {
-        slidesPerView: 3,
-        slidesPerGroup: 3,
+        slidesPerView: 4,
+        slidesPerGroup: 1,
         spaceBetween: 24,
       },
       992: {
         slidesPerView: 5,
         slidesPerGroup: 1,
-        spaceBetween: 20,
-        pagination: false,
+        spaceBetween: 28,
+      },
+      1200: {
+        slidesPerView: 7,
+        slidesPerGroup: 1,
+        spaceBetween: 32,
       },
     },
   };
@@ -88,69 +114,81 @@ export default function Categories() {
   }
 
   return (
-    <section className="category-carousel container">
+    <section className="category-carousel container" style={{ padding: '0px 80px' }}>
 
-      <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
+{/* <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
         Онцлох ангиллууд
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
         Бүх захиалгыг нэг дороос
-      </p>
+      </p> */}
+      <div className="section-header d-flex align-items-center justify-content-center" style={{
+        position: 'relative',
+        width: '100%',
+        marginBottom: '30px'
+      }}>
+        <div className="title-line" style={{
+          flex: 1,
+          height: '2px',
+          backgroundColor: '#DCDCDC',
+          maxWidth: '150px'
+        }}></div>
+        <h2 className="section-title text-uppercase fs-25 fw-medium mb-0" style={{
+          color: '#333',
+          letterSpacing: '1px',
+          margin: '0 30px',
+          whiteSpace: 'nowrap'
+        }}>
+          АНГИЛЛААР ДЭЛГҮҮР ХЭСЭХ
+        </h2>
+        
+        <div className="title-line" style={{
+          flex: 1,
+          height: '2px',
+          backgroundColor: '#DCDCDC',
+          maxWidth: '150px'
+        }}></div>
+        
+      </div>
 
-      <div id="category_1" className="position-relative">
+      <div id="category_1" className="position-relative" style={{ padding: '0 20px' }}>
         <Swiper
           className="swiper-container js-swiper-slider"
           {...swiperOptions}
         >
           {categories.map((category, i) => {
-            // Map category names to image names
-            const getCategoryImage = (categoryName) => {
-              const name = categoryName?.toLowerCase() || '';
-              if (name.includes('ам') || name.includes('skincare')) return '/assets/images/categories/am.jpg';
-              if (name.includes('бие') || name.includes('skincare')) return '/assets/images/categories/bodycare.png';
-              if (name.includes('арьс') || name.includes('skincare')) return '/assets/images/categories/skincare.png';
-              if (name.includes('маск') || name.includes('skincare')) return '/assets/images/categories/mask.png';
-              if (name.includes('туслах') || name.includes('skincare')) return '/assets/images/categories/tuslah.png';
-              if (name.includes('үнэртэн') || name.includes('skincare')) return '/assets/images/categories/perfume.jpg';
-              // if (name.includes('бие') || name.includes('bodycare')) return '/assets/images/categories/bodycare.png';
-              if (name.includes('нүүр') || name.includes('makeup')) return '/assets/images/categories/makeup.png';
-              if (name.includes('үс') || name.includes('haircare')) return '/assets/images/categories/haircare.png';
-              if (name.includes('хувцас') || name.includes('clothing')) return '/assets/images/categories/clothes.png';
-              if (name.includes('хүүхэд') || name.includes('kids')) return '/assets/images/categories/kids.png';
-              if (name.includes('эмэгтэй') || name.includes('women')) return '/assets/images/categories/women.png';
-              return '/assets/images/categories/default.png';
-            };
-
-            const categoryImage = getCategoryImage(category.name);
+            // Get category image by index (cycling through available images)
+            const categoryImage = categoryImages[i % categoryImages.length];
 
             return (
               <SwiperSlide key={category.id || i} className="swiper-slide product-card">
-                <div className="text-center">
+                 <div className="text-center">
+                
                   <Link
                     href={`/shop/${category.id}`}
                     className="category-link d-block"
                   >
-                    <div className="category-image-wrapper mb-3">
-                      <Image
-                        loading="lazy"
-                        src={categoryImage}
-                        width={200}
-                        height={200}
-                        alt={category.name}
-                        className="category-image rounded"
-                        style={{ 
-                          objectFit: 'cover',
-                          transition: 'all 0.3s ease'
-                        }}
-                      />
+                    <div className="category-image-wrapper mb-3 ">
+                      {/* <div className="category-image-container"> */}
+                        <Image
+                          loading="lazy"
+                          src={categoryImage}
+                          width={300}
+                          height={300}
+                          alt={category.name}
+                          className="category-image"
+                          style={{ 
+                            objectFit: 'cover',
+                            transition: 'all 0.3s ease',
+                            // borderRadius: '12px',
+                            // boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            // width: '100%',
+                            // height: 'auto'
+                          }}
+                        />
+                      {/* </div> */}
                     </div>
-                    <h6 className="fw-medium text-uppercase mb-1">
-                      {category.name}
-                    </h6>
                   </Link>
-                  {category.description && (
-                    <p className="text-muted small">{category.description}</p>
-                  )}
                 </div>
               </SwiperSlide>
             );
@@ -160,16 +198,18 @@ export default function Categories() {
         </Swiper>
         {/* <!-- /.swiper-container js-swiper-slider --> */}
 
-        <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">
-          <svg width="25" height="25" viewBox="0 0 25 25">
+        <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center" >
+          <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
             <use href="#icon_prev_md" />
           </svg>
         </div>
-        <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center">
-          <svg width="25" height="25" viewBox="0 0 25 25">
+        <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center" >
+          <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
             <use href="#icon_next_md" />
           </svg>
         </div>
+      
+       
      
         {/* <!-- /.category-carousel__next --> */}
       </div>

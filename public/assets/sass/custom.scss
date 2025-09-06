@@ -459,6 +459,16 @@ body {
   transition: all 0.3s ease;
   box-shadow: none;
 }
+.category-image-wrapper {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+}
+
+.category-image-wrapper:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
+}
+
 
 /* Flash Sale Preview Styles */
 .flash-sale-preview {

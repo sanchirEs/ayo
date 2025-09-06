@@ -1,3 +1,19 @@
+/* Category Navigation Arrow Styles */
+.products-carousel__prev,
+.products-carousel__next {
+  color: #495D35 !important;
+  filter: brightness(1.2) contrast(1.3) !important;
+}
+
+.products-carousel__prev svg,
+.products-carousel__next svg {
+  fill: #495D35 !important;
+  stroke: #495D35 !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 0 2px rgba(73, 93, 53, 0.5)) brightness(1.2) contrast(1.3) !important;
+  transform: scale(1.1) !important;
+}
+
 /* Converse Brand Section Styles - Updated 2024 */
 .converse-brand-section {
   position: relative;
