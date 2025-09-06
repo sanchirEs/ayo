@@ -27,21 +27,95 @@ export default function Categories() {
     '/assets/images/categories/ШҮДНИЙ ОО.png'
   ];
 
+  // Function to get category name from image path
+  const getCategoryNameFromImage = (imagePath) => {
+    const fileName = imagePath.split('/').pop(); // Get filename
+    const nameWithoutExtension = fileName.replace('.png', ''); // Remove .png
+    return nameWithoutExtension;
+  };
+
+  // Function to find matching category from backend based on image name
+  const findMatchingCategory = (imageName, backendCategories) => {
+    return backendCategories.find(category => 
+      category.name === imageName || 
+      category.name.toLowerCase() === imageName.toLowerCase()
+    );
+  };
+
   useEffect(() => {
     let mounted = true;
-    // Use homepageService to get categories
-    api.homepage
-      .bundled({ sections: 'categories', categoryLimit: 8 })
-      .then((res) => {
-        if (!mounted) return;
-        // Extract categories from homepage response
-        const categoryData = res.data?.categories || [];
-        console.log("ontsloh angillaluud: ", res.data)
-        setCategories(categoryData);
-        console.log("categories: ", categoryData)
-      })
-      .catch((e) => setErr(e.message || "Failed to load categories"))
-      .finally(() => setLoading(false));
+    
+    // Try multiple API endpoints to get all categories
+    const loadCategories = async () => {
+      try {
+        // Try categories.getAll() with all=true parameter
+        console.log("Trying categories.getAll() with all=true...");
+        const allCategoriesRes = await api.fetch('/categories?all=true', { auth: false });
+        console.log("categories.getAll() response: ", allCategoriesRes);
+        
+        if (allCategoriesRes.data && allCategoriesRes.data.length > 0) {
+          setCategories(allCategoriesRes.data);
+          console.log("Loaded categories from getAll(): ", allCategoriesRes.data.length, "items");
+          return;
+        }
+      } catch (e) {
+        console.log("categories.getAll() failed: ", e.message);
+      }
+
+      try {
+        // Try categories.getTree() for hierarchical data
+        console.log("Trying categories.getTree()...");
+        const treeRes = await api.categories.getTree();
+        console.log("categories.getTree() response: ", treeRes);
+        
+        if (treeRes.data && treeRes.data.length > 0) {
+          // Flatten the tree to get all categories
+          const flattenCategories = (categories) => {
+            let result = [];
+            categories.forEach(cat => {
+              result.push(cat);
+              if (cat.children && cat.children.length > 0) {
+                result = result.concat(flattenCategories(cat.children));
+              }
+            });
+            return result;
+          };
+          
+          const flattened = flattenCategories(treeRes.data);
+          setCategories(flattened);
+          console.log("Loaded categories from getTree(): ", flattened.length, "items");
+          return;
+        }
+      } catch (e) {
+        console.log("categories.getTree() failed: ", e.message);
+      }
+
+      try {
+        // Try homepage API as fallback
+        console.log("Trying homepage API...");
+        const homepageRes = await api.homepage.bundled({ 
+          sections: 'categories', 
+          categoryLimit: 1000 
+        });
+        console.log("Homepage API response: ", homepageRes);
+        
+        if (homepageRes.data?.categories && homepageRes.data.categories.length > 0) {
+          setCategories(homepageRes.data.categories);
+          console.log("Loaded categories from homepage: ", homepageRes.data.categories.length, "items");
+          return;
+        }
+      } catch (e) {
+        console.log("Homepage API failed: ", e.message);
+      }
+
+      // If all APIs fail, set error
+      setErr("Failed to load categories from all endpoints");
+    };
+
+    loadCategories().finally(() => {
+      if (mounted) setLoading(false);
+    });
+      
     return () => {
       mounted = false;
     };
@@ -84,7 +158,7 @@ export default function Categories() {
         spaceBetween: 28,
       },
       1200: {
-        slidesPerView: 7,
+        slidesPerView: 6,
         slidesPerGroup: 1,
         spaceBetween: 32,
       },
@@ -125,7 +199,7 @@ export default function Categories() {
       <div className="section-header d-flex align-items-center justify-content-center" style={{
         position: 'relative',
         width: '100%',
-        marginBottom: '30px'
+        marginBottom: '40px'
       }}>
         <div className="title-line" style={{
           flex: 1,
@@ -151,43 +225,74 @@ export default function Categories() {
         
       </div>
 
-      <div id="category_1" className="position-relative" style={{ padding: '0 20px' }}>
+      <div id="category_1" className="position-relative" style={{ padding: '0 10px' }}>
         <Swiper
           className="swiper-container js-swiper-slider"
+     
           {...swiperOptions}
         >
-          {categories.map((category, i) => {
-            // Get category image by index (cycling through available images)
-            const categoryImage = categoryImages[i % categoryImages.length];
+          {categoryImages.map((imagePath, i) => {
+            // Get category name from image filename
+            const imageCategoryName = getCategoryNameFromImage(imagePath);
+            // Find matching category from backend
+            const matchingCategory = findMatchingCategory(imageCategoryName, categories);
+            
+            // Debug logging
+            if (!matchingCategory) {
+              console.log(`No matching category found for image: ${imageCategoryName}`);
+              console.log('Available categories:', categories.map(c => c.name));
+            }
+            
+            // If no matching category found, use default category with id 1
+            const displayCategory = matchingCategory || { id: 1, name: imageCategoryName };
 
             return (
-              <SwiperSlide key={category.id || i} className="swiper-slide product-card">
+              <SwiperSlide 
+                key={`category-${i}-${imageCategoryName}`} 
+                className="swiper-slide product-card"
+             
+              >
                  <div className="text-center">
                 
                   <Link
-                    href={`/shop/${category.id}`}
-                    className="category-link d-block"
+                    href={`/shop/${displayCategory.id}`}
+                    className="category-link d-block "
+                   
                   >
                     <div className="category-image-wrapper mb-3 ">
-                      {/* <div className="category-image-container"> */}
-                        <Image
-                          loading="lazy"
-                          src={categoryImage}
-                          width={300}
-                          height={300}
-                          alt={category.name}
-                          className="category-image"
-                          style={{ 
-                            objectFit: 'cover',
-                            transition: 'all 0.3s ease',
-                            // borderRadius: '12px',
-                            // boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            // width: '100%',
-                            // height: 'auto'
-                          }}
-                        />
-                      {/* </div> */}
-                    </div>
+                   
+                    
+                      <Image
+                        loading="lazy"
+                        src={imagePath}
+                        width={300}
+                        height={300}
+                        alt={displayCategory.name}
+                        className="category-image"
+                        style={{ 
+                          objectFit: 'cover',
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '12px'
+                        }}
+                      />
+                      
+                 
+                    {/* <div 
+                      className="category-name text-center"
+                      style={{
+                        marginTop: '10px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#333',
+                        textAlign: 'center',
+                        lineHeight: '1.4',
+                        width: '100%'
+                      }}
+                    >
+                      {matchingCategory.name}
+                    </div> */}
+                   </div>
                   </Link>
                 </div>
               </SwiperSlide>
