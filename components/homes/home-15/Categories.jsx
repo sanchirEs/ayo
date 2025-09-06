@@ -10,6 +10,7 @@ export default function Categories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
   // List of all available category images from the folder
   const categoryImages = [
@@ -41,6 +42,18 @@ export default function Categories() {
       category.name.toLowerCase() === imageName.toLowerCase()
     );
   };
+
+  useEffect(() => {
+    // Check if mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 991);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -188,7 +201,12 @@ export default function Categories() {
   }
 
   return (
-    <section className="category-carousel container" style={{ padding: '0px 80px' }}>
+    <section 
+      className="category-carousel container" 
+      style={{ 
+        padding: isMobile ? '0' : '0px 80px'
+      }}
+    >
 
 {/* <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
         Онцлох ангиллууд
@@ -225,12 +243,74 @@ export default function Categories() {
         
       </div>
 
-      <div id="category_1" className="position-relative" style={{ padding: '0 10px' }}>
-        <Swiper
-          className="swiper-container js-swiper-slider"
-     
-          {...swiperOptions}
-        >
+      <div id="category_1" className="position-relative" style={{ padding: '0' }}>
+        {/* Mobile Grid Layout */}
+        <div className="d-block d-lg-none">
+          <div 
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '4px',
+              padding: '0'
+            }}
+          >
+            {categoryImages.map((imagePath, i) => {
+              // Get category name from image filename
+              const imageCategoryName = getCategoryNameFromImage(imagePath);
+              // Find matching category from backend
+              const matchingCategory = findMatchingCategory(imageCategoryName, categories);
+              
+              // If no matching category found, use default category with id 1
+              const displayCategory = matchingCategory || { id: 1, name: imageCategoryName };
+
+              return (
+                <Link 
+                  key={`mobile-category-${i}-${imageCategoryName}`} 
+                  href={`/shop/${displayCategory.id}`} 
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    color: 'inherit'
+                  }}
+                >
+                  <Image
+                    src={imagePath}
+                    width={150}
+                    height={150}
+                    alt={displayCategory.name}
+                    style={{ 
+                      width: '100%',
+                      height: 'auto',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      // boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                  {/* <div style={{
+                    marginTop: '4px',
+                    fontSize: '10px',
+                    fontWeight: '500',
+                    color: '#333',
+                    textAlign: 'center',
+                    lineHeight: '1.2'
+                  }}>
+                    {displayCategory.name}
+                  </div> */}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Desktop Swiper Layout */}
+        <div className="d-none d-lg-block" style={{ padding: '0 20px' }}>
+          <Swiper
+            className="swiper-container js-swiper-slider"
+          
+            {...swiperOptions}
+          >
           {categoryImages.map((imagePath, i) => {
             // Get category name from image filename
             const imageCategoryName = getCategoryNameFromImage(imagePath);
@@ -300,18 +380,19 @@ export default function Categories() {
           })}
 
           {/* <!-- /.swiper-wrapper --> */}
-        </Swiper>
-        {/* <!-- /.swiper-container js-swiper-slider --> */}
+          </Swiper>
+          {/* <!-- /.swiper-container js-swiper-slider --> */}
 
-        <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center" >
-          <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
-            <use href="#icon_prev_md" />
-          </svg>
-        </div>
-        <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center" >
-          <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
-            <use href="#icon_next_md" />
-          </svg>
+          <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center" >
+            <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
+              <use href="#icon_prev_md" />
+            </svg>
+          </div>
+          <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center" >
+            <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
+              <use href="#icon_next_md" />
+            </svg>
+          </div>
         </div>
       
        
