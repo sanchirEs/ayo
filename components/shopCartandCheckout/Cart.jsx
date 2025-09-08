@@ -7,28 +7,37 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function Cart() {
-  const { cartProducts, setCartProducts, totalPrice } = useContextElement();
+  const { cartProducts, setCartProducts, totalPrice, updateCartItemQuantity, removeCartItem } = useContextElement();
   const router = useRouter();
 
-const setQuantity = (id, q) => {
+const setQuantity = async (id, q) => {
+  const max = cartProducts.find(it => it.id === id)?.stock;
+  const maxQuantity = typeof max === "number" ? max : Infinity;
+  let next = Math.max(1, parseInt(q, 10) || 1);
+  if (next > maxQuantity) {
+    next = maxQuantity;
+    // анхааруулга хүсвэл:
+    // if (typeof window !== "undefined") alert(`Үлдэгдэл ${maxQuantity} ширхэг байна.`);
+  }
+  
+  // Update local state immediately for better UX
   setCartProducts(prev =>
     prev.map(it => {
-      console.log("niit hed bna: ", it.stock)
       if (it.id !== id) return it;
-      const max = typeof it.stock === "number" ? it.stock : Infinity;
-      let next = Math.max(1, parseInt(q, 10) || 1);
-      if (next > max) {
-        next = max;
-        // анхааруулга хүсвэл:
-        // if (typeof window !== "undefined") alert(`Үлдэгдэл ${max} ширхэг байна.`);
-      }
       return { ...it, quantity: next };
     })
   );
+  
+  // Sync with backend
+  await updateCartItemQuantity(id, next);
 };
 
-  const removeItem = (id) => {
+  const removeItem = async (id) => {
+    // Update local state immediately for better UX
     setCartProducts((prev) => prev.filter((it) => it.id !== id));
+    
+    // Sync with backend
+    await removeCartItem(id);
   };
 
   // ✅ Subtotal (context-д байхгүй бол fallback)

@@ -24,13 +24,25 @@ export default function Context({ children }) {
     setTotalPrice(subtotal);
   }, [cartProducts]);
 
-  const addProductToCart = (id) => {
+  const addProductToCart = async (id, variantId = null) => {
     if (!cartProducts.filter((elm) => elm.id == id)[0]) {
       const item = {
         ...allProducts.filter((elm) => elm.id == id)[0],
         quantity: 1,
       };
       setCartProducts((pre) => [...pre, item]);
+
+      // Try to sync with backend cart
+      try {
+        await api.cart.addItem({
+          productId: id,
+          variantId: variantId,
+          quantity: 1,
+          sessionId: 'guest_session_' + Math.random().toString(36).substr(2, 9)
+        });
+      } catch (error) {
+        console.log('Cart sync failed, using local storage:', error.message);
+      }
 
       document
         .getElementById("cartDrawerOverlay")
@@ -155,9 +167,44 @@ export default function Context({ children }) {
     localStorage.setItem("wishlist", JSON.stringify(wishList));
   }, [wishList]);
 
-  const clearCart = () => {
+  const clearCart = async () => {
     setCartProducts([]);
     localStorage.removeItem("cartList");
+    
+    // Try to clear backend cart
+    try {
+      await api.cart.clear();
+    } catch (error) {
+      console.log('Backend cart clear failed:', error.message);
+    }
+  };
+
+  const updateCartItemQuantity = async (itemId, quantity) => {
+    // Update local cart
+    setCartProducts(prev => 
+      prev.map(item => 
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+
+    // Try to sync with backend
+    try {
+      await api.cart.updateItem(itemId, quantity);
+    } catch (error) {
+      console.log('Cart update sync failed:', error.message);
+    }
+  };
+
+  const removeCartItem = async (itemId) => {
+    // Remove from local cart
+    setCartProducts(prev => prev.filter(item => item.id !== itemId));
+
+    // Try to sync with backend
+    try {
+      await api.cart.removeItem(itemId);
+    } catch (error) {
+      console.log('Cart remove sync failed:', error.message);
+    }
   };
 
   const contextElement = {
@@ -172,6 +219,8 @@ export default function Context({ children }) {
     wishList,
     setQuickViewItem,
     clearCart,
+    updateCartItemQuantity,
+    removeCartItem,
     currentCategory,
     setCurrentCategory,
     currentProduct,

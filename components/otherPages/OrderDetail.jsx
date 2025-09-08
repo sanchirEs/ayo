@@ -56,7 +56,7 @@ export default function OrderDetail({ orderId }) {
     const fetchOrderDetails = async () => {
       try {
         setLoading(true);
-        const response = await api.orders.getById(orderId);
+        const response = await api.orders.getOrderDetails(orderId);
         console.log("response in order detail: ", response);
         
         if (response.success) {
@@ -155,24 +155,25 @@ export default function OrderDetail({ orderId }) {
       if (response.success) {
         const result = response.data;
         const payment = result.payment;
-        const providerResponse = result.providerResponse;
         console.log("payment in order detail: ", payment);
-        console.log("providerResponse in order detail: ", providerResponse);
+        console.log("result in order detail: ", result);
         
-        setPaymentData({
+        const paymentDataToSet = {
           orderId: order.id,
           paymentId: payment.id,
           paymentMethod: 'QPAY',
           amount: payment.amount,
           currency: payment.currency,
           status: payment.status,
-          qrImage: providerResponse?.qrImage,
-          qrCode: providerResponse?.qrCode,
-          paymentUrl: providerResponse?.paymentUrl,
-          transactionId: payment.providerTransactionId,
+          qrImage: result.qrImage,
+          qrCode: result.qrImage, // Use qrImage as qrCode fallback
+          paymentUrl: result.paymentUrl,
+          transactionId: result.transactionId,
           expiresAt: payment.expiresAt
-        });
+        };
         
+        console.log("Setting payment data:", paymentDataToSet);
+        setPaymentData(paymentDataToSet);
         setShowPaymentModal(true);
       }
     } catch (error) {
@@ -359,27 +360,29 @@ export default function OrderDetail({ orderId }) {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-6">
-                  <p><strong>Төлбөрийн төрөл:</strong> {order.payment.provider || 'QPAY'}</p>
-                  <p><strong>Төлбөрийн статус:</strong></p>
-                  {order.payment.status === 'COMPLETED' ? (
-                    <span className="badge" style={{ backgroundColor: '#6B8E5A', color: 'white' }}>
-                      <i className="fas fa-check-circle me-1"></i>
-                      Төлбөр төлөгдсөн
-                    </span>
-                  ) : order.payment.status === 'PENDING' ? (
-                    <span className="badge" style={{ backgroundColor: '#C7D4BA', color: 'white' }}>
-                      <i className="fas fa-clock me-1"></i>
-                      Төлбөр хүлээгдэж буй
-                    </span>
-                  ) : (
-                    <span className="badge" style={{ backgroundColor: '#495D35', color: 'white' }}>
-                      <i className="fas fa-times-circle me-1"></i>
-                      Төлбөр амжилтгүй
-                    </span>
-                  )}
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="me-3"><strong>Төлбөрийн төрөл:</strong> {order.payment.provider || 'QPAY'}</span>
+                    <span><strong>Төлбөрийн статус:</strong></span>
+                    {order.payment.status === 'COMPLETED' ? (
+                      <span className="badge ms-2" style={{ backgroundColor: '#6B8E5A', color: 'white' }}>
+                        <i className="fas fa-check-circle me-1"></i>
+                        Төлбөр төлөгдсөн
+                      </span>
+                    ) : order.payment.status === 'PENDING' ? (
+                      <span className="badge ms-2" style={{ backgroundColor: '#C7D4BA', color: 'white' }}>
+                        <i className="fas fa-clock me-1"></i>
+                        Төлбөр хүлээгдэж буй
+                      </span>
+                    ) : (
+                      <span className="badge ms-2" style={{ backgroundColor: '#495D35', color: 'white' }}>
+                        <i className="fas fa-times-circle me-1"></i>
+                        Төлбөр амжилтгүй
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="col-md-6 text-md-end">
-                  {order.payment.status === 'PENDING' && (
+                {/* <div className="col-md-6 text-md-end">
+                  {order.payment.status === 'PENDING' && order.status === 'PENDING' && (
                     <button 
                       className="btn"
                       style={{
@@ -416,7 +419,7 @@ export default function OrderDetail({ orderId }) {
                       )}
                     </button>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -546,17 +549,17 @@ export default function OrderDetail({ orderId }) {
                   </div>
 
                   {/* QR Code Section */}
-                  {(paymentData.qrImage || paymentData.qrCode) && (
+                  {paymentData.qrImage && (
                     <div className="text-center mb-4" style={{ transition: 'all 0.3s ease' }}>
-                                              <h6 className="mb-3" style={{ 
-                          color: '#495D35', 
-                          fontWeight: '600',
-                          fontSize: '1.1rem',
-                          transition: 'all 0.3s ease'
-                        }}>
-                          <i className="fas fa-qrcode me-2" style={{ transition: 'all 0.3s ease' }}></i>
-                          QR Код уншуулах
-                        </h6>
+                      <h6 className="mb-3" style={{ 
+                        color: '#495D35', 
+                        fontWeight: '600',
+                        fontSize: '1.1rem',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        <i className="fas fa-qrcode me-2" style={{ transition: 'all 0.3s ease' }}></i>
+                        QR Код уншуулах
+                      </h6>
                       <div className="card-body text-center" style={{
                         backgroundColor: '#ffffff',
                         borderRadius: '12px',
@@ -566,7 +569,7 @@ export default function OrderDetail({ orderId }) {
                         transition: 'all 0.3s ease'
                       }}>
                         <img 
-                          src={paymentData.qrImage || paymentData.qrCode} 
+                          src={paymentData.qrImage} 
                           alt="QPay QR Code" 
                           style={{ 
                             maxWidth: '280px', 
@@ -576,6 +579,13 @@ export default function OrderDetail({ orderId }) {
                             padding: '15px',
                             backgroundColor: '#ffffff',
                             transition: 'all 0.3s ease'
+                          }}
+                          onError={(e) => {
+                            console.error('QR Image failed to load:', paymentData.qrImage);
+                            e.target.style.display = 'none';
+                          }}
+                          onLoad={() => {
+                            console.log('QR Image loaded successfully:', paymentData.qrImage);
                           }}
                         />
                         

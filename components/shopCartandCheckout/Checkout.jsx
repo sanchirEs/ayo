@@ -82,6 +82,9 @@ export default function Checkout() {
   const [justSavedAddress, setJustSavedAddress] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('QPAY');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
   
   // Payment modal states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -424,7 +427,7 @@ export default function Checkout() {
         console.error('Payment status check error:', error);
         
         // If it's a 404 error, the payment might not exist yet, so continue monitoring
-        if (error.message && error.includes('404')) {
+        if (error.message && error.message.includes('404')) {
           console.log('Payment not found yet, continuing to monitor...');
         } else {
           // For other errors, stop monitoring after a few attempts
@@ -470,13 +473,14 @@ export default function Checkout() {
           postalCode: formData.postalCode,
           country: formData.country,
           mobile: formData.phone
-        }
+        },
+        ...(appliedCoupon && { couponCode: appliedCoupon.code })
       };
 
       console.log('Creating order with payment:', orderData);
 
       // Create order with integrated payment
-      const response = await api.orders.create(orderData);
+      const response = await api.orders.createWithPayment(orderData);
       
       console.log('Order creation response:', response);
       console.log('Response data:', response.data);
@@ -553,116 +557,7 @@ export default function Checkout() {
     router.push('/account_orders');
   };
 
-  // Function to handle payment cancellation
-  const handlePaymentCancel = async () => {
-    if (paymentData?.paymentId && paymentData.status === 'PENDING') {
-      if (confirm('Та төлбөрийг цуцлахдаа итгэлтэй байна уу?')) {
-        try {
-          const response = await api.payments.cancel(paymentData.paymentId);
-          
-          if (response.success) {
-            // Update payment data with cancelled status
-            setPaymentData(prev => ({
-              ...prev,
-              status: 'CANCELLED'
-            }));
-            
-            // Stop monitoring
-            if (statusCheckInterval) {
-              clearInterval(statusCheckInterval);
-              setStatusCheckInterval(null);
-            }
-            
-            setPaymentStatus('CANCELLED');
-            alert('Төлбөр амжилттай цуцлагдлаа.');
-            
-            // Ask if user wants to go to orders page
-    
-              router.push('/account_orders');
-            
-          } else {
-            alert('Төлбөр цуцлахад алдаа гарлаа');
-          }
-        } catch (error) {
-          console.error('Payment cancellation error:', error);
-          alert('Төлбөр цуцлахад алдаа гарлаа: ' + error.message);
-        }
-      }
-    } else {
-      // Just close modal if no payment to cancel
-      setShowPaymentModal(false);
-      setPaymentData(null);
-      if (statusCheckInterval) {
-        clearInterval(statusCheckInterval);
-        setStatusCheckInterval(null);
-      }
-      
-      // Ask if user wants to go to orders page
-      if (confirm('Захиалга хуудас руу очих уу?')) {
-        router.push('/account_orders');
-      }
-    }
-  };
 
-  // Function to handle "Pay Later" - save order without payment
-  const handlePayLater = async () => {
-    try {
-      setIsProcessingPayment(true);
-      
-      // Validate required fields
-      if (!formData.addressLine1 || !formData.city || !formData.country || !formData.phone) {
-        alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
-        return;
-      }
-
-      // Validate cart has items
-      if (!cartProducts || cartProducts.length === 0) {
-        alert('Сагсанд бараа байхгүй байна!');
-        return;
-      }
-
-      // Prepare order data without payment
-      const orderData = {
-        items: cartProducts.map(item => ({
-          productId: item.id,
-          quantity: item.quantity,
-          ...(item.variantId && { variantId: item.variantId })
-        })),
-        shippingAddress: {
-          addressLine1: formData.addressLine1,
-          addressLine2: formData.addressLine2,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          country: formData.country,
-          mobile: formData.phone
-        }
-      };
-
-      console.log('Creating order without payment:', orderData);
-
-      // Create order without payment (PENDING status)
-      const response = await api.orders.create(orderData);
-      
-      if (response.success) {
-        const { order } = response.data;
-        console.log('Order created without payment:', order);
-        
-        // Clear cart after successful order
-        clearCart();
-        
-        // Show success message and redirect
-        alert('Захиалга амжилттай үүслээ! Захиалгын жагсаалт руу орох уу?');
-        
-        // Redirect to account orders page
-        router.push('/account_orders');
-      }
-    } catch (error) {
-      console.error('Order creation error:', error);
-      alert('Захиалга үүсгэхэд алдаа гарлаа: ' + (error.message || 'Алдаа гарлаа'));
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  };
 
   // Function to manually check payment status
   const handleManualStatusCheck = async () => {
@@ -1180,6 +1075,74 @@ export default function Checkout() {
                 </tbody>
               </table>
             </div>
+            {/* Coupon Code Section */}
+            <div className="checkout__coupon mb-4">
+              <h4 className="mb-3" style={{ color: '#495D35' }}>Хөнгөлөлтийн код</h4>
+              <div className="d-flex gap-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Хөнгөлөлтийн код оруулах"
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value);
+                    setCouponError('');
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    border: '1px solid #495D35',
+                    color: 'white',
+                    backgroundColor: '#495D35',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onClick={async () => {
+                    if (!couponCode.trim()) {
+                      setCouponError('Хөнгөлөлтийн код оруулна уу');
+                      return;
+                    }
+                    
+                    try {
+                      // Here you would call your coupon validation API
+                      // For now, we'll simulate a successful coupon
+                      setAppliedCoupon({
+                        code: couponCode,
+                        discount: 10,
+                        type: 'percentage'
+                      });
+                      setCouponError('');
+                      setCouponCode('');
+                    } catch (error) {
+                      setCouponError('Хөнгөлөлтийн код буруу эсвэл хугацаа дууссан байна');
+                    }
+                  }}
+                >
+                  Хэрэглэх
+                </button>
+              </div>
+              
+              {couponError && (
+                <div className="alert alert-danger mt-2">
+                  <i className="fas fa-exclamation-triangle me-2"></i>
+                  {couponError}
+                </div>
+              )}
+              
+              {appliedCoupon && (
+                <div className="alert alert-success mt-2">
+                  <i className="fas fa-check-circle me-2"></i>
+                  Хөнгөлөлтийн код амжилттай хэрэглэгдлээ: {appliedCoupon.code}
+                  <button
+                    type="button"
+                    className="btn-close ms-2"
+                    onClick={() => setAppliedCoupon(null)}
+                  ></button>
+                </div>
+              )}
+            </div>
+
             <div className="checkout__payment-methods">
               <h4 className="mb-3" style={{ color: '#495D35' }}>Төлбөрийн нөхцөл</h4>
               
@@ -1607,7 +1570,12 @@ export default function Checkout() {
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={handlePaymentCancel}
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    if (paymentData?.orderId) {
+                      router.push(`/account_orders/${paymentData.orderId}`);
+                    }
+                  }}
                 ></button>
               </div>
               <div className="modal-body" style={{ 
@@ -1721,11 +1689,24 @@ export default function Checkout() {
                 {paymentData.status === 'PENDING' && (
                   <div className="alert alert-info">
                     <h6><i className="fas fa-info-circle me-2"></i>Заавар:</h6>
-                    <ul className="mb-0">
-                      <li>QR кодыг уншуулж төлбөр хийх</li>
-                      <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
-                      <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
-                    </ul>
+                    {paymentData.paymentMethod === 'STOREPAY' ? (
+                      <div>
+                        <p className="mb-2" style={{ fontWeight: '600', color: '#495D35' }}>
+                          Төлбөрийн нэхэмжлэх Storepay -руу илгээсэн тул та эхний төлөлтөө хийж захиалгаа баталгаажуулна уу.
+                        </p>
+                        <ul className="mb-0">
+                          <li>Storepay апп-аа нээж төлбөр хийх</li>
+                          <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
+                          <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
+                        </ul>
+                      </div>
+                    ) : (
+                      <ul className="mb-0">
+                        <li>QR кодыг уншуулж төлбөр хийх</li>
+                        <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
+                        <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
+                      </ul>
+                    )}
                   </div>
                 )}
                 
@@ -1776,63 +1757,6 @@ export default function Checkout() {
                       Статус шалгах
                     </button>
                     
-                    <button
-                      type="button"
-                      className="btn"
-                      style={{
-                        backgroundColor: '#f7f3d7',
-                        borderColor: '#927238',
-                        color: '#927238',
-                        fontWeight: '500',
-                        fontSize: '0.875rem',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '4px',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#f0e8c7';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = '#f7f3d7';
-                      }}
-                      onClick={handlePaymentCancel}
-                    >
-                      <i className="fas fa-ban me-2"></i>
-                      Төлбөр цуцлах
-                    </button>
-                    
-                    <button
-                      type="button"
-                      className="btn"
-                      style={{
-                        backgroundColor: '#e2e3e5',
-                        borderColor: '#6c757d',
-                        color: '#6c757d',
-                        fontWeight: '500',
-                        fontSize: '0.875rem',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '4px',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#d1d3d4';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = '#e2e3e5';
-                      }}
-                      onClick={() => {
-                        setShowPaymentModal(false);
-                        setPaymentData(null);
-                        if (statusCheckInterval) {
-                          clearInterval(statusCheckInterval);
-                          setStatusCheckInterval(null);
-                        }
-                        router.push('/account_orders');
-                      }}
-                    >
-                      <i className="fas fa-clock me-2"></i>
-                      Дараа төлөх
-                    </button>
                   </>
                 )}
                 
@@ -1899,7 +1823,12 @@ export default function Checkout() {
      {showPaymentModal && (
        <div 
          className="modal-backdrop fade show" 
-         onClick={handlePaymentCancel}
+         onClick={() => {
+           setShowPaymentModal(false);
+           if (paymentData?.orderId) {
+             router.push(`/account_orders?orderId=${paymentData.orderId}`);
+           }
+         }}
        ></div>
      )}
 
