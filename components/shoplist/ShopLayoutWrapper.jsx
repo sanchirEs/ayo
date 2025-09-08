@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Shop4 from "./Shop4";
 import FilterAll from "./filter/FilterAll";
 import { openModalShopFilter } from "@/utlis/aside";
@@ -14,11 +15,20 @@ export default function ShopLayoutWrapper({
   initialPage = 1,
   initialLimit = 12,
   initialSort = "newest",
+  initialFilters = null,
   showSidebar = true,
   ...otherProps 
 }) {
   // Use the filter context for shared state
   const { appliedFilters, handleFiltersChange, totalActiveFilters, lastUpdate } = useFilterContext();
+  
+  // Initialize filters from URL if provided
+  React.useEffect(() => {
+    if (initialFilters && Object.keys(initialFilters).length > 0) {
+      console.log('🔄 SHOP LAYOUT: Initializing filters from URL:', initialFilters);
+      handleFiltersChange(initialFilters);
+    }
+  }, [initialFilters, handleFiltersChange]);
 
   return (
     <section className="shop-main container d-flex pt-4 pt-xl-5">

@@ -117,6 +117,19 @@ export default function Shop4({
     }
   };
 
+  // Calculate total active filters
+  const totalActiveFilters = filters._meta?.totalActiveFilters || 
+    (filters.brands?.length || 0) + 
+    (filters.priceMin !== null ? 1 : 0) + 
+    (filters.priceMax !== null ? 1 : 0) + 
+    Object.values(filters.attributes || {}).flat().length +
+    Object.values(filters.specs || {}).flat().length +
+    (filters.tags?.length || 0) + 
+    (filters.hasDiscount ? 1 : 0) + 
+    (filters.minRating ? 1 : 0) + 
+    (filters.search ? 1 : 0) + 
+    (!filters.inStock ? 1 : 0);
+
   // ---- category state ----
   const [categoryName, setCategoryName] = useState("");
   const [categoryLoading, setCategoryLoading] = useState(false);
@@ -533,6 +546,56 @@ export default function Shop4({
               </div>
             )}
 
+            {/* Clear All Filters Button */}
+            {totalActiveFilters > 0 && (
+              <div className="clear-filters-btn me-3 order-0 order-md-1">
+                <button
+                  className="btn btn-sm"
+                  onClick={() => {
+                    if (onFiltersChange) {
+                      onFiltersChange({
+                        brands: [],
+                        priceMin: null,
+                        priceMax: null,
+                        attributes: {},
+                        specs: {},
+                        tags: [],
+                        inStock: true,
+                        hasDiscount: false,
+                        minRating: null,
+                        search: "",
+                        colors: [],
+                        sizes: [],
+                        price: [20, 70987],
+                        _meta: {
+                          totalActiveFilters: 0,
+                          lastUpdate: Date.now(),
+                          filterType: 'clear'
+                        }
+                      });
+                    }
+                  }}
+                  style={{ 
+                    fontSize: '12px',
+                    border: '1px solid #495D35',
+                    color: '#495D35',
+                    backgroundColor: 'transparent',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#495D35';
+                    e.target.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#495D35';
+                  }}
+                >
+                  🗑️ Clear All ({totalActiveFilters})
+                </button>
+              </div>
+            )}
+
             {/* Sort - Clickable dropdown */}
             <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
               <button
@@ -677,9 +740,27 @@ export default function Shop4({
               <div className="d-flex justify-content-between align-items-start">
                 <div className="flex-grow-1">{err}</div>
                 <button 
-                  className="btn btn-outline-danger btn-sm ms-3"
+                  className="btn btn-sm ms-3"
                   onClick={() => loadProducts()}
                   disabled={loading}
+                  style={{ 
+                    border: '1px solid #495D35',
+                    color: '#495D35',
+                    backgroundColor: 'transparent',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.target.style.backgroundColor = '#495D35';
+                      e.target.style.color = 'white';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = '#495D35';
+                    }
+                  }}
                 >
                   {loading ? 'Ачаалж байна...' : 'Дахин оролдох'}
                 </button>

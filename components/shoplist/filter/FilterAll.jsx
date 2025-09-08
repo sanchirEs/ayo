@@ -32,6 +32,46 @@ export default function FilterAll({ onFiltersChange }) {
   const { setCurrentCategory } = useContextElement();
   const currentCategoryId = params?.categoryId ? parseInt(params.categoryId) : null;
   
+  // Get URL search params for filter initialization
+  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  
+  // Helper functions for URL parsing (moved before usage)
+  const parseAttributesFromURL = (attributesString) => {
+    const attributes = {};
+    if (!attributesString) return attributes;
+    
+    const pairs = attributesString.split(',');
+    pairs.forEach(pair => {
+      const [key, value] = pair.split(':');
+      if (key && value) {
+        if (!attributes[key]) {
+          attributes[key] = [];
+        }
+        attributes[key].push(value);
+      }
+    });
+    
+    return attributes;
+  };
+
+  const parseSpecsFromURL = (specsString) => {
+    const specs = {};
+    if (!specsString) return specs;
+    
+    const pairs = specsString.split(',');
+    pairs.forEach(pair => {
+      const [key, value] = pair.split(':');
+      if (key && value) {
+        if (!specs[key]) {
+          specs[key] = [];
+        }
+        specs[key].push(value);
+      }
+    });
+    
+    return specs;
+  };
+  
   // Category tree state
   const [catTree, setCatTree] = useState([]);
   const [catLoading, setCatLoading] = useState(true);
@@ -49,19 +89,114 @@ export default function FilterAll({ onFiltersChange }) {
   const [filtersLoading, setFiltersLoading] = useState(true);
   const [filtersError, setFiltersError] = useState("");
 
-  // Filter states (ENHANCED FOR INSTANT RESPONSE)
-  const [activeBrands, setActiveBrands] = useState([]); // Array of brand IDs
-  const [activeAttributes, setActiveAttributes] = useState({}); // { "үнэртэн": ["Dive in Fig"], "color": ["red"] }
-  const [activeSpecs, setActiveSpecs] = useState({}); // { "Хэмжээ:": ["3 г"] }
-  const [activeTags, setActiveTags] = useState([]); // Array of tag values
-  const [searchQuery, setSearchQuery] = useState("");
-  const [price, setPrice] = useState([20, 70987]);
-  const [inStock, setInStock] = useState(true);
-  const [hasDiscount, setHasDiscount] = useState(false);
+  // Initialize filter states from URL parameters
+  const initializeFiltersFromURL = () => {
+    const urlBrands = searchParams.get('brands') ? searchParams.get('brands').split(',').map(Number) : [];
+    const urlPriceMin = searchParams.get('priceMin') ? Number(searchParams.get('priceMin')) : null;
+    const urlPriceMax = searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : null;
+    const urlAttributes = parseAttributesFromURL(searchParams.get('attributes'));
+    const urlSpecs = parseSpecsFromURL(searchParams.get('specs'));
+    const urlTags = searchParams.get('tags') ? searchParams.get('tags').split(',') : [];
+    const urlInStock = searchParams.get('inStock') === 'true';
+    const urlHasDiscount = searchParams.get('hasDiscount') === 'true';
+    const urlSearch = searchParams.get('search') || '';
+    const urlPrice = searchParams.get('price') ? searchParams.get('price').split(',').map(Number) : [20, 70987];
+    
+    return {
+      brands: urlBrands,
+      attributes: urlAttributes,
+      specs: urlSpecs,
+      tags: urlTags,
+      search: urlSearch,
+      price: urlPrice,
+      inStock: urlInStock,
+      hasDiscount: urlHasDiscount
+    };
+  };
+
+  // Filter states (ENHANCED FOR INSTANT RESPONSE) - Initialize from URL
+  const urlFilters = initializeFiltersFromURL();
+  const [activeBrands, setActiveBrands] = useState(urlFilters.brands);
+  const [activeAttributes, setActiveAttributes] = useState(urlFilters.attributes);
+  const [activeSpecs, setActiveSpecs] = useState(urlFilters.specs);
+  const [activeTags, setActiveTags] = useState(urlFilters.tags);
+  const [searchQuery, setSearchQuery] = useState(urlFilters.search);
+  const [price, setPrice] = useState(urlFilters.price);
+  const [inStock, setInStock] = useState(urlFilters.inStock);
+  const [hasDiscount, setHasDiscount] = useState(urlFilters.hasDiscount);
 
   // Debounced values for smooth UX (only for continuous inputs)
   const debouncedSearch = useDebounce(searchQuery, 300); // 300ms delay for search
   const debouncedPrice = useDebounce(price, 500); // 500ms delay for price slider
+
+  // URL synchronization function
+  const updateURL = useCallback((filters) => {
+    if (typeof window === 'undefined') return;
+    
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search);
+    
+    // Clear existing filter params
+    ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+      params.delete(param);
+    });
+    
+    // Add new filter params
+    if (filters.brands && filters.brands.length > 0) {
+      params.set('brands', filters.brands.join(','));
+    }
+    if (filters.priceMin !== null) {
+      params.set('priceMin', filters.priceMin.toString());
+    }
+    if (filters.priceMax !== null) {
+      params.set('priceMax', filters.priceMax.toString());
+    }
+    if (filters.attributes && Object.keys(filters.attributes).length > 0) {
+      const attributeStrings = [];
+      Object.entries(filters.attributes).forEach(([key, values]) => {
+        if (Array.isArray(values) && values.length > 0) {
+          values.forEach(value => {
+            attributeStrings.push(`${key}:${value}`);
+          });
+        }
+      });
+      if (attributeStrings.length > 0) {
+        params.set('attributes', attributeStrings.join(','));
+      }
+    }
+    if (filters.specs && Object.keys(filters.specs).length > 0) {
+      const specStrings = [];
+      Object.entries(filters.specs).forEach(([key, values]) => {
+        if (Array.isArray(values) && values.length > 0) {
+          values.forEach(value => {
+            specStrings.push(`${key}:${value}`);
+          });
+        }
+      });
+      if (specStrings.length > 0) {
+        params.set('specs', specStrings.join(','));
+      }
+    }
+    if (filters.tags && filters.tags.length > 0) {
+      params.set('tags', filters.tags.join(','));
+    }
+    if (filters.inStock !== true) {
+      params.set('inStock', filters.inStock.toString());
+    }
+    if (filters.hasDiscount) {
+      params.set('hasDiscount', filters.hasDiscount.toString());
+    }
+    if (filters.search) {
+      params.set('search', filters.search);
+    }
+    if (filters.price && (filters.price[0] !== 20 || filters.price[1] !== 70987)) {
+      params.set('price', filters.price.join(','));
+    }
+    
+    // Update URL without page reload
+    const newUrl = `${url.pathname}?${params.toString()}`;
+    window.history.pushState({}, '', newUrl);
+  }, []);
   
   // Accordion states (DYNAMIC BASED ON AVAILABLE FILTERS)
   const [expandedAccordions, setExpandedAccordions] = useState(new Set(['categories', 'brands', 'price']));
@@ -266,8 +401,9 @@ export default function FilterAll({ onFiltersChange }) {
       };
       
       onFiltersChange(filterData);
+      updateURL(filterData); // Update URL when filters change
     }
-  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount, debouncedPrice, debouncedSearch, totalActiveFilters, onFiltersChange]);
+  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount, debouncedPrice, debouncedSearch, totalActiveFilters, onFiltersChange, updateURL]);
 
   // DEBOUNCED filter notification (for search and price)
   const notifyDebouncedFilters = useCallback(() => {
@@ -295,8 +431,9 @@ export default function FilterAll({ onFiltersChange }) {
       };
       
       onFiltersChange(filterData);
+      updateURL(filterData); // Update URL when filters change
     }
-  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount, debouncedPrice, debouncedSearch, totalActiveFilters, onFiltersChange]);
+  }, [activeBrands, activeAttributes, activeSpecs, activeTags, inStock, hasDiscount, debouncedPrice, debouncedSearch, totalActiveFilters, onFiltersChange, updateURL]);
 
   // Instant updates for immediate filters (brands, attributes, specs, tags, toggles)
   useEffect(() => {
@@ -511,6 +648,17 @@ export default function FilterAll({ onFiltersChange }) {
     setPrice([20, 70987]);
     setInStock(true);
     setHasDiscount(false);
+    
+    // Clear URL parameters
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location);
+      const params = new URLSearchParams(url.search);
+      ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+        params.delete(param);
+      });
+      const newUrl = `${url.pathname}?${params.toString()}`;
+      window.history.pushState({}, '', newUrl);
+    }
   }, []);
 
   const clearFilterType = useCallback((filterType) => {
@@ -709,9 +857,25 @@ export default function FilterAll({ onFiltersChange }) {
                                  e.stopPropagation();
                                  toggleAttribute(attributeKey, option.value);
                                }}
-                               className={`btn btn-sm btn-outline-secondary mb-2 me-2 js-filter ${
-                                 currentValues.includes(option.value) ? "btn-secondary text-white" : ""
-                               }`}
+                               className={`btn btn-sm mb-2 me-2 js-filter`}
+                               style={{
+                                 border: '1px solid #495D35',
+                                 color: currentValues.includes(option.value) ? 'white' : '#495D35',
+                                 backgroundColor: currentValues.includes(option.value) ? '#495D35' : 'transparent',
+                                 transition: 'all 0.3s ease'
+                               }}
+                               onMouseEnter={(e) => {
+                                 if (!currentValues.includes(option.value)) {
+                                   e.target.style.backgroundColor = '#495D35';
+                                   e.target.style.color = 'white';
+                                 }
+                               }}
+                               onMouseLeave={(e) => {
+                                 if (!currentValues.includes(option.value)) {
+                                   e.target.style.backgroundColor = 'transparent';
+                                   e.target.style.color = '#495D35';
+                                 }
+                               }}
                              >
                                {option.value} {option.count ? `(${option.count})` : ''}
                              </button>
@@ -789,9 +953,25 @@ export default function FilterAll({ onFiltersChange }) {
                             <button
                               key={index}
                               onClick={() => toggleSpec(specKey, option.value)}
-                              className={`btn btn-sm btn-outline-info mb-2 me-2 js-filter ${
-                                currentValues.includes(option.value) ? "btn-info text-white" : ""
-                              }`}
+                              className={`btn btn-sm mb-2 me-2 js-filter`}
+                              style={{
+                                border: '1px solid #495D35',
+                                color: currentValues.includes(option.value) ? 'white' : '#495D35',
+                                backgroundColor: currentValues.includes(option.value) ? '#495D35' : 'transparent',
+                                transition: 'all 0.3s ease'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!currentValues.includes(option.value)) {
+                                  e.target.style.backgroundColor = '#495D35';
+                                  e.target.style.color = 'white';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!currentValues.includes(option.value)) {
+                                  e.target.style.backgroundColor = 'transparent';
+                                  e.target.style.color = '#495D35';
+                                }
+                              }}
                             >
                               {option.value} {option.count ? `(${option.count})` : ''}
                             </button>
@@ -943,9 +1123,25 @@ export default function FilterAll({ onFiltersChange }) {
                     onClick={() => {
                       setPrice([range.min, range.max]);
                     }}
-                    className={`btn btn-sm btn-outline-success w-100 mb-2 text-start ${
-                      price[0] === range.min && price[1] === range.max ? "btn-success text-white" : ""
-                    }`}
+                    className={`btn btn-sm w-100 mb-2 text-start`}
+                    style={{
+                      border: '1px solid #495D35',
+                      color: (price[0] === range.min && price[1] === range.max) ? 'white' : '#495D35',
+                      backgroundColor: (price[0] === range.min && price[1] === range.max) ? '#495D35' : 'transparent',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!(price[0] === range.min && price[1] === range.max)) {
+                        e.target.style.backgroundColor = '#495D35';
+                        e.target.style.color = 'white';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!(price[0] === range.min && price[1] === range.max)) {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.color = '#495D35';
+                      }
+                    }}
                   >
                     {range.label} ({range.count})
                   </button>
@@ -1026,9 +1222,25 @@ export default function FilterAll({ onFiltersChange }) {
                      <button
                        key={tag.id || index}
                        onClick={() => toggleTag(tag.value || tag.name || tag.tag || tag)}
-                       className={`btn btn-sm btn-outline-warning mb-2 me-2 js-filter ${
-                         activeTags.includes(tag.value || tag.name || tag.tag || tag) ? "btn-warning text-white" : ""
-                       }`}
+                       className={`btn btn-sm mb-2 me-2 js-filter`}
+                       style={{
+                         border: '1px solid #495D35',
+                         color: activeTags.includes(tag.value || tag.name || tag.tag || tag) ? 'white' : '#495D35',
+                         backgroundColor: activeTags.includes(tag.value || tag.name || tag.tag || tag) ? '#495D35' : 'transparent',
+                         transition: 'all 0.3s ease'
+                       }}
+                       onMouseEnter={(e) => {
+                         if (!activeTags.includes(tag.value || tag.name || tag.tag || tag)) {
+                           e.target.style.backgroundColor = '#495D35';
+                           e.target.style.color = 'white';
+                         }
+                       }}
+                       onMouseLeave={(e) => {
+                         if (!activeTags.includes(tag.value || tag.name || tag.tag || tag)) {
+                           e.target.style.backgroundColor = 'transparent';
+                           e.target.style.color = '#495D35';
+                         }
+                       }}
                      >
                        {tag.name || tag.value || tag.tag || tag} {tag.count ? `(${tag.count})` : ''}
                      </button>
@@ -1086,6 +1298,11 @@ export default function FilterAll({ onFiltersChange }) {
                        checked={inStock}
                        onChange={(e) => setInStock(e.target.checked)}
                        id="inStockSwitch"
+                       style={{
+                         backgroundColor: inStock ? '#495D35' : '#ccc',
+                         borderColor: inStock ? '#495D35' : '#ccc',
+                         boxShadow: inStock ? '0 0 0 0.2rem rgba(73, 93, 53, 0.25)' : 'none'
+                       }}
                      />
                      <label className="form-check-label fw-medium" htmlFor="inStockSwitch">
                        📦 Нөөцтэй
@@ -1100,6 +1317,11 @@ export default function FilterAll({ onFiltersChange }) {
                        checked={hasDiscount}
                        onChange={(e) => setHasDiscount(e.target.checked)}
                        id="hasDiscountSwitch"
+                       style={{
+                         backgroundColor: hasDiscount ? '#495D35' : '#ccc',
+                         borderColor: hasDiscount ? '#495D35' : '#ccc',
+                         boxShadow: hasDiscount ? '0 0 0 0.2rem rgba(73, 93, 53, 0.25)' : 'none'
+                       }}
                      />
                      <label className="form-check-label fw-medium" htmlFor="hasDiscountSwitch">
                        🏷️ Хямдралтай
