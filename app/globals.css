@@ -50,6 +50,49 @@
   overflow: hidden;
 }
 
+/* Mega Menu Scroll Styles - Hidden Scrollbars */
+.mega-menu--allcats {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.mega-menu--allcats::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.mega-menu--allcats::-webkit-scrollbar-track {
+  display: none !important;
+}
+
+.mega-menu--allcats::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+.allcats__left,
+.allcats__right {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.allcats__left::-webkit-scrollbar,
+.allcats__right::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.allcats__left::-webkit-scrollbar-track,
+.allcats__right::-webkit-scrollbar-track {
+  display: none !important;
+}
+
+.allcats__left::-webkit-scrollbar-thumb,
+.allcats__right::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
 /* New Balance Brand Section Styles */
 .new-balance-brand-section {
   position: relative;

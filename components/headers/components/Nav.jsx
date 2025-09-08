@@ -205,12 +205,24 @@ export default function Nav() {
                   top: '100%',
                   left: '0',
                   zIndex: 1000,
-                  minWidth: '800px'
+                  minWidth: '800px',
+                  maxHeight: '70vh',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitScrollbar: { display: 'none' }
                 }}
               >
                 <div className="container d-flex">
                   {/* Left: root categories list */}
-                  <div className="col-2 pe-4 allcats__left">
+                  <div className="col-2 pe-4 allcats__left" style={{ 
+                    maxHeight: '60vh', 
+                    overflowY: 'auto',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitScrollbar: { display: 'none' }
+                  }}>
                     <ul className="list-unstyled m-0">
                       {catTree.map((root) => (
                         <li
@@ -244,7 +256,13 @@ export default function Nav() {
                   </div>
 
                   {/* Right: active root details */}
-                  <div className="col allcats__right">
+                  <div className="col allcats__right" style={{ 
+                    maxHeight: '60vh', 
+                    overflowY: 'auto',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitScrollbar: { display: 'none' }
+                  }}>
                     {(() => {
                       const active = catTree.find((r) => r.id === activeRootId);
                       if (!active) return null;
@@ -350,7 +368,8 @@ export default function Nav() {
               'Нүүр будалт',
               'Үнэртэн',
               'Маск',
-              'Эмэгтэйчүүдийн бүтээгдэхүүн'
+              'Үс, хуйх эмчилгээ'
+              // 'Эмэгтэйчүүдийн бүтээгдэхүүн'
             ];
             
             return specificCategories.map((categoryName, index) => {

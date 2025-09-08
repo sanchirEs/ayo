@@ -59,10 +59,12 @@ export default function Header14() {
             {socialLinks.map((link, index) => (
               <li key={index}>
                 <a
+                
                   href={link.href}
                   className="footer__social-link d-flex align-items-center justify-content-center"
                   style={{
                     color: "white",
+                   
                     transition: "all 0.3s ease",
                   }}
                   onMouseEnter={(e) => {
@@ -91,7 +93,7 @@ export default function Header14() {
           </ul>
           <div
             className="heeader-top__right flex-1 d-flex gap-1 justify-content-end"
-            style={{ color: "white", fontSize: "0.9rem" }}
+            style={{ color: "white", fontSize: "0.8rem" }}
           >
             Хүргэлтийн ачааллаас хамааран онлайн захиалга 24-48 цагт хүргэгдэж
             байна.
@@ -186,7 +188,7 @@ export default function Header14() {
                 <div className="header-tools__item hover-container">
                   <Link
                     href="/login_register"
-                    className="menu-link menu-link_us-s d-flex align-items-center gap-2"
+                    className="menu-link d-flex align-items-center gap-2"
                     style={{
                       color: "var(--color-text)",
                       textDecoration: "none",
