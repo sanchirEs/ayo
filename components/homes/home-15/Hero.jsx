@@ -1,12 +1,40 @@
 "use client";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 import { slideData10 } from "@/data/heroslides";
 import { Autoplay, EffectFade, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 
+// Mobile banner data
+const bannerMobile = {
+  banner1: "/assets/images/bannerMobile/banner1.png",
+  banner2: "/assets/images/bannerMobile/banner2.png", 
+  banner3: "/assets/images/bannerMobile/banner3.png"
+};
+
 export default function Hero() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile banner data
+  const mobileBanners = [
+    { id: 1, bgImage: bannerMobile.banner1, title: "Natural Glow", description: "Beaux products protect, moisturize, and lubricate your skin." },
+    { id: 2, bgImage: bannerMobile.banner2, title: "Natural Glow", description: "Beaux products protect, moisturize, and lubricate your skin." },
+    { id: 3, bgImage: bannerMobile.banner3, title: "Natural Glow", description: "Beaux products protect, moisturize, and lubricate your skin." }
+  ];
+
   const swiperOptions = {
     autoplay: {
       delay: 5000,
@@ -21,21 +49,33 @@ export default function Hero() {
     effect: "fade",
     loop: true,
   };
+
+  const slidesData = isMobile ? mobileBanners : slideData10;
   return (
       <Swiper
         className="swiper-container js-swiper-slider slideshow type4 slideshow-navigation-white-sm swiper-container-fade swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events"
+        style={isMobile ? {
+          height: '70vh'
+        } : {}}
         {...swiperOptions}
       >
-        {slideData10.map((elm, i) => (
+        {slidesData.map((elm, i) => (
           <SwiperSlide key={i} className="swiper-slide">
             <div className="overflow-hidden position-relative h-100">
-              <div className="slideshow-bg">
+              <div className="slideshow-bg" style={isMobile ? {
+                height: '70vh'
+              } : {}}>
                 <Image
                   src={elm.bgImage}
                   width="1920"
                   height="800"
                   alt="Pattern"
                   className="slideshow-bg__img object-fit-cover"
+                  style={isMobile ? {
+                    objectFit: 'contain',
+                    height: '70vh',
+                    width: '100%'
+                  } : {}}
                   priority={i === 0}
                   loading={i === 0 ? undefined : "lazy"}
                   quality={100}

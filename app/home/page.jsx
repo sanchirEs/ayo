@@ -41,7 +41,7 @@ export default function HomePage15() {
           {/* <FeaturesSection /> */}
           
           {/* Categories Section - Онцлох ангиллууд */}
-          <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
+          <div className="mb-2 mb-md-4 mb-xl-5 pb-1 pb-md-3 pt-1 pt-md-2 pb-xl-5"></div>
           <Categories />
           
           {/* Flash Sale Section - Хямдралтай бараанууд */}
