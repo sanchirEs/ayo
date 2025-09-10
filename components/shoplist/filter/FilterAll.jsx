@@ -799,12 +799,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         <div className="accordion-item mb-4">
           <h5 className="accordion-header" id="accordion-heading-11">
             <button
-              className="accordion-button p-0 border-0 fs-5 text-uppercase"
+              className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
               onClick={() => toggleAccordion('categories')}
               aria-expanded={expandedAccordions.has('categories')}
             >
-              АНГИЛАЛ
+              БҮХ АНГИЛАЛ
               <svg 
                 className={`accordion-button__icon transition-transform ${expandedAccordions.has('categories') ? 'rotate-180' : ''}`} 
                 viewBox="0 0 14 14"
@@ -864,7 +864,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             <div className="accordion-item mb-4">
               <h5 className="accordion-header">
                 <button
-                  className="accordion-button p-0 border-0 fs-5 text-uppercase"
+                  className="accordion-button p-0 border-0 fs-6 text-uppercase"
                   type="button"
                   onClick={() => toggleAccordion(attributeId)}
                   aria-expanded={isExpanded}
@@ -970,7 +970,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             <div className="accordion-item mb-4">
               <h5 className="accordion-header">
                 <button
-                  className="accordion-button p-0 border-0 fs-5 text-uppercase"
+                  className="accordion-button p-0 border-0 fs-6 text-uppercase"
                   type="button"
                   onClick={() => toggleAccordion(specId)}
                   aria-expanded={isExpanded}
@@ -978,7 +978,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                   {spec.type || specKey}
                   <svg 
                     className={`accordion-button__icon transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                    viewBox="0 0 14 14"
+                    viewBox="0 0 1? 14"
                   >
                     <g aria-hidden="true" stroke="none" fillRule="evenodd">
                       <path
@@ -1024,9 +1024,9 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                                 toggleSpec(specKey, option.value);
                               }}
                               style={{
-                                width: '16px',
-                                height: '16px',
-                                marginRight: '8px',
+                                width: '18px',
+                                height: '18px',
+                                margin: '10px 10px 10px 0',
                                 accentColor: '#495D35',
                                 cursor: 'pointer'
                               }}
@@ -1067,7 +1067,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         <div className="accordion-item mb-4">
           <h5 className="accordion-header" id="accordion-heading-brand">
             <button
-              className="accordion-button p-0 border-0 fs-5 text-uppercase"
+              className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
               onClick={() => toggleAccordion('brands')}
               aria-expanded={expandedAccordions.has('brands')}
@@ -1118,31 +1118,53 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
               ) : filtersError ? (
                 <div className="text-danger small py-2">{filtersError}</div>
               ) : brandOptions.length > 0 ? (
-                <ul className="multi-select__list list-unstyled">
+                <div className="filter-options-list">
                   {brandOptions
                     .filter((brand) =>
                       brand.name.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                     .map((brand) => (
-                                             <li
-                         key={brand.id}
-                         onClick={(e) => {
-                           e.preventDefault();
-                           e.stopPropagation();
-                           toggleBrand(brand.id);
-                         }}
-                         className={`search-suggestion__item multi-select__item text-primary js-search-select js-multi-select ${
-                           activeBrands.includes(brand.id)
-                             ? "mult-select__item_selected"
-                             : ""
-                         }`}
-                         style={{ cursor: 'pointer' }}
-                       >
-                         <span className="me-auto">{brand.name}</span>
-                         <span className="text-muted small">({brand.count || 0})</span>
-                       </li>
+                      <div key={brand.id} className="filter-option-item d-flex align-items-center justify-content-between py-1">
+                        <div className="d-flex align-items-center">
+                          <input
+                            type="checkbox"
+                            id={`brand-${brand.id}`}
+                            checked={activeBrands.includes(brand.id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              toggleBrand(brand.id);
+                            }}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              margin: '10px 10px 10px 0',
+                              accentColor: '#495D35',
+                              cursor: 'pointer'
+                            }}
+                          />
+                          <label 
+                            htmlFor={`brand-${brand.id}`}
+                            style={{
+                              margin: 0,
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              color: '#333',
+                              fontWeight: '400'
+                            }}
+                          >
+                            {brand.name}
+                          </label>
+                        </div>
+                        <span style={{
+                          fontSize: '12px',
+                          color: '#999',
+                          fontWeight: '400'
+                        }}>
+                          {brand.count || 0}
+                        </span>
+                      </div>
                     ))}
-                </ul>
+                </div>
               ) : (
                 <div className="text-muted small py-2">Брэнд байхгүй</div>
               )}
@@ -1156,7 +1178,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         <div className="accordion-item mb-4">
           <h5 className="accordion-header mb-2" id="accordion-heading-price">
             <button
-              className="accordion-button p-0 border-0 fs-5 text-uppercase"
+              className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
               onClick={() => toggleAccordion('price')}
               aria-expanded={expandedAccordions.has('price')}
@@ -1260,7 +1282,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
            <div className="accordion-item mb-4">
              <h5 className="accordion-header">
                <button
-                 className="accordion-button p-0 border-0 fs-5 text-uppercase"
+                 className="accordion-button p-0 border-0 fs-6 text-uppercase"
                  type="button"
                  onClick={() => toggleAccordion('tags')}
                  aria-expanded={expandedAccordions.has('tags')}
@@ -1346,7 +1368,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
          <div className="accordion-item mb-4">
            <h5 className="accordion-header">
              <button
-               className="accordion-button p-0 border-0 fs-5 text-uppercase"
+               className="accordion-button p-0 border-0 fs-6 text-uppercase"
                type="button"
                onClick={() => toggleAccordion('advanced')}
                aria-expanded={expandedAccordions.has('advanced')}
