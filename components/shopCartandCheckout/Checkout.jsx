@@ -331,95 +331,53 @@ export default function Checkout() {
     };
   }, [statusCheckInterval]);
 
-  // Payment status monitoring
+  // Correct payment status monitoring as per SAGA documentation
   const startPaymentStatusMonitoring = (paymentId) => {
+    console.log('Starting payment status monitoring for:', paymentId);
+    
     let checkCount = 0;
-    const maxChecks = 12; // 1 minute (12 * 5 seconds)
+    const maxAttempts = 60; // 3 minutes with 3-second intervals (as per documentation)
     
     const interval = setInterval(async () => {
       try {
         checkCount++;
-        console.log(`Checking payment status for: ${paymentId} (attempt ${checkCount}/${maxChecks})`);
+        console.log(`Payment status check: ${paymentId} (attempt ${checkCount}/${maxAttempts})`);
         
-        // First try to check with provider (more accurate)
-        try {
-          const checkResponse = await api.payments.checkWithProvider(paymentId);
-          
-          if (checkResponse.success && checkResponse.data) {
-            const payment = checkResponse.data;
-            const newStatus = payment.status;
-            console.log('Provider payment status updated:', newStatus);
-            console.log('Payment data:', payment);
-            
-            // Update payment data with new status only if it actually changed
-            setPaymentData(prev => {
-              if (prev.status === newStatus) {
-                return prev; // Return same reference if status didn't change
-              }
-              return {
-              ...prev,
-              status: newStatus
-              };
-            });
-            
-            // If payment is completed, stop monitoring
-            if (newStatus === 'COMPLETED') {
-              clearInterval(interval);
-              setStatusCheckInterval(null);
-              setPaymentStatus('COMPLETED');
-              
-              // Show success message
-              alert('Төлбөр амжилттай төлөгдлөө!');
-              return;
-            } else if (newStatus === 'FAILED' || newStatus === 'CANCELLED') {
-              clearInterval(interval);
-              setStatusCheckInterval(null);
-              setPaymentStatus(newStatus);
-              return;
-            }
-          }
-        } catch (providerError) {
-          console.log('Provider check failed, trying local status check:', providerError.message);
-        }
-        
-        // Fallback to local status check
+        // Check payment status as per documentation
         const response = await api.payments.getStatus(paymentId);
         
         if (response.success && response.data) {
           const payment = response.data;
           const newStatus = payment.status;
-          console.log('Local payment status updated:', newStatus);
-          console.log('Payment data:', payment);
+          console.log('Payment status updated:', newStatus);
           
-          // Update payment data with new status only if it actually changed
-          setPaymentData(prev => {
-            if (prev.status === newStatus) {
-              return prev; // Return same reference if status didn't change
-            }
-            return {
+          // Update payment data
+          setPaymentData(prev => ({
             ...prev,
-            status: newStatus
-            };
-          });
+            status: newStatus,
+            ...(payment.transactionId && { transactionId: payment.transactionId }),
+            ...(payment.paymentUrl && { paymentUrl: payment.paymentUrl }),
+            ...(payment.qrCode && { qrCode: payment.qrCode, qrImage: payment.qrCode })
+          }));
           
-          // If payment is completed, stop monitoring
+          // Handle payment completion
           if (newStatus === 'COMPLETED') {
             clearInterval(interval);
             setStatusCheckInterval(null);
             setPaymentStatus('COMPLETED');
-            
-            // Show success message
-            alert('Төлбөр амжилттай төлөгдлөө!');
+            alert('Төлбөр амжилттай төлөгдлөө! Захиалга баталгаажлаа!');
+            return;
           } else if (newStatus === 'FAILED' || newStatus === 'CANCELLED') {
             clearInterval(interval);
             setStatusCheckInterval(null);
             setPaymentStatus(newStatus);
+            return;
           }
         }
         
         // Stop monitoring after max attempts
-        if (checkCount >= maxChecks) {
-          console.log('Max payment status checks reached, stopping monitoring');
+        if (checkCount >= maxAttempts) {
+          console.log('Payment status monitoring: max attempts reached');
           clearInterval(interval);
           setStatusCheckInterval(null);
         }
@@ -431,17 +389,53 @@ export default function Checkout() {
           console.log('Payment not found yet, continuing to monitor...');
         } else {
           // For other errors, stop monitoring after a few attempts
-          console.error('Payment status check failed, stopping monitoring');
-          clearInterval(interval);
-          setStatusCheckInterval(null);
+          if (checkCount >= 3) {
+            console.error('Payment status check failed, stopping monitoring');
+            clearInterval(interval);
+            setStatusCheckInterval(null);
+          }
         }
       }
-    }, 5000); // Check every 5 seconds
+    }, 3000); // Check every 3 seconds as per documentation
 
     setStatusCheckInterval(interval);
   };
 
-  // Function to handle order creation and payment
+  // Legacy SAGA progress tracking (kept for backward compatibility)
+  const startSagaProgressTracking = (sagaId) => {
+    console.log('Starting SAGA progress tracking for:', sagaId);
+    
+    // Track SAGA progress every 10 seconds for up to 5 minutes
+    const interval = setInterval(async () => {
+      try {
+        const sagaData = await api.utils.trackSagaProgress(sagaId, (progress) => {
+          console.log('SAGA Progress:', progress);
+          
+          // Only stop tracking on failure, not completion
+          if (progress.status === 'FAILED') {
+            console.log('SAGA failed:', progress);
+            clearInterval(interval);
+          }
+          // Don't stop on COMPLETED - SAGA completion doesn't mean payment is done
+        });
+        
+        if (!sagaData) {
+          clearInterval(interval);
+        }
+      } catch (error) {
+        console.error('SAGA progress tracking error:', error);
+        clearInterval(interval);
+      }
+    }, 10000); // Check every 10 seconds
+    
+    // Stop tracking after 5 minutes
+    setTimeout(() => {
+      clearInterval(interval);
+    }, 300000);
+  };
+
+
+  // Function to handle order creation and payment using Orders SAGA
   const handleOrderAndPayment = async () => {
     try {
       setIsProcessingPayment(true);
@@ -458,7 +452,7 @@ export default function Checkout() {
         return;
       }
 
-      // Prepare order data
+      // Prepare order data for SAGA pattern
       const orderData = {
         items: cartProducts.map(item => ({
           productId: item.id,
@@ -466,6 +460,8 @@ export default function Checkout() {
           ...(item.variantId && { variantId: item.variantId })
         })),
         provider: selectedPaymentMethod,
+        currency: 'MNT', // Default currency
+        ...(appliedCoupon && { couponCode: appliedCoupon.code }),
         shippingAddress: {
           addressLine1: formData.addressLine1,
           addressLine2: formData.addressLine2,
@@ -474,41 +470,68 @@ export default function Checkout() {
           country: formData.country,
           mobile: formData.phone
         },
-        ...(appliedCoupon && { couponCode: appliedCoupon.code })
+        paymentMetadata: {
+          description: `Захиалга #${Date.now()}`,
+          ...(selectedPaymentMethod === 'STOREPAY' && { mobileNumber: formData.phone })
+        }
       };
 
-      console.log('Creating order with payment:', orderData);
+      console.log('Creating order with SAGA pattern:', orderData);
 
-      // Create order with integrated payment
-      const response = await api.orders.createWithPayment(orderData);
+      // Check system health before creating order
+      try {
+        const healthCheck = await api.system.health(true);
+        if (!healthCheck.success || healthCheck.data?.status !== 'healthy') {
+          console.warn('System health check failed:', healthCheck);
+          // Continue anyway, but log the warning
+        }
+      } catch (healthError) {
+        console.warn('System health check error:', healthError);
+        // Continue anyway
+      }
+
+      // Generate unique identifiers for SAGA (for future use when backend supports custom headers)
+      const requestId = api.utils.generateRequestId();
+      const idempotencyKey = api.utils.generateIdempotencyKey();
+
+      // Create order using Orders SAGA pattern
+      // Note: Custom headers disabled by default to avoid CORS issues
+      const response = await api.orders.createWithSaga(orderData, {
+        idempotencyKey,
+        requestId,
+        deviceType: 'web',
+        source: 'web',
+        useCustomHeaders: false // Set to true when backend supports custom headers
+      });
       
       console.log('Order creation response:', response);
       console.log('Response data:', response.data);
       console.log('Payment data:', response.data?.payment);
-      console.log('QR Code in payment:', response.data?.payment?.qrCode);
-      console.log('QR Image in payment:', response.data?.payment?.qrImage);
-      console.log('Payment URL in payment:', response.data?.payment?.paymentUrl);
+      console.log('Order data:', response.data?.order);
       
       if (response.success) {
-        const { order, payment } = response.data;
-        console.log('Order created with payment:', { order, payment });
+        const { order, payment, sagaId } = response.data;
+        console.log('Order created successfully:', { order, payment, sagaId });
         
-        // Set payment data for modal
+        // Set payment data for modal (SAGA format)
         setPaymentData({
+          sagaId: sagaId,
           orderId: order.id,
           paymentId: payment.paymentId,
           paymentMethod: selectedPaymentMethod,
           amount: payment.amount,
           currency: payment.currency,
           status: payment.status,
-          qrImage: payment.qrCode, // Backend returns qrCode, not qrImage
+          qrImage: payment.qrCode, // SAGA returns qrCode
           qrCode: payment.qrCode,
           paymentUrl: payment.paymentUrl,
-          transactionId: payment.transactionId
+          transactionId: payment.transactionId,
+          expiresAt: payment.expiresAt
         });
         
         // Start monitoring payment status if it's pending
         if (payment.status === 'PENDING' && payment.paymentId) {
+          // Use correct payment status monitoring as per SAGA documentation
           startPaymentStatusMonitoring(payment.paymentId);
         }
         
@@ -521,11 +544,26 @@ export default function Checkout() {
     } catch (error) {
       console.error('Order creation error:', error);
       
-      // Handle specific payment provider errors
+      // Handle specific payment provider and SAGA errors
       let errorMessage = 'Захиалга үүсгэхэд алдаа гарлаа';
       
       if (error.message) {
-        if (error.message.includes('хамгийн бага дүнгийн шаардлага')) {
+        // SAGA-specific errors
+        if (error.message.includes('SAGA Execution Failed')) {
+          errorMessage = `Захиалгын системийн алдаа: ${error.message}. Дахин оролдоно уу.`;
+        } else if (error.message.includes('SAGA timeout')) {
+          errorMessage = `Захиалгын системийн цаг дууссан. Дахин оролдоно уу.`;
+        } else if (error.message.includes('Insufficient stock')) {
+          errorMessage = `Агуулахын алдаа: ${error.message}`;
+        } else if (error.message.includes('Provider Unavailable')) {
+          errorMessage = `Төлбөрийн системийн алдаа: ${error.message}. Өөр төлбөрийн арга сонгоно уу.`;
+        } else if (error.message.includes('Rate Limited')) {
+          errorMessage = `Хэт олон захиалга. Түр хүлээгээд дахин оролдоно уу.`;
+        } else if (error.message.includes('Validation failed')) {
+          errorMessage = `Мэдээлэл буруу: ${error.message}`;
+        } else if (error.message.includes('Authentication required')) {
+          errorMessage = `Нэвтрэх шаардлагатай. Дахин нэвтэрнэ үү.`;
+        } else if (error.message.includes('хамгийн бага дүнгийн шаардлага')) {
           errorMessage = `Төлбөрийн алдаа: ${error.message}`;
         } else if (error.message.includes('Pocket Zero')) {
           errorMessage = `Pocket төлбөрийн алдаа: ${error.message}`;
@@ -559,21 +597,26 @@ export default function Checkout() {
 
 
 
-  // Function to manually check payment status
+  // Manual status check as per SAGA documentation
   const handleManualStatusCheck = async () => {
     if (paymentData?.paymentId) {
       try {
-        // First try to check with provider
-        const checkResponse = await api.payments.checkWithProvider(paymentData.paymentId);
+        console.log('Manual status check for payment:', paymentData.paymentId);
         
-        if (checkResponse.success && checkResponse.data) {
-          const payment = checkResponse.data;
+        // Check payment status as per documentation
+        const response = await api.payments.getStatus(paymentData.paymentId);
+        
+        if (response.success && response.data) {
+          const payment = response.data;
           const newStatus = payment.status;
           
           // Update payment data with new status
           setPaymentData(prev => ({
             ...prev,
-            status: newStatus
+            status: newStatus,
+            ...(payment.transactionId && { transactionId: payment.transactionId }),
+            ...(payment.paymentUrl && { paymentUrl: payment.paymentUrl }),
+            ...(payment.qrCode && { qrCode: payment.qrCode, qrImage: payment.qrCode })
           }));
           
           // Show status message
@@ -586,59 +629,20 @@ export default function Checkout() {
           
           alert(`Төлбөрийн статус: ${statusText[newStatus] || newStatus}`);
           
-          // If payment is completed, stop monitoring
+          // If payment is completed, stop monitoring and redirect
           if (newStatus === 'COMPLETED') {
             if (statusCheckInterval) {
               clearInterval(statusCheckInterval);
               setStatusCheckInterval(null);
             }
             setPaymentStatus('COMPLETED');
-              
-              // Ask if user wants to go to orders page
-              if (confirm('Төлбөр амжилттай! Захиалга хуудас руу очих уу?')) {
-                router.push('/account_orders');
-              }
+            
+            if (confirm('Төлбөр амжилттай! Захиалга баталгаажлаа! Захиалга хуудас руу очих уу?')) {
+              router.push('/account_orders');
+            }
           }
         } else {
-          // Fallback to local status check
-          const response = await api.payments.getStatus(paymentData.paymentId);
-          
-          if (response.success && response.data) {
-            const payment = response.data;
-            const newStatus = payment.status;
-            
-            // Update payment data with new status
-            setPaymentData(prev => ({
-              ...prev,
-              status: newStatus
-            }));
-            
-            // Show status message
-            const statusText = {
-              'PENDING': 'Хүлээгдэж буй',
-              'COMPLETED': 'Амжилттай',
-              'FAILED': 'Амжилтгүй',
-              'CANCELLED': 'Цуцлагдсан'
-            };
-            
-            alert(`Төлбөрийн статус: ${statusText[newStatus] || newStatus}`);
-            
-            // If payment is completed, stop monitoring
-            if (newStatus === 'COMPLETED') {
-              if (statusCheckInterval) {
-                clearInterval(statusCheckInterval);
-                setStatusCheckInterval(null);
-              }
-              setPaymentStatus('COMPLETED');
-              
-              // Ask if user wants to go to orders page
-              if (confirm('Төлбөр амжилттай! Захиалга хуудас руу очих уу?')) {
-                router.push('/account_orders');
-              }
-            }
-          } else {
-            alert('Статус шалгахад алдаа гарлаа');
-          }
+          alert('Статус шалгахад алдаа гарлаа');
         }
       } catch (error) {
         console.error('Manual status check error:', error);
@@ -1565,7 +1569,7 @@ export default function Checkout() {
               <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
                 <h5 className="modal-title">
                   <i className="fas fa-credit-card me-2"></i>
-                  Төлбөр хийх
+                  Төлбөр хийх 
                 </h5>
                 <button
                   type="button"

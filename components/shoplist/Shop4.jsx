@@ -8,6 +8,7 @@ import { Navigation } from "swiper/modules";
 import { useParams } from "next/navigation";
 
 import { useContextElement } from "@/context/Context";
+import { useFilterContext } from "@/context/FilterContext";
 import { openModalShopFilter } from "@/utlis/aside";
 import { sortingOptions } from "@/data/products/productCategories";
 import FilterAll from "./filter/FilterAll";
@@ -74,6 +75,9 @@ export default function Shop4({
   const { toggleWishlist, isAddedtoWishlist } = useContextElement();
   const { setQuickViewItem } = useContextElement();
   const { addProductToCart, isAddedToCartProducts } = useContextElement();
+  
+  // Get current filters from FilterContext for active filters display
+  const { appliedFilters: contextFilters } = useFilterContext();
 
   const [selectedColView, setSelectedColView] = useState(4);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -94,8 +98,8 @@ export default function Shop4({
   const [isFilteringActive, setIsFilteringActive] = useState(false);
   const [lastFilterUpdate, setLastFilterUpdate] = useState(0);
   
-  // Use filters from parent component (ShopLayoutWrapper) or fallback to default
-  const filters = appliedFilters || {
+  // Use filters from context (most up-to-date) or fallback to props or default
+  const filters = contextFilters || appliedFilters || {
     brands: [], // Array of brand IDs
     priceMin: null,
     priceMax: null,
@@ -270,6 +274,7 @@ export default function Shop4({
         });
         if (attributeStrings.length > 0) {
           params.attributes = attributeStrings.join(',');
+          console.log('🔍 DEBUG: Attribute filters being sent:', params.attributes);
         }
       }
 
@@ -284,11 +289,13 @@ export default function Shop4({
               const cleanKey = key.replace(/::+/g, '').trim();
               const specString = `${cleanKey}:${value}`;
               specStrings.push(specString);
+              console.log('🔍 DEBUG: Spec filter being sent:', { originalKey: key, cleanKey, value, specString });
             });
           }
         });
         if (specStrings.length > 0) {
           params.specs = specStrings.join(',');
+          console.log('🔍 DEBUG: Final specs parameter:', params.specs);
         }
       }
 
@@ -315,6 +322,10 @@ export default function Shop4({
       }
 
 
+
+      // Debug: Log all parameters being sent to API
+      console.log('🔍 DEBUG: Complete API parameters:', params);
+      console.log('🔍 DEBUG: Current filters object:', filters);
 
       // Use new enhanced products API
       const res = await api.products.enhanced(params);
@@ -527,6 +538,79 @@ export default function Shop4({
 
   return (
     <div>
+      {/* Active Filter Tags Styles */}
+      <style jsx>{`
+        .active-filters-section {
+          // background-color: #f8f9fa;
+          padding: 12px 16px;
+          border-radius: 8px;
+          // border: 1px solid #e9ecef;
+        }
+        
+        .active-filter-tag {
+          display: inline-flex;
+          align-items: center;
+          background-color: #fff3cd;
+          border: 1px solid #ffeaa7;
+          border-radius: 20px;
+          padding: 4px 8px 4px 12px;
+          margin: 2px;
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        
+        .filter-label {
+          color: #333;
+          font-weight: 500;
+          margin-right: 4px;
+        }
+        
+        .filter-value {
+          color: #333;
+          font-weight: 400;
+          margin-right: 6px;
+        }
+        
+        .filter-remove-btn {
+          background: none;
+          border: none;
+          color: #333;
+          font-size: 16px;
+          font-weight: bold;
+          cursor: pointer;
+          padding: 0;
+          margin: 0;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: all 0.2s ease;
+        }
+        
+        .filter-remove-btn:hover {
+          background-color: #f8d7da;
+          color: #721c24;
+        }
+        
+        .clear-all-filters-btn {
+          background: none;
+          border: none;
+          color: #dc3545;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          padding: 4px 8px;
+          margin-left: 8px;
+          transition: all 0.2s ease;
+        }
+        
+        .clear-all-filters-btn:hover {
+          color: #a71e2a;
+          text-decoration: underline;
+        }
+      `}</style>
         
         <div className="d-flex justify-content-between mb-4 pb-md-2">
           <div className="breadcrumb mb-0 d-none d-md-block flex-grow-1">
@@ -712,7 +796,244 @@ export default function Shop4({
           </div>
         </div>
 
+        {/* ACTIVE FILTERS DISPLAY */}
+        {totalActiveFilters > 0 && (
+          <div className="active-filters-section mb-4">
+            <div className="d-flex flex-wrap align-items-center gap-2">
+              {/* Display active attribute filters */}
+              {Object.entries(filters.attributes || {}).map(([attrKey, values]) => {
+                if (!Array.isArray(values) || values.length === 0) return null;
+                return values.map((value, index) => (
+                  <div key={`${attrKey}-${value}-${index}`} className="active-filter-tag">
+                    <span className="filter-label">{attrKey}:</span>
+                    <span className="filter-value">{value}</span>
+                    <button
+                      className="filter-remove-btn"
+                      onClick={() => {
+                        if (onFiltersChange) {
+                          const newAttributes = { ...filters.attributes };
+                          newAttributes[attrKey] = newAttributes[attrKey].filter(v => v !== value);
+                          if (newAttributes[attrKey].length === 0) {
+                            delete newAttributes[attrKey];
+                          }
+                          onFiltersChange({
+                            ...filters,
+                            attributes: newAttributes,
+                            _meta: {
+                              ...filters._meta,
+                              lastUpdate: Date.now(),
+                              filterType: 'remove'
+                            }
+                          });
+                        }
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ));
+              })}
 
+              {/* Display active spec filters */}
+              {Object.entries(filters.specs || {}).map(([specKey, values]) => {
+                if (!Array.isArray(values) || values.length === 0) return null;
+                return values.map((value, index) => (
+                  <div key={`${specKey}-${value}-${index}`} className="active-filter-tag">
+                    <span className="filter-label">{specKey}:</span>
+                    <span className="filter-value">{value}</span>
+                    <button
+                      className="filter-remove-btn"
+                      onClick={() => {
+                        if (onFiltersChange) {
+                          const newSpecs = { ...filters.specs };
+                          newSpecs[specKey] = newSpecs[specKey].filter(v => v !== value);
+                          if (newSpecs[specKey].length === 0) {
+                            delete newSpecs[specKey];
+                          }
+                          onFiltersChange({
+                            ...filters,
+                            specs: newSpecs,
+                            _meta: {
+                              ...filters._meta,
+                              lastUpdate: Date.now(),
+                              filterType: 'remove'
+                            }
+                          });
+                        }
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ));
+              })}
+
+              {/* Display active brand filters */}
+              {filters.brands && filters.brands.length > 0 && (
+                <div className="active-filter-tag">
+                  <span className="filter-label">Брэнд:</span>
+                  <span className="filter-value">{filters.brands.join(', ')}</span>
+                  <button
+                    className="filter-remove-btn"
+                    onClick={() => {
+                      if (onFiltersChange) {
+                        onFiltersChange({
+                          ...filters,
+                          brands: [],
+                          _meta: {
+                            ...filters._meta,
+                            lastUpdate: Date.now(),
+                            filterType: 'remove'
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {/* Display active tag filters */}
+              {filters.tags && filters.tags.length > 0 && (
+                <div className="active-filter-tag">
+                  <span className="filter-label">Таг:</span>
+                  <span className="filter-value">{filters.tags.join(', ')}</span>
+                  <button
+                    className="filter-remove-btn"
+                    onClick={() => {
+                      if (onFiltersChange) {
+                        onFiltersChange({
+                          ...filters,
+                          tags: [],
+                          _meta: {
+                            ...filters._meta,
+                            lastUpdate: Date.now(),
+                            filterType: 'remove'
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {/* Display price range filter */}
+              {(filters.priceMin !== null || filters.priceMax !== null) && (
+                <div className="active-filter-tag">
+                  <span className="filter-label">Үнэ:</span>
+                  <span className="filter-value">
+                    {filters.priceMin !== null ? `₮${filters.priceMin.toLocaleString()}` : '₮0'} - {filters.priceMax !== null ? `₮${filters.priceMax.toLocaleString()}` : '∞'}
+                  </span>
+                  <button
+                    className="filter-remove-btn"
+                    onClick={() => {
+                      if (onFiltersChange) {
+                        onFiltersChange({
+                          ...filters,
+                          priceMin: null,
+                          priceMax: null,
+                          _meta: {
+                            ...filters._meta,
+                            lastUpdate: Date.now(),
+                            filterType: 'remove'
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {/* Display stock filter */}
+              {filters.inStock === false && (
+                <div className="active-filter-tag">
+                  <span className="filter-label">Нөөц:</span>
+                  <span className="filter-value">Бүх</span>
+                  <button
+                    className="filter-remove-btn"
+                    onClick={() => {
+                      if (onFiltersChange) {
+                        onFiltersChange({
+                          ...filters,
+                          inStock: true,
+                          _meta: {
+                            ...filters._meta,
+                            lastUpdate: Date.now(),
+                            filterType: 'remove'
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {/* Display discount filter */}
+              {filters.hasDiscount && (
+                <div className="active-filter-tag">
+                  <span className="filter-label">Хямдрал:</span>
+                  <span className="filter-value">Хямдралтай</span>
+                  <button
+                    className="filter-remove-btn"
+                    onClick={() => {
+                      if (onFiltersChange) {
+                        onFiltersChange({
+                          ...filters,
+                          hasDiscount: false,
+                          _meta: {
+                            ...filters._meta,
+                            lastUpdate: Date.now(),
+                            filterType: 'remove'
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {/* Clear All Button */}
+              <button
+                className="clear-all-filters-btn"
+                onClick={() => {
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      brands: [],
+                      priceMin: null,
+                      priceMax: null,
+                      attributes: {},
+                      specs: {},
+                      tags: [],
+                      inStock: true,
+                      hasDiscount: false,
+                      minRating: null,
+                      search: "",
+                      colors: [],
+                      sizes: [],
+                      price: [20, 70987],
+                      _meta: {
+                        totalActiveFilters: 0,
+                        lastUpdate: Date.now(),
+                        filterType: 'clear'
+                      }
+                    });
+                  }
+                }}
+              >
+                Цэвэрлэх
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* PRODUCTS GRID WITH SOPHISTICATED LOADING */}
         <div

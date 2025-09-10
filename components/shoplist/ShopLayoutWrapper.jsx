@@ -46,8 +46,11 @@ export default function ShopLayoutWrapper({
 
           <div className="pt-4 pt-lg-0"></div>
 
-          {/* FILTER COMPONENT - Pass the filter change handler */}
-          <FilterAll onFiltersChange={handleFiltersChange} />
+                 {/* FILTER COMPONENT - Pass the filter change handler and current filters */}
+                 <FilterAll 
+                   onFiltersChange={handleFiltersChange} 
+                   externalFilters={appliedFilters}
+                 />
         </div>
       )}
 

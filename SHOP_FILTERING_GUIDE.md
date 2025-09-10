@@ -328,3 +328,5 @@ localStorage.setItem('debug', 'true');
 5. **Clear filters**: Click "Clear All" button
 
 The system automatically handles all the complexity while providing a smooth, responsive filtering experience for your users.
+
+

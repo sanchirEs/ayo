@@ -26,7 +26,7 @@ function useDebounce(value, delay) {
   return debouncedValue;
 }
 
-export default function FilterAll({ onFiltersChange }) {
+export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   const params = useParams();
   const router = useRouter();
   const { setCurrentCategory } = useContextElement();
@@ -128,6 +128,41 @@ export default function FilterAll({ onFiltersChange }) {
   // Debounced values for smooth UX (only for continuous inputs)
   const debouncedSearch = useDebounce(searchQuery, 300); // 300ms delay for search
   const debouncedPrice = useDebounce(price, 500); // 500ms delay for price slider
+
+  // Sync external filter changes with local state
+  useEffect(() => {
+    if (externalFilters && externalFilters._meta && externalFilters._meta.filterType === 'remove') {
+      // Update local state to match external filter changes
+      if (externalFilters.brands !== undefined) {
+        setActiveBrands(externalFilters.brands || []);
+      }
+      if (externalFilters.attributes !== undefined) {
+        setActiveAttributes(externalFilters.attributes || {});
+      }
+      if (externalFilters.specs !== undefined) {
+        setActiveSpecs(externalFilters.specs || {});
+      }
+      if (externalFilters.tags !== undefined) {
+        setActiveTags(externalFilters.tags || []);
+      }
+      if (externalFilters.priceMin !== undefined || externalFilters.priceMax !== undefined) {
+        const newPrice = [
+          externalFilters.priceMin !== null ? externalFilters.priceMin : 20,
+          externalFilters.priceMax !== null ? externalFilters.priceMax : 70987
+        ];
+        setPrice(newPrice);
+      }
+      if (externalFilters.inStock !== undefined) {
+        setInStock(externalFilters.inStock);
+      }
+      if (externalFilters.hasDiscount !== undefined) {
+        setHasDiscount(externalFilters.hasDiscount);
+      }
+      if (externalFilters.search !== undefined) {
+        setSearchQuery(externalFilters.search || '');
+      }
+    }
+  }, [externalFilters]);
 
   // URL synchronization function
   const updateURL = useCallback((filters) => {
@@ -272,15 +307,27 @@ export default function FilterAll({ onFiltersChange }) {
         
         if (alive) {
           if (payload && payload.filters) {
+            // Clean spec keys to remove double colons from backend
+            const cleanedSpecs = {};
+            if (payload.filters.specs) {
+              Object.entries(payload.filters.specs).forEach(([key, specData]) => {
+                const cleanKey = key.replace(/::+/g, '').trim();
+                cleanedSpecs[cleanKey] = specData;
+              });
+            }
+            
             const newFilterOptions = {
               brands: payload.filters.brands || [],
               priceRanges: payload.filters.priceRanges || [],
               attributes: payload.filters.attributes || {},
-              specs: payload.filters.specs || {}, // Add specs support
+              specs: cleanedSpecs, // Use cleaned specs
               tags: payload.filters.tags || { simple: [], hierarchical: [] }
             };
             
             setFilterOptions(newFilterOptions);
+            
+            // Debug: Log filter options received from backend
+            console.log('🔍 DEBUG: Filter options received from backend:', newFilterOptions);
             
             // Auto-expand accordions for available filter types
             setExpandedAccordions(prev => {
@@ -576,9 +623,13 @@ export default function FilterAll({ onFiltersChange }) {
   // Filter functions
   // Toggle functions for DYNAMIC FILTER SYSTEM
   const toggleAttribute = (attributeKey, attributeValue) => {
+    console.log('🔍 DEBUG: Toggling attribute:', { attributeKey, attributeValue });
+    
     setActiveAttributes((prev) => {
       const currentValues = prev[attributeKey] || [];
       const isRemoving = currentValues.includes(attributeValue);
+      
+      console.log('🔍 DEBUG: Current values:', currentValues, 'Is removing:', isRemoving);
       
       let newState;
       if (isRemoving) {
@@ -596,6 +647,7 @@ export default function FilterAll({ onFiltersChange }) {
         newState = { ...prev, [attributeKey]: [...currentValues, attributeValue] };
       }
       
+      console.log('🔍 DEBUG: New attribute state:', newState);
       return newState;
     });
   };
@@ -604,19 +656,26 @@ export default function FilterAll({ onFiltersChange }) {
     // Clean the spec key to remove double colons that come from backend
     const cleanSpecKey = specKey.replace(/::+/g, '').trim();
     
+    console.log('🔍 DEBUG: Toggling spec:', { originalSpecKey: specKey, cleanSpecKey, specValue });
+    
     setActiveSpecs((prev) => {
       const currentValues = prev[cleanSpecKey] || [];
+      console.log('🔍 DEBUG: Current spec values:', currentValues);
+      
       if (currentValues.includes(specValue)) {
         // Remove value
         const newValues = currentValues.filter(v => v !== specValue);
         if (newValues.length === 0) {
           // Remove the entire spec key if no values left
           const { [cleanSpecKey]: removed, ...rest } = prev;
+          console.log('🔍 DEBUG: Removing spec key completely:', cleanSpecKey);
           return rest;
         }
+        console.log('🔍 DEBUG: Removing spec value:', specValue, 'from', cleanSpecKey);
         return { ...prev, [cleanSpecKey]: newValues };
       } else {
         // Add value
+        console.log('🔍 DEBUG: Adding spec value:', specValue, 'to', cleanSpecKey);
         return { ...prev, [cleanSpecKey]: [...currentValues, specValue] };
       }
     });
@@ -846,42 +905,48 @@ export default function FilterAll({ onFiltersChange }) {
                   ) : filtersError ? (
                     <div className="text-danger small py-2">{filtersError}</div>
                   ) : attribute.options?.length > 0 ? (
-                    <div className="d-flex flex-wrap">
-                      <div className="mb-2 w-100">
-                        <div className="d-flex flex-wrap">
-                                                     {attribute.options.map((option, index) => (
-                             <button
-                               key={option.id || index}
-                               onClick={(e) => {
-                                 e.preventDefault();
-                                 e.stopPropagation();
-                                 toggleAttribute(attributeKey, option.value);
-                               }}
-                               className={`btn btn-sm mb-2 me-2 js-filter`}
-                               style={{
-                                 border: '1px solid #495D35',
-                                 color: currentValues.includes(option.value) ? 'white' : '#495D35',
-                                 backgroundColor: currentValues.includes(option.value) ? '#495D35' : 'transparent',
-                                 transition: 'all 0.3s ease'
-                               }}
-                               onMouseEnter={(e) => {
-                                 if (!currentValues.includes(option.value)) {
-                                   e.target.style.backgroundColor = '#495D35';
-                                   e.target.style.color = 'white';
-                                 }
-                               }}
-                               onMouseLeave={(e) => {
-                                 if (!currentValues.includes(option.value)) {
-                                   e.target.style.backgroundColor = 'transparent';
-                                   e.target.style.color = '#495D35';
-                                 }
-                               }}
-                             >
-                               {option.value} {option.count ? `(${option.count})` : ''}
-                             </button>
-                           ))}
+                    <div className="filter-options-list">
+                      {attribute.options.map((option, index) => (
+                        <div key={option.id || index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
+                          <div className="d-flex align-items-center">
+                            <input
+                              type="checkbox"
+                              id={`${attributeKey}-${option.id || index}`}
+                              checked={currentValues.includes(option.value)}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                toggleAttribute(attributeKey, option.value);
+                              }}
+                              style={{
+                                width: '16px',
+                                height: '16px',
+                                marginRight: '8px',
+                                accentColor: '#495D35',
+                                cursor: 'pointer'
+                              }}
+                            />
+                            <label 
+                              htmlFor={`${attributeKey}-${option.id || index}`}
+                              style={{
+                                margin: 0,
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                color: '#333',
+                                fontWeight: '400'
+                              }}
+                            >
+                              {option.value}
+                            </label>
+                          </div>
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#999',
+                            fontWeight: '400'
+                          }}>
+                            {option.count || 0}
+                          </span>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   ) : (
                     <div className="text-muted small py-2">{attribute.name || attributeKey} байхгүй</div>
@@ -946,38 +1011,48 @@ export default function FilterAll({ onFiltersChange }) {
                   ) : filtersError ? (
                     <div className="text-danger small py-2">{filtersError}</div>
                   ) : spec.values?.length > 0 ? (
-                    <div className="d-flex flex-wrap">
-                      <div className="mb-2 w-100">
-                        <div className="d-flex flex-wrap">
-                          {spec.values.map((option, index) => (
-                            <button
-                              key={index}
-                              onClick={() => toggleSpec(specKey, option.value)}
-                              className={`btn btn-sm mb-2 me-2 js-filter`}
+                    <div className="filter-options-list">
+                      {spec.values.map((option, index) => (
+                        <div key={index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
+                          <div className="d-flex align-items-center">
+                            <input
+                              type="checkbox"
+                              id={`${specKey}-${index}`}
+                              checked={currentValues.includes(option.value)}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                toggleSpec(specKey, option.value);
+                              }}
                               style={{
-                                border: '1px solid #495D35',
-                                color: currentValues.includes(option.value) ? 'white' : '#495D35',
-                                backgroundColor: currentValues.includes(option.value) ? '#495D35' : 'transparent',
-                                transition: 'all 0.3s ease'
+                                width: '16px',
+                                height: '16px',
+                                marginRight: '8px',
+                                accentColor: '#495D35',
+                                cursor: 'pointer'
                               }}
-                              onMouseEnter={(e) => {
-                                if (!currentValues.includes(option.value)) {
-                                  e.target.style.backgroundColor = '#495D35';
-                                  e.target.style.color = 'white';
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!currentValues.includes(option.value)) {
-                                  e.target.style.backgroundColor = 'transparent';
-                                  e.target.style.color = '#495D35';
-                                }
+                            />
+                            <label 
+                              htmlFor={`${specKey}-${index}`}
+                              style={{
+                                margin: 0,
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                color: '#333',
+                                fontWeight: '400'
                               }}
                             >
-                              {option.value} {option.count ? `(${option.count})` : ''}
-                            </button>
-                          ))}
+                              {option.value}
+                            </label>
+                          </div>
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#999',
+                            fontWeight: '400'
+                          }}>
+                            {option.count || 0}
+                          </span>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   ) : (
                     <div className="text-muted small py-2">{spec.type || specKey} байхгүй</div>
@@ -1217,33 +1292,47 @@ export default function FilterAll({ onFiltersChange }) {
                }}
              >
                <div className="accordion-body px-0 pb-0">
-                 <div className="d-flex flex-wrap">
+                 <div className="filter-options-list">
                    {tagOptions.map((tag, index) => (
-                     <button
-                       key={tag.id || index}
-                       onClick={() => toggleTag(tag.value || tag.name || tag.tag || tag)}
-                       className={`btn btn-sm mb-2 me-2 js-filter`}
-                       style={{
-                         border: '1px solid #495D35',
-                         color: activeTags.includes(tag.value || tag.name || tag.tag || tag) ? 'white' : '#495D35',
-                         backgroundColor: activeTags.includes(tag.value || tag.name || tag.tag || tag) ? '#495D35' : 'transparent',
-                         transition: 'all 0.3s ease'
-                       }}
-                       onMouseEnter={(e) => {
-                         if (!activeTags.includes(tag.value || tag.name || tag.tag || tag)) {
-                           e.target.style.backgroundColor = '#495D35';
-                           e.target.style.color = 'white';
-                         }
-                       }}
-                       onMouseLeave={(e) => {
-                         if (!activeTags.includes(tag.value || tag.name || tag.tag || tag)) {
-                           e.target.style.backgroundColor = 'transparent';
-                           e.target.style.color = '#495D35';
-                         }
-                       }}
-                     >
-                       {tag.name || tag.value || tag.tag || tag} {tag.count ? `(${tag.count})` : ''}
-                     </button>
+                     <div key={tag.id || index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
+                       <div className="d-flex align-items-center">
+                         <input
+                           type="checkbox"
+                           id={`tag-${tag.id || index}`}
+                           checked={activeTags.includes(tag.value || tag.name || tag.tag || tag)}
+                           onChange={(e) => {
+                             e.stopPropagation();
+                             toggleTag(tag.value || tag.name || tag.tag || tag);
+                           }}
+                           style={{
+                             width: '16px',
+                             height: '16px',
+                             marginRight: '8px',
+                             accentColor: '#495D35',
+                             cursor: 'pointer'
+                           }}
+                         />
+                         <label 
+                           htmlFor={`tag-${tag.id || index}`}
+                           style={{
+                             margin: 0,
+                             cursor: 'pointer',
+                             fontSize: '14px',
+                             color: '#333',
+                             fontWeight: '400'
+                           }}
+                         >
+                           {tag.name || tag.value || tag.tag || tag}
+                         </label>
+                       </div>
+                       <span style={{
+                         fontSize: '12px',
+                         color: '#999',
+                         fontWeight: '400'
+                       }}>
+                         {tag.count || 0}
+                       </span>
+                     </div>
                    ))}
                  </div>
                </div>
