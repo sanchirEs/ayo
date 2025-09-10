@@ -235,6 +235,11 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   
   // Accordion states (DYNAMIC BASED ON AVAILABLE FILTERS)
   const [expandedAccordions, setExpandedAccordions] = useState(new Set(['categories', 'brands', 'price']));
+  
+  // Debug expandedAccordions state
+  useEffect(() => {
+    console.log('🔍 DEBUG: expandedAccordions changed:', Array.from(expandedAccordions));
+  }, [expandedAccordions]);
 
   // Load category tree from backend
   useEffect(() => {
@@ -550,6 +555,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   // Render category recursively
   const renderCategory = (category, level = 0) => {
     const isExpanded = expandedCategories.has(category.id);
+    console.log('🔍 DEBUG: isExpanded:', isExpanded);
     const isActive = isCategoryActive(category);
     const hasChildren = category.children && category.children.length > 0;
     const paddingLeft = level * 16; // 16px per level
@@ -579,7 +585,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
-                strokeWidth="2"
+                strokeWidth="1.5"
                 className={`me-2 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
               >
                 <path d="M9 18l6-6-6-6"/>
@@ -623,32 +629,24 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   // Filter functions
   // Toggle functions for DYNAMIC FILTER SYSTEM
   const toggleAttribute = (attributeKey, attributeValue) => {
-    console.log('🔍 DEBUG: Toggling attribute:', { attributeKey, attributeValue });
-    
     setActiveAttributes((prev) => {
       const currentValues = prev[attributeKey] || [];
       const isRemoving = currentValues.includes(attributeValue);
       
-      console.log('🔍 DEBUG: Current values:', currentValues, 'Is removing:', isRemoving);
-      
-      let newState;
       if (isRemoving) {
         // Remove value
         const newValues = currentValues.filter(v => v !== attributeValue);
         if (newValues.length === 0) {
           // Remove the entire attribute key if no values left
           const { [attributeKey]: removed, ...rest } = prev;
-          newState = rest;
+          return rest;
         } else {
-          newState = { ...prev, [attributeKey]: newValues };
+          return { ...prev, [attributeKey]: newValues };
         }
       } else {
         // Add value
-        newState = { ...prev, [attributeKey]: [...currentValues, attributeValue] };
+        return { ...prev, [attributeKey]: [...currentValues, attributeValue] };
       }
-      
-      console.log('🔍 DEBUG: New attribute state:', newState);
-      return newState;
     });
   };
 
@@ -656,11 +654,8 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
     // Clean the spec key to remove double colons that come from backend
     const cleanSpecKey = specKey.replace(/::+/g, '').trim();
     
-    console.log('🔍 DEBUG: Toggling spec:', { originalSpecKey: specKey, cleanSpecKey, specValue });
-    
     setActiveSpecs((prev) => {
       const currentValues = prev[cleanSpecKey] || [];
-      console.log('🔍 DEBUG: Current spec values:', currentValues);
       
       if (currentValues.includes(specValue)) {
         // Remove value
@@ -668,14 +663,11 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         if (newValues.length === 0) {
           // Remove the entire spec key if no values left
           const { [cleanSpecKey]: removed, ...rest } = prev;
-          console.log('🔍 DEBUG: Removing spec key completely:', cleanSpecKey);
           return rest;
         }
-        console.log('🔍 DEBUG: Removing spec value:', specValue, 'from', cleanSpecKey);
         return { ...prev, [cleanSpecKey]: newValues };
       } else {
         // Add value
-        console.log('🔍 DEBUG: Adding spec value:', specValue, 'to', cleanSpecKey);
         return { ...prev, [cleanSpecKey]: [...currentValues, specValue] };
       }
     });
@@ -751,12 +743,16 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
 
   // Toggle accordion
   const toggleAccordion = (accordionId) => {
+    console.log('🔍 DEBUG: toggleAccordion called with:', accordionId);
     setExpandedAccordions(prev => {
       const newSet = new Set(prev);
+      console.log('🔍 DEBUG: Current expandedAccordions:', Array.from(prev));
       if (newSet.has(accordionId)) {
         newSet.delete(accordionId);
+        console.log('🔍 DEBUG: Removed', accordionId, 'New set:', Array.from(newSet));
       } else {
         newSet.add(accordionId);
+        console.log('🔍 DEBUG: Added', accordionId, 'New set:', Array.from(newSet));
       }
       return newSet;
     });
@@ -801,24 +797,28 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             <button
               className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
-              onClick={() => toggleAccordion('categories')}
+              onClick={() => {
+                console.log('🔍 DEBUG: Categories button clicked!');
+                toggleAccordion('categories');
+              }}
               aria-expanded={expandedAccordions.has('categories')}
             >
               БҮХ АНГИЛАЛ
               <svg 
-                className={`accordion-button__icon transition-transform ${expandedAccordions.has('categories') ? 'rotate-180' : ''}`} 
-                viewBox="0 0 14 14"
+                width="18" 
+                height="18" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="1.5"
+                 className={`transition-transform duration-200 ${expandedAccordions.has('categories') ? 'rotate-180' : ''}`}
+                 data-debug={`categories expanded: ${expandedAccordions.has('categories')}`}
+                style={{ 
+                  color: '#495D35',
+                  marginLeft: 'auto'
+                }}
               >
-                <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                  <path
-                    className="svg-path-vertical"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                  <path
-                    className="svg-path-horizontal"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                </g>
+                <path d="M6 9l6 6 6-6"/>
               </svg>
             </button>
           </h5>
@@ -871,19 +871,19 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 >
                   {attribute.name || attributeKey}
                   <svg 
-                    className={`accordion-button__icon transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                    viewBox="0 0 14 14"
+                    width="18" 
+                    height="18" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="1.5"
+                     className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    style={{ 
+                      color: '#495D35',
+                      marginLeft: 'auto'
+                    }}
                   >
-                    <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                      <path
-                        className="svg-path-vertical"
-                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                      />
-                      <path
-                        className="svg-path-horizontal"
-                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                      />
-                    </g>
+                    <path d="M6 9l6 6 6-6"/>
                   </svg>
                 </button>
               </h5>
@@ -977,19 +977,19 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 >
                   {spec.type || specKey}
                   <svg 
-                    className={`accordion-button__icon transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                    viewBox="0 0 1? 14"
+                    width="18" 
+                    height="18"  
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="1.5"
+                     className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    style={{ 
+                      color: '#495D35',
+                      marginLeft: 'auto'
+                    }}
                   >
-                    <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                      <path
-                        className="svg-path-vertical"
-                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                      />
-                      <path
-                        className="svg-path-horizontal"
-                        d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                      />
-                    </g>
+                    <path d="M6 9l6 6 6-6"/>
                   </svg>
                 </button>
               </h5>
@@ -1069,24 +1069,27 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             <button
               className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
-              onClick={() => toggleAccordion('brands')}
+              onClick={() => {
+                console.log('🔍 DEBUG: Brands button clicked!');
+                toggleAccordion('brands');
+              }}
               aria-expanded={expandedAccordions.has('brands')}
             >
               Brands
               <svg 
-                className={`accordion-button__icon transition-transform ${expandedAccordions.has('brands') ? 'rotate-180' : ''}`} 
-                viewBox="0 0 14 14"
+                width="18" 
+                height="18" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="1.5"
+                 className={`transition-transform duration-200 ${expandedAccordions.has('brands') ? 'rotate-180' : ''}`}
+                style={{ 
+                  color: '#495D35',
+                  marginLeft: 'auto'
+                }}
               >
-                <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                  <path
-                    className="svg-path-vertical"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                  <path
-                    className="svg-path-horizontal"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                </g>
+                <path d="M6 9l6 6 6-6"/>
               </svg>
             </button>
           </h5>
@@ -1185,19 +1188,19 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             >
               Price
               <svg 
-                className={`accordion-button__icon transition-transform ${expandedAccordions.has('price') ? 'rotate-180' : ''}`} 
-                viewBox="0 0 14 14"
+                width="18" 
+                height="18" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="1.5"
+                 className={`transition-transform duration-200 ${expandedAccordions.has('price') ? 'rotate-180' : ''}`}
+                style={{ 
+                  color: '#495D35',
+                  marginLeft: 'auto'
+                }}
               >
-                <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                  <path
-                    className="svg-path-vertical"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                  <path
-                    className="svg-path-horizontal"
-                    d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                  />
-                </g>
+                <path d="M6 9l6 6 6-6"/>
               </svg>
             </button>
           </h5>
@@ -1289,19 +1292,19 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                >
                  🏷️ TAGS
                  <svg 
-                   className={`accordion-button__icon transition-transform ${expandedAccordions.has('tags') ? 'rotate-180' : ''}`} 
-                   viewBox="0 0 14 14"
+                   width="18" 
+                   height="18" 
+                   viewBox="0 0 24 24" 
+                   fill="none" 
+                   stroke="currentColor" 
+                   strokeWidth="1.5"
+                    className={`transition-transform duration-200 ${expandedAccordions.has('tags') ? 'rotate-180' : ''}`}
+                   style={{ 
+                    color: '#495D35',
+                     marginLeft: 'auto'
+                   }}
                  >
-                   <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                     <path
-                       className="svg-path-vertical"
-                       d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                     />
-                     <path
-                       className="svg-path-horizontal"
-                       d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                     />
-                   </g>
+                   <path d="M6 9l6 6 6-6"/>
                  </svg>
                </button>
              </h5>
@@ -1375,19 +1378,19 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
              >
                ⚙️ НЭМЭЛТ ШҮҮЛТҮҮР
                <svg 
-                 className={`accordion-button__icon transition-transform ${expandedAccordions.has('advanced') ? 'rotate-180' : ''}`} 
-                 viewBox="0 0 14 14"
+                 width="18" 
+                 height="18" 
+                 viewBox="0 0 24 24" 
+                 fill="none" 
+                 stroke="currentColor" 
+                 strokeWidth="1.5"
+                 className={`transition-transform duration-200 ${expandedAccordions.has('advanced') ? 'rotate-180' : ''}`}
+                 style={{ 
+                  color: '#495D35',
+                   marginLeft: 'auto'
+                 }}
                >
-                 <g aria-hidden="true" stroke="none" fillRule="evenodd">
-                   <path
-                     className="svg-path-vertical"
-                     d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                   />
-                   <path
-                     className="svg-path-horizontal"
-                     d="M14,6 L14,8 L0,8 L0,6 L14,6"
-                   />
-                 </g>
+                 <path d="M6 9l6 6 6-6"/>
                </svg>
              </button>
            </h5>

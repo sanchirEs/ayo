@@ -284,18 +284,15 @@ export default function Shop4({
         Object.entries(filters.specs).forEach(([key, values]) => {
           if (Array.isArray(values) && values.length > 0) {
             values.forEach(value => {
-              // Backend expects format: key:value (single colon, not double)
-              // Clean up the key to remove any existing double colons (anywhere in the key)
-              const cleanKey = key.replace(/::+/g, '').trim();
-              const specString = `${cleanKey}:${value}`;
+              // Backend expects format: key:value (single colon)
+              // Don't clean the key - keep it as is from backend
+              const specString = `${key}:${value}`;
               specStrings.push(specString);
-              console.log('🔍 DEBUG: Spec filter being sent:', { originalKey: key, cleanKey, value, specString });
             });
           }
         });
         if (specStrings.length > 0) {
           params.specs = specStrings.join(',');
-          console.log('🔍 DEBUG: Final specs parameter:', params.specs);
         }
       }
 
@@ -323,10 +320,6 @@ export default function Shop4({
 
 
 
-      // Debug: Log all parameters being sent to API
-      console.log('🔍 DEBUG: Complete API parameters:', params);
-      console.log('🔍 DEBUG: Current filters object:', filters);
-
       // Use new enhanced products API
       const res = await api.products.enhanced(params);
 
@@ -341,6 +334,7 @@ export default function Shop4({
         hasNext: false,
         hasPrev: false
       };
+      
 
       // Map pagination fields to match current structure
       const mappedPagination = {
