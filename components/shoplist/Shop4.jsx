@@ -12,6 +12,7 @@ import { useFilterContext } from "@/context/FilterContext";
 import { openModalShopFilter } from "@/utlis/aside";
 import { sortingOptions } from "@/data/products/productCategories";
 import FilterAll from "./filter/FilterAll";
+import MobileFilterFooter from "./MobileFilterFooter";
 import BreadCumb from "./BreadCumb";
 import Star from "../common/Star";
 import ColorSelection from "../common/ColorSelection";
@@ -618,14 +619,20 @@ export default function Shop4({
                 {/* <h4 className="mb-0 text-primary">
                   {categoryLoading ? "Ачаалж байна..." : categoryName}
                 </h4> */}
-                <small className="text-muted">
-                  {pagination.total} бүтээгдэхүүн
-                </small>
+                 {pagination.total > 0 ? (
+                   <small className="text-muted">
+                     {pagination.total} бүтээгдэхүүн олдлоо
+                   </small>
+                 ) : (
+                   <small className="text-muted">
+                     {/* Бүтээгдэхүүн олдсонгүй */}
+                   </small>
+                 )}
               </div>
             )}
 
             {/* Clear All Filters Button */}
-            {totalActiveFilters > 0 && (
+            {/* {totalActiveFilters > 0 && (
               <div className="clear-filters-btn me-3 order-0 order-md-1">
                 <button
                   className="btn btn-sm"
@@ -672,10 +679,10 @@ export default function Shop4({
                   🗑️ Clear All ({totalActiveFilters})
                 </button>
               </div>
-            )}
+            )} */}
 
             {/* Sort - Clickable dropdown */}
-            <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
+            {/* <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
               <button
                 className="btn btn-link text-decoration-none p-0"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -757,7 +764,7 @@ export default function Shop4({
               ))}
                 </div>
               )}
-            </div>
+            </div> */}
 
             <div className="shop-asc__seprator mx-3 bg-light d-none d-md-block order-md-0" />
 
@@ -776,7 +783,7 @@ export default function Shop4({
             </div>
 
             {/* Mobile filter open */}
-            <div className="shop-filter d-flex align-items-center order-0 order-md-3 d-lg-none">
+            {/* <div className="shop-filter d-flex align-items-center order-0 order-md-3 d-lg-none">
               <button
                 className="btn-link btn-link_f d-flex align-items-center ps-0 js-open-aside"
                 onClick={openModalShopFilter}
@@ -786,13 +793,13 @@ export default function Shop4({
                 </svg>
                 <span className="text-uppercase fw-medium d-inline-block align-middle">Filter</span>
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
 
-        {/* ACTIVE FILTERS DISPLAY */}
+        {/* ACTIVE FILTERS DISPLAY - Web only */}
         {totalActiveFilters > 0 && (
-          <div className="active-filters-section mb-4">
+          <div className="active-filters-section mb-4 d-none d-md-block">
             <div className="d-flex flex-wrap align-items-center gap-2">
               {/* Display active attribute filters */}
               {Object.entries(filters.attributes || {}).map(([attrKey, values]) => {
@@ -1248,7 +1255,14 @@ export default function Shop4({
             Next
           </button>
         </div> */}
+        {/* Mobile Filter Footer */}
+      <MobileFilterFooter 
+        currentSort={sort}
+        onSortChange={setSort}
+        totalActiveFilters={totalActiveFilters}
+      />
       </div>
-  
+
+
   );
 }
