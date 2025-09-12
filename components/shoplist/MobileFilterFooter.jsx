@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { sortingOptions } from "@/data/products/productCategories";
 import { openModalShopFilter } from "@/utlis/aside";
 
@@ -10,6 +10,25 @@ export default function MobileFilterFooter({
   totalActiveFilters = 0 
 }) {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  // Add CSS for hiding scrollbar
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .hide-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;  /* Chrome, Safari and Opera */
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <div className="mobile-filter-footer d-lg-none">
@@ -136,17 +155,26 @@ export default function MobileFilterFooter({
 
           {/* Sort Dropdown */}
           {showSortDropdown && (
-            <div 
-              className="position-absolute bottom-100 start-0 end-0 mb-2 bg-white border rounded shadow-lg"
-              style={{ 
-                zIndex: 1001,
-                maxHeight: '200px',
-                overflowY: 'auto',
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-              }}
-            >
+            <div
+            className="position-fixed bg-white border rounded hide-scrollbar"
+            style={{
+              zIndex: 1001,
+              maxHeight: '300px',
+              overflowY: 'auto',
+              border: '1px solid #e0e0e0',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              padding: '8px 5px',
+              width: 'calc(100% - 40px)', // хоёр талаас нь 20px орчим сул
+              left: '20px',
+              right: '20px',
+              bottom: '70px',
+              margin: '0',
+              scrollbarWidth: 'none', // Firefox
+              msOverflowStyle: 'none' // IE/Edge
+            }}
+          >
+         
               {sortingOptions.map((option, index) => (
                 <button
                   key={index}
@@ -157,13 +185,14 @@ export default function MobileFilterFooter({
                   }}
                   style={{ 
                     border: 'none',
-                    borderBottom: index < sortingOptions.length - 1 ? '1px solid #f8f9fa' : 'none',
-                    padding: '12px 16px',
+                    borderBottom: index < sortingOptions.length - 1 ? '1px solid #f0f0f0' : 'none',
+                    padding: '12px 20px',
                     fontSize: '14px',
-                    color: currentSort === option.value ? '#495D35' : '#6c757d',
-                    backgroundColor: currentSort === option.value ? '#f8f9fa' : 'transparent',
-                    fontWeight: currentSort === option.value ? '600' : '400',
-                    transition: 'all 0.2s ease'
+                    color: currentSort === option.value ? '#333' : '#666',
+                    backgroundColor: 'transparent',
+                    fontWeight: currentSort === option.value ? '500' : '400',
+                    transition: 'all 0.2s ease',
+                    position: 'relative'
                   }}
                   onMouseEnter={(e) => {
                     if (currentSort !== option.value) {
@@ -176,7 +205,23 @@ export default function MobileFilterFooter({
                     }
                   }}
                 >
-                  {option.label}
+                  {currentSort === option.value && (
+                    <span 
+                      style={{
+                        position: 'absolute',
+                        left: '8px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '6px',
+                        height: '6px',
+                        backgroundColor: '#dc3545',
+                        borderRadius: '50%'
+                      }}
+                    />
+                  )}
+                  <span style={{ marginLeft: currentSort === option.value ? '12px' : '0' }}>
+                    {option.label}
+                  </span>
                 </button>
               ))}
             </div>
