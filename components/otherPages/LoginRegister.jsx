@@ -169,9 +169,9 @@ export default function LoginRegister() {
                     Намайг сана
                   </label>
                 </div>
-                <Link href="#" className="btn-text ms-auto">
+                {/* <Link href="#" className="btn-text ms-auto">
                   Нууц үг мартсан?
-                </Link>
+                </Link> */}
               </div>
 
               {loginErr && (
