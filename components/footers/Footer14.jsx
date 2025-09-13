@@ -14,82 +14,7 @@ import {
 export default function Footer14() {
   return (
     <footer className="footer footer_type_1 dark" style={{backgroundColor: "#495D35"}}>
-      <div className="footer-top container py-0">
-        <div className="service-promotion horizontal container">
-          <div className="row">
-            <div className="col-md-4 mb-5 mb-md-0 d-flex align-items-center justify-content-center gap-3">
-              <div className="service-promotion__icon">
-                <svg
-                  width="52"
-                  height="52"
-                  viewBox="0 0 52 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <use href="#icon_shipping" />
-                </svg>
-              </div>
-              <div className="service-promotion__content-wrap">
-                <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  Хурдан Шуурхай Хүргэлт
-                </h3>
-                <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Бид таны захиалгыг 0-оос 48 цагийн дотор хүргэнэ.
-                </p>
-              </div>
-            </div>
-            {/* <!-- /.col-md-4 text-center--> */}
-
-            <div className="col-md-4 mb-5 mb-md-0 d-flex align-items-center justify-content-center gap-3">
-              <div className="service-promotion__icon">
-                <svg
-                  width="53"
-                  height="52"
-                  viewBox="0 0 53 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <use href="#icon_headphone" />
-                </svg>
-              </div>
-              <div className="service-promotion__content-wrap">
-                <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  24/7 Үйлчилгээ
-                </h3>
-                <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Та хүссэн цагтаа хүссэн бүтээгдэхүүнээ захиалаарай.
-                </p>
-              </div>
-            </div>
-            {/* <!-- /.col-md-4 text-center--> */}
-
-            <div className="col-md-4 mb-5 mb-md-0 d-flex align-items-center justify-content-center gap-3">
-              <div className="service-promotion__icon">
-                <svg
-                  width="52"
-                  height="52"
-                  viewBox="0 0 52 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <use href="#icon_shield" />
-                </svg>
-              </div>
-              <div className="service-promotion__content-wrap">
-                <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  Тав тухтай үйлчилгээ
-                </h3>
-                <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Хямд үнэ, өргөн сонголт
-                </p>
-              </div>
-            </div>
-            {/* <!-- /.col-md-4 text-center--> */}
-          </div>
-          {/* <!-- /.row --> */}
-        </div>
-        {/* <!-- /.service-promotion container --> */}
-      </div>
+    
       {/* <!-- /.footer-top container --> */}
 
       <div className="footer-middle container">
@@ -98,9 +23,9 @@ export default function Footer14() {
             <div className="logo">
               <Link href="/">
                 <Image
-                  src="/assets/images/logo-white-cosmetics.png"
-                  width={112}
-                  height={28}
+                  src="/assets/images/logoAyo.png"
+                  width={120}
+                  height={60}
                   alt="Ayo"
                   className="logo__image d-block"
                 />
@@ -143,48 +68,74 @@ export default function Footer14() {
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Компани</h6>
+            <h6 className="sub-menu__title text-uppercase">ТАНИЛЦУУЛГА</h6>
             <ul className="sub-menu__list list-unstyled">
-              {footerLinks1.map((elm, i) => (
-                <li key={i} className="sub-menu__item">
-                  <Link href={elm.href} className="menu-link menu-link_us-s">
-                    {elm.text}
-                  </Link>
-                </li>
-              ))}
+              <li className="sub-menu__item">
+                <Link href="/about" className="menu-link menu-link_us-s">
+                  Бидний тухай
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/careers" className="menu-link menu-link_us-s">
+                  Ажлын анкет
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/delivery" className="menu-link menu-link_us-s">
+                  Хүргэлт
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/gift-cards" className="menu-link menu-link_us-s">
+                  Бэлгийн карт
+                </Link>
+              </li>
             </ul>
           </div>
           {/* <!-- /.footer-column --> */}
 
-          <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Дэлгүүр</h6>
-            <ul className="sub-menu__list list-unstyled">
-              {footerLinks2.map((elm, i) => (
-                <li key={i} className="sub-menu__item">
-                  <Link href={elm.href} className="menu-link menu-link_us-s">
-                    {elm.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+      
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
             <h6 className="sub-menu__title text-uppercase">Тусламж</h6>
             <ul className="sub-menu__list list-unstyled">
-              {footerLinks3.map((elm, i) => (
-                <li key={i} className="sub-menu__item">
-                  <Link href={elm.href} className="menu-link menu-link_us-s">
-                    {elm.text}
-                  </Link>
-                </li>
-              ))}
+              <li className="sub-menu__item">
+                <Link href="/privacy" className="menu-link menu-link_us-s">
+                  Нууцлал
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/faq" className="menu-link menu-link_us-s">
+                  Түгээмэл асуулт, хариулт
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/terms" className="menu-link menu-link_us-s">
+                  Үйлчилгээний нөхцөл
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/return-policy" className="menu-link menu-link_us-s">
+                  Бараа буцаалтын журам
+                </Link>
+              </li>
             </ul>
           </div>
           {/* <!-- /.footer-column --> */}
 
-          <div className="footer-column footer-newsletter col-12 mb-4 mb-lg-0">
+          <div className="footer-column footer-menu mb-4 mb-lg-0">
+            <h6 className="sub-menu__title text-uppercase">САЛБАРЫН БАЙРШИЛ</h6>
+            <ul className="sub-menu__list list-unstyled">
+              <li className="sub-menu__item">
+                <Link href="/store-location" className="menu-link menu-link_us-s">
+                  Салбарын байршил харах
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* <div className="footer-column footer-newsletter col-12 mb-4 mb-lg-0">
             <h6 className="sub-menu__title text-uppercase">Бүртгүүлэх</h6>
             <p>
               Хямдрал, урамшуулал болон бусад шинэ мэдээллийг хамгийн түрүүнд аваарай!
@@ -205,7 +156,7 @@ export default function Footer14() {
                 defaultValue="НЭГДЭХ"
               />
             </form>
-          </div>
+          </div> */}
           {/* <!-- /.footer-column --> */}
         </div>
         {/* <!-- /.row-cols-5 --> */}
