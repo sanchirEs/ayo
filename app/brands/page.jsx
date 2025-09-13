@@ -39,7 +39,7 @@ export default function BrandsPage() {
               </div>
 
               {/* Brand Name (right side) */}
-              <h6 className="fw-medium mb-0">{brand.name ?? "no name"}</h6>
+              <h6 className="fw-medium mb-0">{brand.name ?? ""}</h6>
             </Link>
           </div>
         ))}
