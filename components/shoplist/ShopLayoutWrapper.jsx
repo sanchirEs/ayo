@@ -13,7 +13,7 @@ import { useFilterContext } from "@/context/FilterContext";
 export default function ShopLayoutWrapper({ 
   categoryId = null,
   initialPage = 1,
-  initialLimit = 12,
+  initialLimit = 20,
   initialSort = "newest",
   initialFilters = null,
   showSidebar = true,
