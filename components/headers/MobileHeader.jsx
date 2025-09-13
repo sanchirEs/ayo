@@ -8,6 +8,10 @@ import CartLength from "./components/CartLength";
 import { openCart } from "@/utlis/openCart";
 import MobileNav from "./components/MobileNav";
 import Image from "next/image";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import User from "./components/User";
+import { openModalUserlogin } from "@/utlis/aside";
 
 export default function MobileHeader() {
   const [scrollDirection, setScrollDirection] = useState("down");
@@ -98,7 +102,7 @@ export default function MobileHeader() {
       </div>
       {/* <!-- /.container --> */}
 
-      <nav className="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto" >
+      <nav className="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto" style={{ display: 'none' }}>
         <div className="container" style={{ backgroundColor: "#F4F7F5" }}>
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -152,6 +156,8 @@ export default function MobileHeader() {
         {/* <!-- /.container --> */}
 
         <div className="border-top mt-auto pb-2">
+          </div>
+        {/* <div className="border-top mt-auto pb-2">
           <div className="customer-links container mt-4 mb-2 pb-1">
             <svg
               className="d-inline-block align-middle"
@@ -227,7 +233,7 @@ export default function MobileHeader() {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
       </nav>
       {/* <!-- /.navigation --> */}
     </div>

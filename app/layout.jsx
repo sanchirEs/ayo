@@ -30,9 +30,11 @@ import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
 import Footer1 from "@/components/footers/Footer14";
 import { useShopRoute } from "@/hooks/useShopRoute";
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({ children }) {
-  const { isShopRoute, isProductRoute, isCartRoute } = useShopRoute();
+  const { isShopRoute, isProductRoute, isCartRoute, isCheckoutRoute, isDashboardRoute } = useShopRoute();
+  const pathname = usePathname();
   
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -164,12 +166,9 @@ export default function RootLayout({ children }) {
             <HeaderWrapper />
           </div>
             {children}
-            {!isShopRoute && !isProductRoute && !isCartRoute && (
-              <>
-                <Footer1 />
-                <MobileFooter1 />
-              </>
-            )}
+            <div className="d-none d-lg-block"><Footer1 /></div>
+            {pathname === '/' && <div className="d-lg-none"><Footer1 /></div>}
+            {!isCartRoute && !isCheckoutRoute && <MobileFooter1 />}
           </main>
         
           {/* //modals and asides */}

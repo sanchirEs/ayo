@@ -2,11 +2,14 @@ import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import MobileDashboardSidebar from "@/components/otherPages/MobileDashboardSidebar";
+import { useAuth } from "@/context/AuthContext";
+import { openModalUserlogin } from "@/utlis/aside";
 
 export default function MobileFooter1() {
   const [showFooter, setShowFooter] = useState(false);
   const [showDashboardSidebar, setShowDashboardSidebar] = useState(false);
   const { wishList } = useContextElement();
+  const { user } = useAuth();
   
   useEffect(() => {
     setShowFooter(true);
@@ -14,7 +17,21 @@ export default function MobileFooter1() {
 
   const handleProfileClick = (e) => {
     e.preventDefault();
-    setShowDashboardSidebar(true);
+    if (user) {
+      // Нэвтэрсэн үед dashboard sidebar нээх
+      setShowDashboardSidebar(true);
+    } else {
+      // Нэвтрээгүй үед login modal нээх
+      openModalUserlogin();
+    }
+  };
+
+  const handleWishlistClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      openModalUserlogin();
+    }
+    // Хэрэв user байвал ердийн байдлаар wishlist хуудас руу шилжинэ
   };
 
   const closeDashboardSidebar = () => {
@@ -79,6 +96,7 @@ export default function MobileFooter1() {
           <Link
             href="/account_wishlist"
             className="footer-mobile__link d-flex flex-column align-items-center"
+            onClick={handleWishlistClick}
           >
             <div className="position-relative">
               <svg

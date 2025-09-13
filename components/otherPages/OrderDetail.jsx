@@ -440,7 +440,7 @@ export default function OrderDetail({ orderId }) {
                   <tr>
                     <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Бүтээгдэхүүн</th>
                     <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Үнэ</th>
-                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Тоо ширхэг</th>
+                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Тоо</th>
                     <th className="text-end" style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Нийт</th>
                   </tr>
                 </thead>
