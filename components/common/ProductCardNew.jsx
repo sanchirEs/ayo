@@ -89,7 +89,7 @@ export default function ProductCardNew({ product, imageWidth = 330, imageHeight 
         </div> */}
 
         {/* Add to cart button stays at bottom */}
-        <button
+        {/* <button
             className="pc__atc btn btn-primary btn-lg anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside left-0 w-100 bottom-0 btn-50 text-white d-flex align-items-center justify-content-center gap-2"
             onClick={addToCart}
             title={isInCart ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
@@ -100,7 +100,7 @@ export default function ProductCardNew({ product, imageWidth = 330, imageHeight 
             <span>
                 {isInCart ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
             </span>
-        </button>
+        </button> */}
       </div>
 
       <div className="pc__info position-relative text-rigth">
