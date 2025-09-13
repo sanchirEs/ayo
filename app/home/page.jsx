@@ -36,12 +36,16 @@ export default function HomePage15() {
           <div className="hero-banner-container">
             <Hero />
           </div>
+
+          {/* Brands Section - Брэндүүд */}
+          <div className="mb-2 mb-xl-3 pb-3 pt-2 "></div>
+          <Brands />
           
           {/* Features Section - Онцлох үйлчилгээ */}
           {/* <FeaturesSection /> */}
           
           {/* Categories Section - Онцлох ангиллууд */}
-          <div className="mb-2 mb-md-4 mb-xl-5 pb-1 pb-md-3 pt-1 pt-md-2 pb-xl-5"></div>
+          <div className="mb-2 mb-md-4 pb-1 pb-md-3 pt-1 pt-md-2"></div>
           <Categories />
           
           {/* Flash Sale Section - Хямдралтай бараанууд */}
@@ -51,16 +55,13 @@ export default function HomePage15() {
           {/* Featured Products - Шинэ бараанууд */}
           <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
           <Featured />
-          
        
           {/* Brand Product Section - Converse брэнд */}
           <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
           <div className="banner-container">
             <BrandProduct />
           </div>
-          
-
-          
+                    
           {/* Popular Products - Тренд бараанууд */}
           <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
           <PopulerProducts />
@@ -70,9 +71,6 @@ export default function HomePage15() {
             <PaymentMethod />
           </div>
 
-          
-          
-          
           {/* Discounted Products - Хямдралтай бараанууд */}
           {/* <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div> */}
           <ConditionalDiscountedProducts />
@@ -88,13 +86,8 @@ export default function HomePage15() {
           
           {/* Brands Section - Брэндүүд */}
           <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
-          <Brands />
-
-
-         
+          <Brands />  
           
-        
-    
           <div className="mb-4 mb-xl-5 pb-3 pt-2 pb-xl-5"></div>
         </main>
       </div>
