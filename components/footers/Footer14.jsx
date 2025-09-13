@@ -71,7 +71,7 @@ export default function Footer14() {
             <h6 className="sub-menu__title text-uppercase">ТАНИЛЦУУЛГА</h6>
             <ul className="sub-menu__list list-unstyled">
               <li className="sub-menu__item">
-                <Link href="/about" className="menu-link menu-link_us-s">
+                <Link href="#" className="menu-link menu-link_us-s">
                   Бидний тухай
                 </Link>
               </li>
@@ -81,12 +81,12 @@ export default function Footer14() {
                 </Link>
               </li>
               <li className="sub-menu__item">
-                <Link href="/delivery" className="menu-link menu-link_us-s">
+                <Link href="#" className="menu-link menu-link_us-s">
                   Хүргэлт
                 </Link>
               </li>
               <li className="sub-menu__item">
-                <Link href="/gift-cards" className="menu-link menu-link_us-s">
+                <Link href="#" className="menu-link menu-link_us-s">
                   Бэлгийн карт
                 </Link>
               </li>
@@ -101,17 +101,17 @@ export default function Footer14() {
             <h6 className="sub-menu__title text-uppercase">Тусламж</h6>
             <ul className="sub-menu__list list-unstyled">
               <li className="sub-menu__item">
-                <Link href="/privacy" className="menu-link menu-link_us-s">
+                <Link href="#" className="menu-link menu-link_us-s">
                   Нууцлал
                 </Link>
               </li>
               <li className="sub-menu__item">
-                <Link href="/faq" className="menu-link menu-link_us-s">
+                <Link href="#" className="menu-link menu-link_us-s">
                   Түгээмэл асуулт, хариулт
                 </Link>
               </li>
               <li className="sub-menu__item">
-                <Link href="/terms" className="menu-link menu-link_us-s">
+                <Link href="#" className="menu-link menu-link_us-s">
                   Үйлчилгээний нөхцөл
                 </Link>
               </li>
