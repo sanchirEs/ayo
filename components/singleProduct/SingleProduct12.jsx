@@ -155,6 +155,20 @@ export default function SingleProduct12({ product }) {
           </div>
 
           <h1 className="product-single__name">{product?.name}</h1>
+          
+          {/* Product SKU and Category */}
+          <div className="product-single__meta mb-2">
+            <small className="text-muted">
+              {product?.category?.name && (
+                <span className="me-3">
+                  <strong>{product.category.name}</strong>
+                </span>
+              )}
+              {product?.sku && (
+                <span>#{product.sku}</span>
+              )}
+            </small>
+          </div>
 
           <div className="product-single__rating">
             <div className="reviews-group d-flex">
@@ -519,7 +533,7 @@ export default function SingleProduct12({ product }) {
             <ShareComponent title={product?.name || "Product"} />
           </div>
 
-          <div className="product-single__meta-info">
+          {/* <div className="product-single__meta-info">
             <div className="meta-item">
               <label>SKU:</label>
               <span>{product?.sku || "N/A"}</span>
@@ -532,7 +546,7 @@ export default function SingleProduct12({ product }) {
               <label>Tags:</label>
               <span>{(product?.tags || []).map((t) => t.tag).join(", ") || "—"}</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
