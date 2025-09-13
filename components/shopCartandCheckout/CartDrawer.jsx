@@ -189,9 +189,12 @@ const setQuantity = async (id, q) => {
               </Link>
             </>
           ) : (
-            <Link href="/shop-1" className="btn btn-light mt-3 d-block">
-              Дэлгүүрээ үзэх
-            </Link>
+            <button 
+              onClick={closeCart} 
+              className="btn btn-light mt-3 d-block w-100"
+            >
+              Буцах
+            </button>
           )}
         </div>
       </div>

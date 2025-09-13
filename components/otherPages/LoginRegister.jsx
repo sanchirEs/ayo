@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   // ---- Login form state ----
   const [identifier, setIdentifier] = useState("");
@@ -26,6 +26,31 @@ export default function LoginRegister() {
       setRedirectUrl(decodeURIComponent(redirect));
     }
   }, [searchParams]);
+
+  // Нэвтэрсэн хэрэглэгч login хуудас руу оролдвол home руу redirect
+  useEffect(() => {
+    if (user) {
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push('/');
+      }
+    }
+  }, [user, redirectUrl, router]);
+
+  // Loading state - нэвтэрсэн хэрэглэгч redirect хийх хүртэл
+  if (user) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3 text-secondary">Уучлаарай, та аль хэдийн нэвтэрсэн байна...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import api from "@/lib/api";
 
 export default function CustomerLogin() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -79,6 +79,13 @@ export default function CustomerLogin() {
     setShowRegister(false);
     setError("");
   };
+
+  // Нэвтэрсэн хэрэглэгч modal нээхэд хаах
+  useEffect(() => {
+    if (user) {
+      closeModalUserlogin();
+    }
+  }, [user]);
 
   return (
     <div
