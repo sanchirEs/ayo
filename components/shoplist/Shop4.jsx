@@ -682,7 +682,7 @@ export default function Shop4({
             )} */}
 
             {/* Sort - Clickable dropdown */}
-            <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
+            <div className="shop-acs__select w-auto border-0 py-0 order-1 order-md-0 position-relative d-none d-lg-block">
               <button
                 className="btn btn-link text-decoration-none p-0"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}

@@ -51,7 +51,7 @@ export default function ShopFilter() {
           <button
             className="btn btn-outline-secondary flex-fill"
             style={{
-              border: '1px solid #6c757d',
+              border: '1px solid #495D35',
               color: '#6c757d',
               backgroundColor: 'white',
               padding: '12px 24px',
@@ -69,7 +69,7 @@ export default function ShopFilter() {
           <button
             className="btn btn-dark flex-fill"
             style={{
-              backgroundColor: '#212529',
+              backgroundColor: '#495D35',
               color: 'white',
               padding: '12px 24px',
               borderRadius: '6px',
