@@ -61,6 +61,7 @@ import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import pako from "pako";
 import QRCode from "qrcode";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function Checkout() {
   const { cartProducts, totalPrice, clearCart } = useContextElement();
@@ -104,209 +105,134 @@ export default function Checkout() {
     userId: session?.user?.userId
   });
 
-  // QR Code Display Component
+  // QR Code Display Component - Simple and efficient without state
   const QRCodeDisplay = ({ qrData, paymentMethod }) => {
-    const [qrImageSrc, setQrImageSrc] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
-    const processedRef = useRef(null);
-    const generatedRef = useRef(false);
+    // Process QR data synchronously without state
+    const processQRData = (data) => {
+      if (!data) return null;
 
-    // Memoize qrData to prevent unnecessary re-renders
-    const memoizedQrData = useMemo(() => qrData, [qrData]);
-
-    // Process QR data only once
-    useEffect(() => {
-      if (!memoizedQrData || processedRef.current === memoizedQrData) {
-        return;
+      // If it's already a data URL or external URL, return as is
+      if (data.startsWith('data:') || data.startsWith('http')) {
+        return data;
       }
 
-      processedRef.current = memoizedQrData;
-      generatedRef.current = false;
-
-      const processQRData = async () => {
+      // If it's GZIP compressed base64
+      if (data.startsWith('H4sI')) {
         try {
-          setIsLoading(true);
-          setError('');
-
-          let processedData = memoizedQrData;
-
-          // If it's already a data URL or external URL
-          if (qrData.startsWith('data:') || qrData.startsWith('http')) {
-            setQrImageSrc(qrData);
-            setIsLoading(false);
-            return;
+          console.log('Processing GZIP compressed QR data:', data.substring(0, 50) + '...');
+          
+          // Convert base64 to binary
+          const binary = atob(data);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
           }
 
-          // If it's GZIP compressed base64
-          if (qrData.startsWith('H4sI')) {
-            try {
-              console.log('Processing GZIP compressed QR data:', qrData.substring(0, 50) + '...');
-              
-              // Convert base64 to binary
-              const binary = atob(qrData);
-              const bytes = new Uint8Array(binary.length);
-              for (let i = 0; i < binary.length; i++) {
-                bytes[i] = binary.charCodeAt(i);
-              }
+          // Decompress using pako
+          const decompressed = pako.inflate(bytes);
+          const processedData = String.fromCharCode.apply(null, decompressed);
 
-              console.log('Binary length:', binary.length);
-
-              // Decompress using pako
-              const decompressed = pako.inflate(bytes);
-              processedData = String.fromCharCode.apply(null, decompressed);
-
-              console.log('Decompressed string length:', processedData.length);
-              console.log('Decompressed string:', processedData.substring(0, 100) + '...');
-
-              // Generate QR code image from the decoded text
-              try {
-                const qrDataUrl = await QRCode.toDataURL(processedData, {
-                  width: 250,
-                  margin: 2,
-                  color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                  }
-                });
-
-                console.log('Successfully generated QR code image from GZIP data');
-                setQrImageSrc(qrDataUrl);
-                setIsLoading(false);
-                return;
-              } catch (qrError) {
-                console.error('Failed to generate QR code image:', qrError);
-                // Fallback: show the text
-                setQrImageSrc(processedData);
-                setIsLoading(false);
-                return;
-              }
-            } catch (err) {
-              console.error('Failed to process GZIP QR data:', err);
-              setError('QR код уншихад алдаа гарлаа');
-              setIsLoading(false);
-              return;
-            }
-          }
-
-          // Generate QR code image
-          if (processedData.length > 1000 && /^[A-Za-z0-9+/=]+$/.test(processedData)) {
-            // This looks like a base64 image, convert to data URL
-            const qrDataUrl = `data:image/png;base64,${processedData}`;
-            setQrImageSrc(qrDataUrl);
-          } else if (processedData.length < 200) {
-            // Short text, try to generate QR code
-            try {
-              const qrDataUrl = await QRCode.toDataURL(processedData, {
-                width: 250,
-                margin: 2,
-                color: {
-                  dark: '#000000',
-                  light: '#FFFFFF'
-                }
-              });
-              setQrImageSrc(qrDataUrl);
-            } catch (err) {
-              console.error('Failed to generate QR code image from text:', err);
-              // Fallback: show the text
-              setQrImageSrc(processedData);
-            }
-          } else {
-            // Long text, show as text (don't try to generate QR code)
-            setQrImageSrc(processedData);
-          }
-
-          generatedRef.current = true;
+          console.log('Decompressed string length:', processedData.length);
+          return processedData;
         } catch (err) {
-          console.error('QR code processing error:', err);
-          setError('QR код уншихад алдаа гарлаа');
-        } finally {
-          setIsLoading(false);
+          console.error('Failed to process GZIP QR data:', err);
+          return data; // Return original data as fallback
         }
-      };
+      }
 
-      processQRData();
-    }, [memoizedQrData]);
+      // Return data as is for other cases
+      return data;
+    };
 
-    if (isLoading) {
+    const processedData = processQRData(qrData);
+
+    if (!processedData) {
       return (
-        <div className="text-center py-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">QR код үүсгэж байна...</span>
-          </div>
-          <div className="mt-2 text-muted">QR код үүсгэж байна...</div>
+        <div className="alert alert-warning">
+          <i className="fas fa-info-circle me-2"></i>
+          QR код үүсгэх боломжгүй байна
         </div>
       );
     }
 
-    if (error) {
+    // If it's a data URL, show as image
+    if (processedData.startsWith('data:image')) {
       return (
-        <div className="alert alert-danger">
-          <i className="fas fa-exclamation-triangle me-2"></i>
-          {error}
-        </div>
+        <img 
+          src={processedData}
+          alt="QR Code" 
+          style={{ 
+            maxWidth: '250px', 
+            height: 'auto', 
+            border: '2px solid #dee2e6',
+            borderRadius: '8px',
+            padding: '10px'
+          }}
+        />
       );
     }
 
-    if (qrImageSrc) {
-      // If it's a data URL, show as image
-      if (qrImageSrc.startsWith('data:image')) {
-        return (
-          <img 
-            src={qrImageSrc}
-            alt="QR Code" 
+    // If it's a base64 image, convert to data URL
+    if (processedData.length > 1000 && /^[A-Za-z0-9+/=]+$/.test(processedData)) {
+      const qrDataUrl = `data:image/png;base64,${processedData}`;
+      return (
+        <img 
+          src={qrDataUrl}
+          alt="QR Code" 
+          style={{ 
+            maxWidth: '250px', 
+            height: 'auto', 
+            border: '2px solid #dee2e6',
+            borderRadius: '8px',
+            padding: '10px'
+          }}
+        />
+      );
+    }
+
+    // For text data, use QRCodeSVG component (no state needed)
+    if (processedData.length < 200) {
+      return (
+        <div style={{ textAlign: 'center' }}>
+          <QRCodeSVG
+            value={processedData}
+            size={250}
             style={{ 
-              maxWidth: '250px', 
-              height: 'auto', 
               border: '2px solid #dee2e6',
               borderRadius: '8px',
               padding: '10px'
             }}
-            onLoad={(e) => {
-              // console.log('QR code image loaded successfully');
-            }}
-            onError={(e) => {
-              console.error('QR code image failed to load');
-              setError('QR код харагдахгүй байна');
-            }}
           />
-        );
-      }
-
-      // If it's QR code text, show with instructions
-      return (
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          border: '2px dashed #dee2e6',
-          borderRadius: '8px',
-          margin: '10px 0'
-        }}>
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-            <strong>QR Кодын текст:</strong>
-          </div>
-          <div style={{
-            fontFamily: 'monospace',
-            fontSize: '12px',
-            wordBreak: 'break-all',
-            backgroundColor: 'white',
-            padding: '10px',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px'
-          }}>
-            {qrImageSrc}
-          </div>
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
-            Энэ нь QR кодын текст юм. Та үүнийг QR код үүсгэгч апп-аар уншуулж болно.
-          </div>
         </div>
       );
     }
 
+    // For long text, show as text with instructions
     return (
-      <div className="alert alert-warning">
-        <i className="fas fa-info-circle me-2"></i>
-        QR код үүсгэх боломжгүй байна
+      <div style={{
+        padding: '20px',
+        backgroundColor: '#f8f9fa',
+        border: '2px dashed #dee2e6',
+        borderRadius: '8px',
+        margin: '10px 0'
+      }}>
+        <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+          <strong>QR Кодын текст:</strong>
+        </div>
+        <div style={{
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          wordBreak: 'break-all',
+          backgroundColor: 'white',
+          padding: '10px',
+          border: '1px solid #dee2e6',
+          borderRadius: '4px'
+        }}>
+          {processedData}
+        </div>
+        <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+          Энэ нь QR кодын текст юм. Та үүнийг QR код үүсгэгч апп-аар уншуулж болно.
+        </div>
       </div>
     );
   };
@@ -1610,7 +1536,7 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                {/* QR Code Section */}
+                {/* QR Code Section - Only show once when payment data is available */}
                 {(paymentData.qrImage || paymentData.qrCode) && (
                   <div className="text-center">
                     <h6 className="mb-2">
