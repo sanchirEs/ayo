@@ -2,9 +2,16 @@
 
 import { closeModalUserlogin } from "@/utlis/aside";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CustomerLogin() {
+  const { login } = useAuth();
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     const pageOverlay = document.getElementById("pageOverlay");
 
@@ -14,6 +21,22 @@ export default function CustomerLogin() {
       pageOverlay.removeEventListener("click", closeModalUserlogin);
     };
   }, []);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    
+    try {
+      await login({ identifier, password });
+      // Амжилттай нэвтэрсэн бол modal хаах
+      closeModalUserlogin();
+    } catch (err) {
+      setError(err.message || "Нэвтрэхэд алдаа гарлаа.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -29,13 +52,16 @@ export default function CustomerLogin() {
               className="btn-close-lg js-close-aside ms-auto"
             />
           </div>
-          <form onSubmit={(e) => e.preventDefault()} className="aside-content">
+          <form onSubmit={handleLogin} className="aside-content">
             <div className="form-floating mb-3">
               <input
-                name="email"
-                type="email"
+                name="identifier"
+                type="text"
                 className="form-control form-control_gray"
-                placeholder="name@example.com"
+                placeholder="Username or email address"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
               />
               <label>Username or email address *</label>
             </div>
@@ -47,6 +73,9 @@ export default function CustomerLogin() {
                 className="form-control form-control_gray"
                 type="password"
                 placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <div className="d-flex align-items-center mb-3 pb-2">
@@ -65,11 +94,19 @@ export default function CustomerLogin() {
                 Lost password?
               </Link>
             </div>
+            
+            {error && (
+              <div className="alert alert-danger mb-3" role="alert">
+                {error}
+              </div>
+            )}
+            
             <button
               className="btn btn-primary w-100 text-uppercase"
               type="submit"
+              disabled={loading}
             >
-              Log In
+              {loading ? "Logging in..." : "Log In"}
             </button>
             <div className="customer-option mt-4 text-center">
               <span className="text-secondary">No account yet?</span>{" "}
