@@ -38,7 +38,7 @@ function mapSortToBackend(value) {
     case "popular":
       return "popular";
     case "oldest":
-      return "newest"; // No specific "oldest" in new API, use newest
+      return "oldest";
     case "newest":
     default:
       return "newest";
@@ -55,7 +55,7 @@ function mapSortToBackend(value) {
 export default function Shop4({
   categoryId: propCategoryId = null,
   initialPage = 1,
-  initialLimit = 12,
+  initialLimit = 20,
   initialSort = "newest",
   appliedFilters = null, // Filters from ShopLayoutWrapper
   onFiltersChange = null, // Filter change handler from ShopLayoutWrapper
@@ -682,7 +682,7 @@ export default function Shop4({
             )} */}
 
             {/* Sort - Clickable dropdown */}
-            {/* <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
+            <div className="shop-acs__select  w-auto border-0 py-0 order-1 order-md-0 position-relative">
               <button
                 className="btn btn-link text-decoration-none p-0"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -693,7 +693,7 @@ export default function Shop4({
                   fontWeight: '500',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  // gap: '8px',
                   // padding: '8px 12px',
                   border: '1px solid #dee2e6',
                   borderRadius: '4px',
@@ -722,8 +722,8 @@ export default function Shop4({
                   className="position-absolute top-100 start-0 mt-1 bg-white border rounded shadow-sm"
                   style={{ 
                     zIndex: 1000,
-                    minWidth: '150px',
-                    maxHeight: '300px',
+                    minWidth: '100px',
+                    maxHeight: '200px',
                     overflowY: 'auto',
                     border: '1px solid #dee2e6',
                     borderRadius: '4px',
@@ -740,13 +740,14 @@ export default function Shop4({
                       }}
                       style={{ 
                         border: 'none',
-                        borderBottom: index < sortingOptions.length - 1 ? '1px solid #f8f9fa' : 'none',
-                        padding: '10px 12px',
+                        borderBottom: index < sortingOptions.length - 1 ? '1px solid #f0f0f0' : 'none',
+                        padding: '12px 20px',
                         fontSize: '14px',
-                        color: sort === option.value ? '#007bff' : '#212529',
-                        backgroundColor: sort === option.value ? '#f8f9fa' : 'transparent',
+                        color: sort === option.value ? '#333' : '#666',
+                        backgroundColor: 'transparent',
                         fontWeight: sort === option.value ? '500' : '400',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        position: 'relative'
                       }}
                       onMouseEnter={(e) => {
                         if (sort !== option.value) {
@@ -759,12 +760,28 @@ export default function Shop4({
                         }
                       }}
                     >
-                  {option.label}
+                      {sort === option.value && (
+                        <span 
+                          style={{
+                            position: 'absolute',
+                            left: '8px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: '6px',
+                            height: '6px',
+                            backgroundColor: '#dc3545',
+                            borderRadius: '50%'
+                          }}
+                        />
+                      )}
+                      <span style={{ marginLeft: sort === option.value ? '12px' : '0' }}>
+                        {option.label}
+                      </span>
                     </button>
               ))}
                 </div>
               )}
-            </div> */}
+            </div>
 
             <div className="shop-asc__seprator mx-3 bg-light d-none d-md-block order-md-0" />
 

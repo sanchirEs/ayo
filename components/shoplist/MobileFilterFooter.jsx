@@ -165,7 +165,7 @@ export default function MobileFilterFooter({
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               padding: '8px 5px',
-              width: 'calc(100% - 40px)', // хоёр талаас нь 20px орчим сул
+              width: 'calc(100% - 40px)', 
               left: '20px',
               right: '20px',
               bottom: '70px',
