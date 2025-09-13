@@ -90,7 +90,7 @@ export default function CustomerLogin() {
                   Намайг сана
                 </label>
               </div>
-              <Link href="/reset_password" className="btn-text ms-auto">
+              <Link href="#" className="btn-text ms-auto">
                 Нууц үг мартсан?
               </Link>
             </div>
