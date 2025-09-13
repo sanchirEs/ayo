@@ -4,9 +4,12 @@ import { useContextElement } from "@/context/Context";
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { openModalUserlogin } from "@/utlis/aside";
 
 export default function CartDrawer() {
   const { cartProducts, setCartProducts, totalPrice, updateCartItemQuantity, removeCartItem } = useContextElement();
+  const { user } = useAuth();
   const pathname = usePathname();
 
   const closeCart = () => {
@@ -45,6 +48,16 @@ const setQuantity = async (id, q) => {
     
     // Sync with backend
     await removeCartItem(id);
+  };
+
+  // Checkout button дээр дарахад нэвтрээгүй үед login modal харуулах
+  const handleCheckoutClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      closeCart(); // Cart modal хаах
+      openModalUserlogin(); // Login modal нээх
+    }
+    // Хэрэв user байвал ердийн байдлаар checkout хуудас руу шилжинэ
   };
 
   useEffect(() => {
@@ -166,7 +179,12 @@ const setQuantity = async (id, q) => {
               <Link href="/shop_cart" className="btn btn-light mt-3 d-block">
                 Сагсыг харах
               </Link>
-              <Link href="/shop_checkout" className="btn btn-success mt-3 d-block" style={{backgroundColor: "#495D35", color: "white"}}>
+              <Link 
+                href="/shop_checkout" 
+                className="btn btn-success mt-3 d-block" 
+                style={{backgroundColor: "#495D35", color: "white"}}
+                onClick={handleCheckoutClick}
+              >
                 Худалдаж авах
               </Link>
             </>

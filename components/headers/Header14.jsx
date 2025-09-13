@@ -25,6 +25,8 @@ export default function Header14() {
     // Хэрэв user байвал ердийн байдлаар wishlist хуудас руу шилжинэ
   };
 
+  // Cart icon дээр дарахад нэвтрээгүй үед login modal харуулах
+
   return (
     <header
       id="header"
@@ -259,7 +261,7 @@ export default function Header14() {
               </Link>
 
               <a
-                onClick={() => openCart()}
+              onClick={() => openCart()}
                 className="header-tools__item header-tools__cart js-open-aside"
                 // style={{
                 //   color: "var(--color-text)",
