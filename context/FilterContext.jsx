@@ -81,7 +81,13 @@ export function FilterProvider({ children }) {
       }
     };
     setAppliedFilters(clearedFilters);
-  }, []);
+    
+    // Also trigger the filter change handler to notify FilterAll component
+    // This ensures the mobile filter component gets the cleared state
+    setTimeout(() => {
+      handleFiltersChange(clearedFilters);
+    }, 0);
+  }, [handleFiltersChange]);
 
   const value = {
     appliedFilters,

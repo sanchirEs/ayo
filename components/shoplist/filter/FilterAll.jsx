@@ -131,35 +131,64 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
 
   // Sync external filter changes with local state
   useEffect(() => {
-    if (externalFilters && externalFilters._meta && externalFilters._meta.filterType === 'remove') {
-      // Update local state to match external filter changes
-      if (externalFilters.brands !== undefined) {
-        setActiveBrands(externalFilters.brands || []);
+    if (externalFilters && externalFilters._meta) {
+      // Handle complete filter clearing
+      if (externalFilters._meta.filterType === 'clear') {
+        console.log('🔄 FILTER ALL: Clearing all filters from external source');
+        setActiveBrands([]);
+        setActiveAttributes({});
+        setActiveSpecs({});
+        setActiveTags([]);
+        setSearchQuery("");
+        setPrice([20, 70987]);
+        setInStock(true);
+        setHasDiscount(false);
+        
+        // Clear URL parameters
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location);
+          const params = new URLSearchParams(url.search);
+          ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+            params.delete(param);
+          });
+          const newUrl = `${url.pathname}?${params.toString()}`;
+          window.history.pushState({}, '', newUrl);
+        }
+        return;
       }
-      if (externalFilters.attributes !== undefined) {
-        setActiveAttributes(externalFilters.attributes || {});
-      }
-      if (externalFilters.specs !== undefined) {
-        setActiveSpecs(externalFilters.specs || {});
-      }
-      if (externalFilters.tags !== undefined) {
-        setActiveTags(externalFilters.tags || []);
-      }
-      if (externalFilters.priceMin !== undefined || externalFilters.priceMax !== undefined) {
-        const newPrice = [
-          externalFilters.priceMin !== null ? externalFilters.priceMin : 20,
-          externalFilters.priceMax !== null ? externalFilters.priceMax : 70987
-        ];
-        setPrice(newPrice);
-      }
-      if (externalFilters.inStock !== undefined) {
-        setInStock(externalFilters.inStock);
-      }
-      if (externalFilters.hasDiscount !== undefined) {
-        setHasDiscount(externalFilters.hasDiscount);
-      }
-      if (externalFilters.search !== undefined) {
-        setSearchQuery(externalFilters.search || '');
+      
+      // Handle individual filter removal
+      if (externalFilters._meta.filterType === 'remove') {
+        console.log('🔄 FILTER ALL: Removing individual filters from external source');
+        // Update local state to match external filter changes
+        if (externalFilters.brands !== undefined) {
+          setActiveBrands(externalFilters.brands || []);
+        }
+        if (externalFilters.attributes !== undefined) {
+          setActiveAttributes(externalFilters.attributes || {});
+        }
+        if (externalFilters.specs !== undefined) {
+          setActiveSpecs(externalFilters.specs || {});
+        }
+        if (externalFilters.tags !== undefined) {
+          setActiveTags(externalFilters.tags || []);
+        }
+        if (externalFilters.priceMin !== undefined || externalFilters.priceMax !== undefined) {
+          const newPrice = [
+            externalFilters.priceMin !== null ? externalFilters.priceMin : 20,
+            externalFilters.priceMax !== null ? externalFilters.priceMax : 70987
+          ];
+          setPrice(newPrice);
+        }
+        if (externalFilters.inStock !== undefined) {
+          setInStock(externalFilters.inStock);
+        }
+        if (externalFilters.hasDiscount !== undefined) {
+          setHasDiscount(externalFilters.hasDiscount);
+        }
+        if (externalFilters.search !== undefined) {
+          setSearchQuery(externalFilters.search || '');
+        }
       }
     }
   }, [externalFilters]);
@@ -908,36 +937,35 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                     <div className="filter-options-list">
                       {attribute.options.map((option, index) => (
                         <div key={option.id || index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
-                          <div className="d-flex align-items-center">
-                            <input
-                              type="checkbox"
-                              id={`${attributeKey}-${option.id || index}`}
-                              checked={currentValues.includes(option.value)}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                toggleAttribute(attributeKey, option.value);
-                              }}
-                              style={{
-                                width: '16px',
-                                height: '16px',
-                                marginRight: '8px',
-                                accentColor: '#495D35',
-                                cursor: 'pointer'
-                              }}
-                            />
-                            <label 
-                              htmlFor={`${attributeKey}-${option.id || index}`}
-                              style={{
-                                margin: 0,
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                color: '#333',
-                                fontWeight: '400'
-                              }}
-                            >
-                              {option.value}
-                            </label>
-                          </div>
+                           <div className="d-flex align-items-center">
+                             <label 
+                               className="d-flex align-items-center"
+                               style={{
+                                 margin: 0,
+                                 cursor: 'pointer',
+                                 fontSize: '14px',
+                                 color: '#333',
+                                 fontWeight: '400'
+                               }}
+                             >
+                               <input
+                                 type="checkbox"
+                                 checked={currentValues.includes(option.value)}
+                                 onChange={(e) => {
+                                   e.stopPropagation();
+                                   toggleAttribute(attributeKey, option.value);
+                                 }}
+                                 style={{
+                                   width: '16px',
+                                   height: '16px',
+                                   marginRight: '8px',
+                                   accentColor: '#495D35',
+                                   cursor: 'pointer'
+                                 }}
+                               />
+                               {option.value}
+                             </label>
+                           </div>
                           <span style={{
                             fontSize: '12px',
                             color: '#999',
@@ -1014,36 +1042,35 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                     <div className="filter-options-list">
                       {spec.values.map((option, index) => (
                         <div key={index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
-                          <div className="d-flex align-items-center">
-                            <input
-                              type="checkbox"
-                              id={`${specKey}-${index}`}
-                              checked={currentValues.includes(option.value)}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                toggleSpec(specKey, option.value);
-                              }}
-                              style={{
-                                width: '18px',
-                                height: '18px',
-                                margin: '10px 10px 10px 0',
-                                accentColor: '#495D35',
-                                cursor: 'pointer'
-                              }}
-                            />
-                            <label 
-                              htmlFor={`${specKey}-${index}`}
-                              style={{
-                                margin: 0,
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                color: '#333',
-                                fontWeight: '400'
-                              }}
-                            >
-                              {option.value}
-                            </label>
-                          </div>
+                           <div className="d-flex align-items-center">
+                             <label 
+                               className="d-flex align-items-center"
+                               style={{
+                                 margin: 0,
+                                 cursor: 'pointer',
+                                 fontSize: '14px',
+                                 color: '#333',
+                                 fontWeight: '400'
+                               }}
+                             >
+                               <input
+                                 type="checkbox"
+                                 checked={currentValues.includes(option.value)}
+                                 onChange={(e) => {
+                                   e.stopPropagation();
+                                   toggleSpec(specKey, option.value);
+                                 }}
+                                 style={{
+                                   width: '18px',
+                                   height: '18px',
+                                   margin: '10px 10px 10px 0',
+                                   accentColor: '#495D35',
+                                   cursor: 'pointer'
+                                 }}
+                               />
+                               {option.value}
+                             </label>
+                           </div>
                           <span style={{
                             fontSize: '12px',
                             color: '#999',
@@ -1128,36 +1155,35 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                     )
                     .map((brand) => (
                       <div key={brand.id} className="filter-option-item d-flex align-items-center justify-content-between py-1">
-                        <div className="d-flex align-items-center">
-                          <input
-                            type="checkbox"
-                            id={`brand-${brand.id}`}
-                            checked={activeBrands.includes(brand.id)}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              toggleBrand(brand.id);
-                            }}
-                            style={{
-                              width: '18px',
-                              height: '18px',
-                              margin: '10px 10px 10px 0',
-                              accentColor: '#495D35',
-                              cursor: 'pointer'
-                            }}
-                          />
-                          <label 
-                            htmlFor={`brand-${brand.id}`}
-                            style={{
-                              margin: 0,
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              color: '#333',
-                              fontWeight: '400'
-                            }}
-                          >
-                            {brand.name}
-                          </label>
-                        </div>
+                         <div className="d-flex align-items-center">
+                           <label 
+                             className="d-flex align-items-center"
+                             style={{
+                               margin: 0,
+                               cursor: 'pointer',
+                               fontSize: '14px',
+                               color: '#333',
+                               fontWeight: '400'
+                             }}
+                           >
+                             <input
+                               type="checkbox"
+                               checked={activeBrands.includes(brand.id)}
+                               onChange={(e) => {
+                                 e.stopPropagation();
+                                 toggleBrand(brand.id);
+                               }}
+                               style={{
+                                 width: '18px',
+                                 height: '18px',
+                                 margin: '10px 10px 10px 0',
+                                 accentColor: '#495D35',
+                                 cursor: 'pointer'
+                               }}
+                             />
+                             {brand.name}
+                           </label>
+                         </div>
                         <span style={{
                           fontSize: '12px',
                           color: '#999',
@@ -1321,34 +1347,25 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                    {tagOptions.map((tag, index) => (
                      <div key={tag.id || index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
                        <div className="d-flex align-items-center">
-                         <input
-                           type="checkbox"
-                           id={`tag-${tag.id || index}`}
-                           checked={activeTags.includes(tag.value || tag.name || tag.tag || tag)}
-                           onChange={(e) => {
-                             e.stopPropagation();
-                             toggleTag(tag.value || tag.name || tag.tag || tag);
-                           }}
-                           style={{
-                             width: '16px',
-                             height: '16px',
-                             marginRight: '8px',
-                             accentColor: '#495D35',
-                             cursor: 'pointer'
-                           }}
-                         />
-                         <label 
-                           htmlFor={`tag-${tag.id || index}`}
-                           style={{
-                             margin: 0,
-                             cursor: 'pointer',
-                             fontSize: '14px',
-                             color: '#333',
-                             fontWeight: '400'
-                           }}
-                         >
-                           {tag.name || tag.value || tag.tag || tag}
-                         </label>
+                       <label 
+  className="d-flex align-items-center"
+  style={{ cursor: 'pointer', fontSize: '14px', color: '#333', fontWeight: '400' }}
+>
+  <input
+    type="checkbox"
+    checked={activeTags.includes(tag.value || tag.name || tag.tag || tag)}
+    onChange={() => toggleTag(tag.value || tag.name || tag.tag || tag)}
+    style={{
+      width: '16px',
+      height: '16px',
+      marginRight: '8px',
+      accentColor: '#495D35',
+      cursor: 'pointer'
+    }}
+  />
+  {tag.name || tag.value || tag.tag || tag}
+</label>
+
                        </div>
                        <span style={{
                          fontSize: '12px',

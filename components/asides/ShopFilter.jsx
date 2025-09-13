@@ -19,7 +19,7 @@ export default function ShopFilter() {
   }, []);
 
   // Use the filter context for shared state
-  const { handleFiltersChange, clearAllFilters } = useFilterContext();
+  const { appliedFilters, handleFiltersChange, clearAllFilters } = useFilterContext();
 
   console.log('🚨 SHOP FILTER (Mobile): Component rendered with context handler:', !!handleFiltersChange);
 
@@ -34,8 +34,8 @@ export default function ShopFilter() {
       </div>
       {/* /.aside-header */}
       <div className="aside-content">
-        {/* Pass the filter change handler from context to FilterAll */}
-        <FilterAll onFiltersChange={handleFiltersChange} />
+        {/* Pass the filter change handler and external filters from context to FilterAll */}
+        <FilterAll onFiltersChange={handleFiltersChange} externalFilters={appliedFilters} />
       </div>
       {/* /.aside-content */}
       
