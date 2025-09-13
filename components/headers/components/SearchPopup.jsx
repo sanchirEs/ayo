@@ -59,7 +59,7 @@ export default function SearchPopup() {
 
     setIsSearching(true);
     try {
-      const response = await api.products.getAll({
+      const response = await api.products.enhanced({
         search: query,
         limit: 8
       });
