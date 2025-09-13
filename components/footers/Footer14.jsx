@@ -128,7 +128,7 @@ export default function Footer14() {
             <h6 className="sub-menu__title text-uppercase">САЛБАРЫН БАЙРШИЛ</h6>
             <ul className="sub-menu__list list-unstyled">
               <li className="sub-menu__item">
-                <Link href="/store-location" className="menu-link menu-link_us-s">
+                <Link href="/store-locations" className="menu-link menu-link_us-s">
                   Салбарын байршил харах
                 </Link>
               </li>
