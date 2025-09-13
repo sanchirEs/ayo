@@ -244,9 +244,9 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
     if (filters.tags && filters.tags.length > 0) {
       params.set('tags', filters.tags.join(','));
     }
-    if (filters.inStock !== true) {
-      params.set('inStock', filters.inStock.toString());
-    }
+    // if (filters.inStock === true) {
+    //   params.set('inStock', 'true');
+    // }
     if (filters.hasDiscount) {
       params.set('hasDiscount', filters.hasDiscount.toString());
     }
