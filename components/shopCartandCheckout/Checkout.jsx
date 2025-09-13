@@ -978,7 +978,7 @@ export default function Checkout() {
                       <td>
                         {elm.title} x {elm.quantity}
                       </td>
-                      <td>${elm.price * elm.quantity}</td>
+                      <td>{elm.price * elm.quantity}₮</td>
                     </tr>
                   ))}
                 </tbody>
@@ -991,7 +991,7 @@ export default function Checkout() {
                   </tr> */}
                   <tr>
                     <th>ХҮРГЭЛТ</th>
-                    <td>${totalPrice && 19}</td>
+                    <td>{totalPrice && 6000}₮</td>
                     {/* <td>Үнэгүй</td> */}
                   </tr>
                   {/* <tr>
@@ -1000,7 +1000,7 @@ export default function Checkout() {
                   </tr> */}
                   <tr>
                     <th>НИЙТ ДҮН</th>
-                    <td>${totalPrice && totalPrice + 19}</td>
+                    <td>{totalPrice && totalPrice + 6000}₮</td>
                   </tr>
                 </tbody>
               </table>
