@@ -265,10 +265,11 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   // Accordion states (DYNAMIC BASED ON AVAILABLE FILTERS)
   const [expandedAccordions, setExpandedAccordions] = useState(new Set(['categories', 'brands', 'price']));
   
-  // Debug expandedAccordions state
-  useEffect(() => {
-    console.log('🔍 DEBUG: expandedAccordions changed:', Array.from(expandedAccordions));
-  }, [expandedAccordions]);
+  // Debug expandedAccordions state (commented out for production)
+  // useEffect(() => {
+  //   console.log('🔍 DEBUG: expandedAccordions changed:', Array.from(expandedAccordions));
+  //   console.log('🔍 DEBUG: categories expanded?', expandedAccordions.has('categories'));
+  // }, [expandedAccordions]);
 
   // Load category tree from backend
   useEffect(() => {
@@ -360,8 +361,8 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             
             setFilterOptions(newFilterOptions);
             
-            // Debug: Log filter options received from backend
-            console.log('🔍 DEBUG: Filter options received from backend:', newFilterOptions);
+            // // Debug: Log filter options received from backend
+            // console.log('🔍 DEBUG: Filter options received from backend:', newFilterOptions);
             
             // Auto-expand accordions for available filter types
             setExpandedAccordions(prev => {
@@ -584,7 +585,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   // Render category recursively
   const renderCategory = (category, level = 0) => {
     const isExpanded = expandedCategories.has(category.id);
-    console.log('🔍 DEBUG: isExpanded:', isExpanded);
+    // console.log('🔍 DEBUG: isExpanded:', isExpanded);
     const isActive = isCategoryActive(category);
     const hasChildren = category.children && category.children.length > 0;
     const paddingLeft = level * 16; // 16px per level
@@ -775,16 +776,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
 
   // Toggle accordion
   const toggleAccordion = (accordionId) => {
-    console.log('🔍 DEBUG: toggleAccordion called with:', accordionId);
     setExpandedAccordions(prev => {
       const newSet = new Set(prev);
-      console.log('🔍 DEBUG: Current expandedAccordions:', Array.from(prev));
       if (newSet.has(accordionId)) {
         newSet.delete(accordionId);
-        console.log('🔍 DEBUG: Removed', accordionId, 'New set:', Array.from(newSet));
       } else {
         newSet.add(accordionId);
-        console.log('🔍 DEBUG: Added', accordionId, 'New set:', Array.from(newSet));
       }
       return newSet;
     });
@@ -829,10 +826,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             <button
               className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
-              onClick={() => {
-                console.log('🔍 DEBUG: Categories button clicked!');
-                toggleAccordion('categories');
-              }}
+              onClick={() => toggleAccordion('categories')}
               aria-expanded={expandedAccordions.has('categories')}
             >
               БҮХ АНГИЛАЛ
@@ -843,11 +837,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="1.5"
-                 className={`transition-transform duration-200 ${expandedAccordions.has('categories') ? 'rotate-180' : ''}`}
-                 data-debug={`categories expanded: ${expandedAccordions.has('categories')}`}
+                className="accordion-icon"
                 style={{ 
                   color: '#495D35',
-                  marginLeft: 'auto'
+                  marginLeft: 'auto',
+                  transform: expandedAccordions.has('categories') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease-in-out'
                 }}
               >
                 <path d="M6 9l6 6 6-6"/>
@@ -909,10 +904,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                     fill="none" 
                     stroke="currentColor" 
                     strokeWidth="1.5"
-                     className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                     className="accordion-icon"
                     style={{ 
                       color: '#495D35',
-                      marginLeft: 'auto'
+                      marginLeft: 'auto',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease-in-out'
                     }}
                   >
                     <path d="M6 9l6 6 6-6"/>
@@ -1014,10 +1011,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                     fill="none" 
                     stroke="currentColor" 
                     strokeWidth="1.5"
-                     className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                     className="accordion-icon"
                     style={{ 
                       color: '#495D35',
-                      marginLeft: 'auto'
+                      marginLeft: 'auto',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease-in-out'
                     }}
                   >
                     <path d="M6 9l6 6 6-6"/>
@@ -1099,10 +1098,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             <button
               className="accordion-button p-0 border-0 fs-6 text-uppercase"
               type="button"
-              onClick={() => {
-                console.log('🔍 DEBUG: Brands button clicked!');
-                toggleAccordion('brands');
-              }}
+              onClick={() => toggleAccordion('brands')}
               aria-expanded={expandedAccordions.has('brands')}
             >
               Brands
@@ -1113,10 +1109,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="1.5"
-                 className={`transition-transform duration-200 ${expandedAccordions.has('brands') ? 'rotate-180' : ''}`}
+                 className="accordion-icon"
                 style={{ 
                   color: '#495D35',
-                  marginLeft: 'auto'
+                  marginLeft: 'auto',
+                  transform: expandedAccordions.has('brands') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease-in-out'
                 }}
               >
                 <path d="M6 9l6 6 6-6"/>
@@ -1225,10 +1223,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="1.5"
-                 className={`transition-transform duration-200 ${expandedAccordions.has('price') ? 'rotate-180' : ''}`}
+                 className="accordion-icon"
                 style={{ 
                   color: '#495D35',
-                  marginLeft: 'auto'
+                  marginLeft: 'auto',
+                  transform: expandedAccordions.has('price') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease-in-out'
                 }}
               >
                 <path d="M6 9l6 6 6-6"/>
@@ -1332,10 +1332,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                    fill="none" 
                    stroke="currentColor" 
                    strokeWidth="1.5"
-                    className={`transition-transform duration-200 ${expandedAccordions.has('tags') ? 'rotate-180' : ''}`}
+                    className="accordion-icon"
                    style={{ 
                     color: '#495D35',
-                     marginLeft: 'auto'
+                     marginLeft: 'auto',
+                     transform: expandedAccordions.has('tags') ? 'rotate(180deg)' : 'rotate(0deg)',
+                     transition: 'transform 0.2s ease-in-out'
                    }}
                  >
                    <path d="M6 9l6 6 6-6"/>
@@ -1409,10 +1411,12 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                  fill="none" 
                  stroke="currentColor" 
                  strokeWidth="1.5"
-                 className={`transition-transform duration-200 ${expandedAccordions.has('advanced') ? 'rotate-180' : ''}`}
+                 className="accordion-icon"
                  style={{ 
                   color: '#495D35',
-                   marginLeft: 'auto'
+                   marginLeft: 'auto',
+                   transform: expandedAccordions.has('advanced') ? 'rotate(180deg)' : 'rotate(0deg)',
+                   transition: 'transform 0.2s ease-in-out'
                  }}
                >
                  <path d="M6 9l6 6 6-6"/>
