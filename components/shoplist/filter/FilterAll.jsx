@@ -628,6 +628,9 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 e.preventDefault();
                 e.stopPropagation();
                 
+                // Clear all filters when switching categories
+                // clearAllFilters();
+                
                 // Save category info to context
                 setCurrentCategory({
                   id: category.id,
@@ -1203,7 +1206,9 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         {/* /.accordion-item */}
       </div>
       {/* /.accordion */}
-      <div className="accordion" id="price-filters">
+      {
+        priceRanges.length > 0 && (
+          <div className="accordion" id="price-filters">
         <div className="accordion-item mb-4">
           <h5 className="accordion-header mb-2" id="accordion-heading-price">
             <button
@@ -1275,7 +1280,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
               </div>
             ) : (
               <div>
-                <div className="mt-2">
+                {/* <div className="mt-2">
                   <Slider
                     range
                     formatLabel={() => ``}
@@ -1296,13 +1301,16 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                     <span className="text-secondary">Max Price: </span>
                     <span className="price-range__max">${price[1]}</span>
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
         </div>
         {/* /.accordion-item */}
       </div>
+        )
+      }
+      
       {/* /.accordion */}
 
              {/* TAGS SECTION - If tags are available */}

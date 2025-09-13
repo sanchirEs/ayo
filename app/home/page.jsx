@@ -37,9 +37,9 @@ export default function HomePage15() {
             <Hero />
           </div>
 
-          {/* Brands Section - Брэндүүд */}
+          {/* Brands Section - Брэндүүд
           <div className="mb-2 mb-xl-3 pb-3 pt-2 "></div>
-          <Brands />
+          <Brands /> */}
           
           {/* Features Section - Онцлох үйлчилгээ */}
           {/* <FeaturesSection /> */}

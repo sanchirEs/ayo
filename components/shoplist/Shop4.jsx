@@ -943,7 +943,7 @@ export default function Shop4({
                 <div className="active-filter-tag">
                   <span className="filter-label">Үнэ:</span>
                   <span className="filter-value">
-                    {filters.priceMin !== null ? `₮${filters.priceMin.toLocaleString()}` : '₮0'} - {filters.priceMax !== null ? `₮${filters.priceMax.toLocaleString()}` : '∞'}
+                    {filters.priceMin !== null ? `${filters.priceMin.toLocaleString()}₮` : '0₮'} - {filters.priceMax !== null ? `${filters.priceMax.toLocaleString()}₮` : '∞'}
                   </span>
                   <button
                     className="filter-remove-btn"
@@ -1191,11 +1191,11 @@ export default function Shop4({
                       <div className="product-card__price d-flex">
                         {showOldPrice ? (
                           <>
-                            <span className="money price price-old">${priceOld}</span>
-                            <span className="money price price-sale">${displayPrice}</span>
+                            <span className="money price price-old">{priceOld}₮</span>
+                            <span className="money price price-sale">{displayPrice}₮</span>
                           </>
                         ) : (
-                          <span className="money price">${displayPrice}</span>
+                          <span className="money price">{displayPrice}₮</span>
                         )}
                       </div>
 

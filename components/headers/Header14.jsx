@@ -10,10 +10,22 @@ import { socialLinks } from "@/data/socials";
 import SearchPopup from "./components/SearchPopup";
 import { useAuth } from "@/context/AuthContext";
 import { useContextElement } from "@/context/Context";
+import { openModalUserlogin } from "@/utlis/aside";
 
 export default function Header14() {
   const { user, logout } = useAuth();
   const { wishList } = useContextElement();
+
+  // Heart icon дээр дарахад нэвтрээгүй үед login modal харуулах
+  const handleWishlistClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      openModalUserlogin();
+    }
+    // Хэрэв user байвал ердийн байдлаар wishlist хуудас руу шилжинэ
+  };
+
+  // Cart icon дээр дарахад нэвтрээгүй үед login modal харуулах
 
   return (
     <header
@@ -34,7 +46,7 @@ export default function Header14() {
           <ul className="list-unstyled d-flex flex-1 gap-3 m-0">
             <li>
               <a
-                href="#"
+                href="/store-locations"
                 className="menu-link menu-link_us-s d-flex align-items-center gap-2"
                 style={{ color: "white" }}
               >
@@ -213,6 +225,7 @@ export default function Header14() {
               <Link
                 className="header-tools__item header-tools__cart js-open-aside"
                 href="/account_wishlist"
+                onClick={handleWishlistClick}
               >
                 <svg
                   className="d-block"
@@ -248,7 +261,7 @@ export default function Header14() {
               </Link>
 
               <a
-                onClick={() => openCart()}
+              onClick={() => openCart()}
                 className="header-tools__item header-tools__cart js-open-aside"
                 // style={{
                 //   color: "var(--color-text)",

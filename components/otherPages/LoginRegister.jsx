@@ -133,12 +133,12 @@ export default function LoginRegister() {
                   name="login_identifier"
                   type="text"
                   className="form-control form-control_gray"
-                  placeholder="Email эсвэл Username *"
+                  placeholder="Имэйл эсвэл хэрэглэгчийн нэр *"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
                 />
-                <label>Email эсвэл Username *</label>
+                <label>Имэйл эсвэл хэрэглэгчийн нэр *</label>
               </div>
 
               <div className="pb-3"></div>
@@ -149,12 +149,12 @@ export default function LoginRegister() {
                   type="password"
                   className="form-control form-control_gray"
                   id="customerPasswodInput"
-                  placeholder="Password *"
+                  placeholder="Нууц үг *"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
                 />
-                <label htmlFor="customerPasswodInput">Password *</label>
+                <label htmlFor="customerPasswodInput">Нууц үг *</label>
               </div>
 
               <div className="d-flex align-items-center mb-3 pb-2">
@@ -166,11 +166,11 @@ export default function LoginRegister() {
                     defaultValue=""
                   />
                   <label className="form-check-label text-secondary">
-                    Remember me
+                    Намайг сана
                   </label>
                 </div>
                 <Link href="/reset_password" className="btn-text ms-auto">
-                  Lost password?
+                  Нууц үг мартсан?
                 </Link>
               </div>
 
@@ -185,17 +185,17 @@ export default function LoginRegister() {
                 type="submit"
                 disabled={loginLoading}
               >
-                {loginLoading ? "Logging in..." : "Log In"}
+                {loginLoading ? "Нэвтэрч байна..." : "Нэвтрэх"}
               </button>
 
               <div className="customer-option mt-4 text-center">
-                <span className="text-secondary">No account yet?</span>{" "}
+                <span className="text-secondary">Бүртгэл байхгүй юу?</span>{" "}
                 <a
                   href="#register-tab"
                   className="btn-text js-show-register"
                   data-bs-toggle="tab"
                 >
-                  Create Account
+                  Бүртгүүлэх
                 </a>
               </div>
             </form>
@@ -262,50 +262,53 @@ export default function LoginRegister() {
                 status,
               }) => (
                 <form onSubmit={handleSubmit} className="needs-validation">
-                  {/* First name */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="firstName"
-                      type="text"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.firstName && errors.firstName ? " is-invalid" : "")
-                      }
-                      placeholder="First name *"
-                      value={values.firstName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label>First name *</label>
-                    {touched.firstName && errors.firstName && (
-                      <div className="invalid-feedback d-block">{errors.firstName}</div>
-                    )}
+                  {/* First name and Last name in one row */}
+                  <div className="row g-1 mb-2">
+                    
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="lastName"
+                          type="text"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.lastName && errors.lastName ? " is-invalid" : "")
+                          }
+                          placeholder="Овог *"
+                          value={values.lastName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <label>Овог *</label>
+                        {touched.lastName && errors.lastName && (
+                          <div className="invalid-feedback d-block">{errors.lastName}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="firstName"
+                          type="text"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.firstName && errors.firstName ? " is-invalid" : "")
+                          }
+                          placeholder="Нэр *"
+                          value={values.firstName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <label>Нэр *</label>
+                        {touched.firstName && errors.firstName && (
+                          <div className="invalid-feedback d-block">{errors.firstName}</div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Last name */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="lastName"
-                      type="text"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.lastName && errors.lastName ? " is-invalid" : "")
-                      }
-                      placeholder="Last name *"
-                      value={values.lastName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label>Last name *</label>
-                    {touched.lastName && errors.lastName && (
-                      <div className="invalid-feedback d-block">{errors.lastName}</div>
-                    )}
-                  </div>
-
-                  <div className="pb-2"></div>
 
                   {/* Username */}
-                  <div className="form-floating mb-3">
+                  <div className="form-floating mb-2">
                     <input
                       name="username"
                       type="text"
@@ -314,69 +317,67 @@ export default function LoginRegister() {
                         (touched.username && errors.username ? " is-invalid" : "")
                       }
                       id="customerNameRegisterInput"
-                      placeholder="Username *"
+                      placeholder="Хэрэглэгчийн нэр *"
                       value={values.username}
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />
-                    <label htmlFor="customerNameRegisterInput">Username *</label>
+                    <label htmlFor="customerNameRegisterInput">Хэрэглэгчийн нэр *</label>
                     {touched.username && errors.username && (
                       <div className="invalid-feedback d-block">{errors.username}</div>
                     )}
                   </div>
 
-                  <div className="pb-2"></div>
-
-                  {/* Email */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="email"
-                      type="email"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.email && errors.email ? " is-invalid" : "")
-                      }
-                      id="customerEmailRegisterInput"
-                      placeholder="Email address *"
-                      value={values.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label htmlFor="customerEmailRegisterInput">
-                      Email address *
-                    </label>
-                    {touched.email && errors.email && (
-                      <div className="invalid-feedback d-block">{errors.email}</div>
-                    )}
+                  {/* Email and Telephone in one row */}
+                  <div className="row g-1 mb-2">
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="email"
+                          type="email"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.email && errors.email ? " is-invalid" : "")
+                          }
+                          id="customerEmailRegisterInput"
+                          placeholder="Имэйл хаяг *"
+                          value={values.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <label htmlFor="customerEmailRegisterInput">
+                          Имэйл хаяг *
+                        </label>
+                        {touched.email && errors.email && (
+                          <div className="invalid-feedback d-block">{errors.email}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="telephone"
+                          type="text"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.telephone && errors.telephone ? " is-invalid" : "")
+                          }
+                          id="customerTelephoneRegisterInput"
+                          placeholder="Утасны дугаар *"
+                          value={values.telephone}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <label htmlFor="customerTelephoneRegisterInput">Утасны дугаар *</label>
+                        {touched.telephone && errors.telephone && (
+                          <div className="invalid-feedback d-block">{errors.telephone}</div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="pb-2"></div>
-
-                  {/* Telephone */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="telephone"
-                      type="text"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.telephone && errors.telephone ? " is-invalid" : "")
-                      }
-                      id="customerTelephoneRegisterInput"
-                      placeholder="Telephone *"
-                      value={values.telephone}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label htmlFor="customerTelephoneRegisterInput">Telephone *</label>
-                    {touched.telephone && errors.telephone && (
-                      <div className="invalid-feedback d-block">{errors.telephone}</div>
-                    )}
-                  </div>
-
-                  <div className="pb-2"></div>
 
                   {/* Password */}
-                  <div className="form-floating mb-3">
+                  <div className="form-floating mb-2">
                     <input
                       name="password"
                       type="password"
@@ -385,19 +386,19 @@ export default function LoginRegister() {
                         (touched.password && errors.password ? " is-invalid" : "")
                       }
                       id="customerPasswodRegisterInput"
-                      placeholder="Password *"
+                      placeholder="Нууц үг *"
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />
-                    <label htmlFor="customerPasswodRegisterInput">Password *</label>
+                    <label htmlFor="customerPasswodRegisterInput">Нууц үг *</label>
                     {touched.password && errors.password && (
                       <div className="invalid-feedback d-block">{errors.password}</div>
                     )}
                   </div>
 
                   {/* Confirm Password */}
-                  <div className="form-floating mb-3">
+                  <div className="form-floating mb-2">
                     <input
                       name="confirmPassword"
                       type="password"
@@ -407,12 +408,12 @@ export default function LoginRegister() {
                           ? " is-invalid"
                           : "")
                       }
-                      placeholder="Confirm Password *"
+                      placeholder="Нууц үг баталгаажуулах *"
                       value={values.confirmPassword}
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />
-                    <label>Confirm Password *</label>
+                    <label>Нууц үг баталгаажуулах *</label>
                     {touched.confirmPassword && errors.confirmPassword && (
                       <div className="invalid-feedback d-block">
                         {errors.confirmPassword}
@@ -420,17 +421,10 @@ export default function LoginRegister() {
                     )}
                   </div>
 
-                  <div className="d-flex align-items-center mb-3 pb-2">
-                    <p className="m-0">
-                      Your personal data will be used to support your experience
-                      throughout this website, to manage access to your account, and
-                      for other purposes described in our privacy policy.
-                    </p>
-                  </div>
 
                   {/* Server error list (backend) */}
                   {status?.error && (
-                    <div className="alert alert-danger mb-3" role="alert">
+                    <div className="alert alert-danger mb-2" role="alert">
                       {status.error}
                       {Array.isArray(status.serverErrors) && status.serverErrors.length > 0 && (
                         <ul className="mt-2 mb-0 ps-3">
@@ -442,7 +436,7 @@ export default function LoginRegister() {
                     </div>
                   )}
                   {status?.success && (
-                    <div className="alert alert-success mb-3" role="alert">
+                    <div className="alert alert-success mb-2" role="alert">
                       {status.success}
                     </div>
                   )}
@@ -452,7 +446,7 @@ export default function LoginRegister() {
                     type="submit"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Registering..." : "Register"}
+                    {isSubmitting ? "Бүртгүүлж байна..." : "Бүртгүүлэх"}
                   </button>
                 </form>
               )}

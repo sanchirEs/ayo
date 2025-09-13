@@ -5,9 +5,12 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { openModalUserlogin } from "@/utlis/aside";
 
 export default function Cart() {
   const { cartProducts, setCartProducts, totalPrice, updateCartItemQuantity, removeCartItem } = useContextElement();
+  const { user } = useAuth();
   const router = useRouter();
 
 const setQuantity = async (id, q) => {
@@ -69,10 +72,16 @@ const setQuantity = async (id, q) => {
   const vat = 19;
   const grandTotal = computedSubtotal + shippingFee + vat;
 
-  // Захиалга өгөх товчийг дарахад дараагийн step рүү шилжих
+  // Захиалга өгөх товчийг дарахад нэвтрээгүй үед login modal харуулах
   const handleCheckout = () => {
     if (cartProducts.length > 0) {
-      router.push('/shop_checkout');
+      if (!user) {
+        // Нэвтрээгүй бол login modal харуулах
+        openModalUserlogin();
+      } else {
+        // Нэвтэрсэн бол checkout хуудас руу шилжих
+        router.push('/shop_checkout');
+      }
     }
   };
 
@@ -148,7 +157,7 @@ const setQuantity = async (id, q) => {
                       </td>
                       <td>
                         <span className="shopping-cart__product-price">
-                        ₮{unitPrice.toLocaleString()}
+                       {unitPrice.toLocaleString()}₮
                         </span>
                       </td>
                       <td>
@@ -200,7 +209,7 @@ const setQuantity = async (id, q) => {
                       </td>
                       <td>
                         <span className="shopping-cart__subtotal">
-                        ₮{lineTotal.toLocaleString()}
+                        {lineTotal.toLocaleString()}₮
                         </span>
                       </td>
                       <td>
@@ -287,16 +296,16 @@ const setQuantity = async (id, q) => {
                 <tbody>
                   <tr>
                     <th>Бүтээгдэхүүний нийт үнэ</th>
-                    <td>₮{computedSubtotal.toLocaleString()}</td>
+                    <td>{computedSubtotal.toLocaleString()}₮</td>
                   </tr>
                  
                   <tr>
                     <th>Хүргэлтийн зардал</th>
-                    <td>₮{vat.toLocaleString()}</td>
+                    <td>{vat.toLocaleString()}₮</td>
                   </tr>
                   <tr>
                     <th>НИЙТ</th>
-                    <td>₮{grandTotal.toLocaleString()}</td>
+                    <td>{grandTotal.toLocaleString()}₮</td>
                   </tr>
                 </tbody>
               </table>

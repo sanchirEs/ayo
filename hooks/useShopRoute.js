@@ -8,6 +8,8 @@ export function useShopRoute() {
     const isShopRoute = pathname.startsWith('/shop/');
     const isProductRoute = pathname.startsWith('/product1_simple/');
     const isCartRoute = pathname.startsWith('/shop_cart');
+    const isCheckoutRoute = pathname.startsWith('/shop_checkout');
+    const isStoreLocationsRoute = pathname.startsWith('/store-locations');
     const isDashboardRoute = pathname.startsWith('/account_');
     let categoryId = null;
     let productId = null;
@@ -35,13 +37,21 @@ export function useShopRoute() {
         '/account_edit_address': 'Хаягийн мэдээлэл',
         '/account_wishlist': 'Хүслийн жагсаалт'
       };
-      dashboardTitle = titleMap[pathname] || 'Миний профайл';
+      
+      // Check for dynamic order detail route
+      if (pathname.startsWith('/account_orders/') && pathname !== '/account_orders') {
+        dashboardTitle = 'Миний захиалга';
+      } else {
+        dashboardTitle = titleMap[pathname] || 'Миний профайл';
+      }
     }
     
     return {
       isShopRoute,
       isProductRoute,
       isCartRoute,
+      isCheckoutRoute,
+      isStoreLocationsRoute,
       isDashboardRoute,
       categoryId,
       productId,

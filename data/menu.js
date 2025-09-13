@@ -201,7 +201,7 @@ export const dashboardMenuItems = [
   },
   {
     id: 6,
-    href: "/login_register",
+    href: "/",
     title: "Гарах",
   },
 ];
