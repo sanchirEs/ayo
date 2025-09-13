@@ -23,15 +23,9 @@ export default function Footer14() {
             <div className="logo">
               <Link href="/">
                 <Image
-<<<<<<< HEAD
-                  src="/assets/images/logoReal2.png"
-                  width={112}
-                  height={48}
-=======
                   src="/assets/images/logoAyo.png"
                   width={120}
                   height={60}
->>>>>>> e4634563f05b7a30a3ef68842820c5d2d5abded4
                   alt="Ayo"
                   className="logo__image d-block"
                 />
