@@ -365,6 +365,22 @@
 // Text links with underline
 .btn-text {
   text-decoration: underline;
+  
+  // Button elements should look like links
+  &.btn,
+  &[type="button"] {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 // Carousel Dots
