@@ -189,7 +189,7 @@ export default function OrderManagement() {
                   
                   <div className="mb-2">
                     <small className="text-muted">Нийт дүн:</small>
-                    <div className="fw-bold">₮{order.total?.toLocaleString()}</div>
+                    <div className="fw-bold">{order.total?.toLocaleString()}₮</div>
                   </div>
                   
                   <div className="mb-3">

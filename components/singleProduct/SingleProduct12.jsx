@@ -160,11 +160,11 @@ export default function SingleProduct12({ product }) {
             <div className="reviews-group d-flex">
               <Star stars={5} />
             </div>
-            <span className="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
+            {/* <span className="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span> */}
           </div>
 
           <div className="product-single__price">
-            <span className="current-price">${price.toLocaleString()}</span>
+            <span className="current-price">{price.toLocaleString()}₮</span>
           </div>
 
           {/* ✅ Үлдэгдэл */}
@@ -175,7 +175,7 @@ export default function SingleProduct12({ product }) {
               </span>
             ) : (
               <span className="text-secondary">
-                Боломжит үлдэгдэл: <strong>{selectedStock}</strong>
+                {/* Боломжит үлдэгдэл: <strong>{selectedStock}</strong> */}
               </span>
             )}
           </div>
@@ -320,7 +320,7 @@ export default function SingleProduct12({ product }) {
                               
                               <div className="variant-info text-center mt-1">
                                 <div className="variant-value small fw-medium">{option.value}</div>
-                                <div className="variant-price small text-muted">₮{Number(option.price).toLocaleString()}</div>
+                                <div className="variant-price small text-muted">{Number(option.price).toLocaleString()}₮</div>
                               </div>
                             </div>
                           );
@@ -415,67 +415,72 @@ export default function SingleProduct12({ product }) {
 
             {/* ✅ Үлдэгдэлгүй үед тоо болон товчнуудыг нуух */}
             {!outOfStock && (
-              <div className="product-single__addtocart">
-                <div className="qty-control position-relative">
-                  <input
-                    type="number"
-                    name="quantity"
-                    value={isIncludeCard()?.quantity ?? quantity}
-                    min="1"
-                    max={selectedStock || undefined}
-                    onChange={(e) => setQuantityCartItem(product.id, e.target.value)}
-                    className="qty-control__number text-center"
-                  />
-                  <div
-                    onClick={() =>
-                      setQuantityCartItem(
-                        product.id,
-                        (isIncludeCard()?.quantity || quantity) - 1
-                      )
-                    }
-                    className="qty-control__reduce"
-                  >
-                    -
-                  </div>
-                  <div
-                    onClick={() =>
-                      setQuantityCartItem(
-                        product.id,
-                        (isIncludeCard()?.quantity || quantity) + 1
-                      )
-                    }
-                    className="qty-control__increase"
-                  >
-                    +
-                  </div>
-                </div>
+  <div 
+    className="product-single__addtocart d-flex align-items-center gap-2 flex-wrap"
+    style={{flexWrap:"nowrap"}} // Хүсвэл албадан нэг мөрөнд
+  >
+    <div className="qty-control position-relative" style={{flex: "0 0 auto"}}>
+      <input
+        type="number"
+        name="quantity"
+        value={isIncludeCard()?.quantity ?? quantity}
+        min="1"
+        max={selectedStock || undefined}
+        onChange={(e) => setQuantityCartItem(product.id, e.target.value)}
+        className="qty-control__number text-center"
+      />
+      <div
+        onClick={() =>
+          setQuantityCartItem(
+            product.id,
+            (isIncludeCard()?.quantity || quantity) - 1
+          )
+        }
+        className="qty-control__reduce"
+      >
+        -
+      </div>
+      <div
+        onClick={() =>
+          setQuantityCartItem(
+            product.id,
+            (isIncludeCard()?.quantity || quantity) + 1
+          )
+        }
+        className="qty-control__increase"
+      >
+        +
+      </div>
+    </div>
 
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-addtocart js-open-aside"
-                  style={{backgroundColor:"#495D35"}}
-                  onClick={addToCart}
-                  disabled={outOfStock}
-                >
-                  {isIncludeCard() ? "Сагсанд хийсэн" : "Сагсанд хийх"}
-                </button>
+    <button
+      type="submit"
+      className="btn btn-primary btn-addtocart js-open-aside"
+      style={{ backgroundColor: "#495D35", flex: "1 1 auto", minWidth: "90px" }}
+      onClick={addToCart}
+      disabled={outOfStock}
+    >
+      {isIncludeCard() ? "Сагсанд хийсэн" : "Сагсанд хийх"}
+    </button>
 
-                <Link
-                  href="/shop_cart"
-                  onClick={(e) => {
-                    if (outOfStock) {
-                      e.preventDefault();
-                      return;
-                    }
-                    if (!isIncludeCard()) addToCart();
-                  }}
-                  className="btn btn-primary btn-addtocart js-open-aside bg-white text-dark"
-                  aria-disabled={outOfStock}
-                >
-                  Худалдаж авах
-                </Link>
-              </div>
-            )}
+    <Link
+      href="/shop_cart"
+      onClick={(e) => {
+        if (outOfStock) {
+          e.preventDefault();
+          return;
+        }
+        if (!isIncludeCard()) addToCart();
+      }}
+      className="btn btn-primary btn-addtocart js-open-aside bg-white text-dark"
+      style={{flex: "1 1 auto", minWidth: "90px"}}
+      aria-disabled={outOfStock}
+    >
+      Худалдаж авах
+    </Link>
+  </div>
+)}
+
           </form>
 
           <div className="product-single__addtolinks">

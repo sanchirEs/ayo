@@ -144,7 +144,7 @@ const setQuantity = async (id, q) => {
                         </div>
 
                         <span className="cart-drawer-item__price money price">
-                          ₮{lineTotal.toLocaleString()}
+                          {lineTotal.toLocaleString()}₮
                         </span>
                       </div>
                     </div>
@@ -170,7 +170,7 @@ const setQuantity = async (id, q) => {
             <h6 className="fs-base fw-medium">Нийт:</h6>
             {/* Хэрэв context-д totalPrice аль хэдийн байгаа бол түүнийг ашигла */}
             <span className="cart-subtotal fw-medium">
-              ₮{Number(totalPrice || cartProducts.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity || 1)), 0)).toLocaleString()}
+             {Number(totalPrice || cartProducts.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity || 1)), 0)).toLocaleString()}₮
             </span>
           </div>
 
