@@ -9,6 +9,7 @@ export function useShopRoute() {
     const isProductRoute = pathname.startsWith('/product1_simple/');
     const isCartRoute = pathname.startsWith('/shop_cart');
     const isCheckoutRoute = pathname.startsWith('/shop_checkout');
+    const isStoreLocationsRoute = pathname.startsWith('/store-locations');
     const isDashboardRoute = pathname.startsWith('/account_');
     let categoryId = null;
     let productId = null;
@@ -50,6 +51,7 @@ export function useShopRoute() {
       isProductRoute,
       isCartRoute,
       isCheckoutRoute,
+      isStoreLocationsRoute,
       isDashboardRoute,
       categoryId,
       productId,

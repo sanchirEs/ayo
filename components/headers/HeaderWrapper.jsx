@@ -5,10 +5,11 @@ import CategoryHeader from "../shoplist/CategoryHeader";
 import ProductHeader from "../shoplist/ProductHeader";
 import CartHeader from "../shoplist/CartHeader";
 import CheckoutHeader from "../shoplist/CheckoutHeader";
+import StoreHeader from "../shoplist/StoreHeader";
 import DashboardHeader from "../otherPages/DashboardHeader";
 
 export default function HeaderWrapper() {
-  const { isShopRoute, isProductRoute, isCartRoute, isCheckoutRoute, isDashboardRoute, categoryId, productId, dashboardTitle } = useShopRoute();
+  const { isShopRoute, isProductRoute, isCartRoute, isCheckoutRoute, isStoreLocationsRoute, isDashboardRoute, categoryId, productId, dashboardTitle } = useShopRoute();
   
   if (isShopRoute) {
     return <CategoryHeader categoryId={categoryId} />;
@@ -20,6 +21,10 @@ export default function HeaderWrapper() {
   
   if (isCheckoutRoute) {
     return <CheckoutHeader />;
+  }
+  
+  if (isStoreLocationsRoute) {
+    return <StoreHeader />;
   }
   
   if (isCartRoute) {

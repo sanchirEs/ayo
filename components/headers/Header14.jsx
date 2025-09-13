@@ -46,7 +46,7 @@ export default function Header14() {
           <ul className="list-unstyled d-flex flex-1 gap-3 m-0">
             <li>
               <a
-                href="#"
+                href="/store-locations"
                 className="menu-link menu-link_us-s d-flex align-items-center gap-2"
                 style={{ color: "white" }}
               >
