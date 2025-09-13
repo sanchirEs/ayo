@@ -857,3 +857,29 @@ button.js-add-wishlist.active {
     transform: rotate(90deg);
   }
 }
+
+.text-wrap-2 a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;     /* allow wrapping */
+}
+
+.pc__title a {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;   /* show max 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.badge-new {
+  font-size: 12px;
+  font-weight: 600;
+  background: #bb3728 !important; /* custom red */
+  color: #fff;
+  border-radius: 4px;
+}
