@@ -1054,15 +1054,16 @@ export default function Shop4({
         )}
 
         {/* PRODUCTS GRID WITH SOPHISTICATED LOADING */}
-        <div
+        {/* <div
           className={`products-grid row row-cols-2 row-cols-md-3 row-cols-lg-${selectedColView}`}
           id="products-grid"
           style={{
             opacity: isFilteringActive ? 0.7 : 1,
             transition: 'opacity 0.2s ease'
           }}
-        >
+        > */}
           {loading ? (
+            
             <div className="col-12 text-center py-5">
               <div className="d-flex flex-column align-items-center">
                 <div className="spinner-border text-primary mb-3" role="status">
@@ -1106,7 +1107,7 @@ export default function Shop4({
               </div>
             </div>
           ) : products.length === 0 ? (
-            <div className="col-12 text-center py-5">
+            <div className="col-12 text-center  ">
               <div className="d-flex flex-column align-items-center">
                 <div className="empty-state-icon mb-4 p-4 bg-light rounded-circle">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-muted">
@@ -1122,7 +1123,15 @@ export default function Shop4({
               </div>
             </div>
           ) : (
-            products.map((p) => {
+            <div
+            className={`products-grid row row-cols-2 row-cols-md-3 row-cols-lg-${selectedColView}`}
+            id="products-grid"
+            style={{
+              opacity: isFilteringActive ? 0.7 : 1,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
+            {products.map((p) => {
               const id = p.id;
               const title = getTitle(p);
               const price = getPrice(p);
@@ -1138,6 +1147,7 @@ export default function Shop4({
               const showOldPrice = priceOld && discountedPrice;
 
               return (
+                
                 <div key={id} className="product-card-wrapper">
                   <div className="product-card mb-3 mb-md-4 mb-xxl-5">
                     <div className="pc__img-wrapper">
@@ -1249,9 +1259,10 @@ export default function Shop4({
                   </div>
                 </div>
               );
-            })
+            })}
+            </div>
           )}
-        </div>
+        {/* </div> */}
 
         {/* Simple pagination */}
         
