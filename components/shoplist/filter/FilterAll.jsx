@@ -608,7 +608,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
             }}
             style={{ cursor: hasChildren ? 'pointer' : 'default' }}
           >
-            {hasChildren && (
+            {/* {hasChildren && ( */}
               <svg 
                 width="12" 
                 height="12" 
@@ -620,7 +620,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
               >
                 <path d="M9 18l6-6-6-6"/>
               </svg>
-            )}
+            {/* )} */}
             <div
               className={`category-link text-decoration-none flex-grow-1 cursor-pointer ${
                 isActive ? 'text-primary fw-medium' : 'text-dark'
