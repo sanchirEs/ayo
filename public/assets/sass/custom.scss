@@ -1050,6 +1050,28 @@ body {
   font-family: "Noto Sans", sans-serif !important;
 }
 
+/* Fix footer layering issue - ensure Footer1 is visible above MobileFooter1 */
+.footer {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.footer-mobile {
+  z-index: 2 !important;
+}
+
+/* Ensure proper spacing between footers */
+.footer + .footer-mobile {
+  margin-top: 0 !important;
+}
+
+/* Fix mobile footer positioning to not overlap desktop footer */
+@media (max-width: 991.98px) {
+  .footer {
+    margin-bottom: 50px !important; /* Add space for mobile footer */
+  }
+}
+
 /* Payment Method Section Styles */
 .payment-methods-wrapper {
   display: flex;
