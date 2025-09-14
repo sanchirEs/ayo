@@ -1,5 +1,6 @@
 "use client";
 import { useContextElement } from "@/context/Context";
+import { useNavigation } from "@/context/NavigationContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CartLength from "./components/CartLength";
@@ -13,6 +14,7 @@ export default function UnifiedMobileHeader({
   className = ""
 }) {
   const { cartProducts, currentCategory, currentProduct } = useContextElement();
+  const { navigateBack } = useNavigation();
   const router = useRouter();
   const [displayTitle, setDisplayTitle] = useState(title || "");
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,9 @@ export default function UnifiedMobileHeader({
   }, [titleType, categoryId, productId, currentCategory, currentProduct, title]);
 
   const handleBack = () => {
-    router.back();
+
+    // Use the smart navigation function
+    navigateBack(router);
   };
 
   const cartItemCount = cartProducts.length;
