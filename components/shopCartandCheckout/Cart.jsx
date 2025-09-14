@@ -279,10 +279,8 @@ const setQuantity = async (id, q) => {
           </>
         ) : (
           <>
-            <div className="fs-20">Shop cart is empty</div>
-            <button className="btn mt-3 btn-light">
-              <Link href={"/"}>Explore Products</Link>
-            </button>
+            <div className="fs-20">Таны сагс хоосон байна</div>
+           
           </>
         )}
       </div>

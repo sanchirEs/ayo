@@ -1072,6 +1072,62 @@ body {
   }
 }
 
+// /* Fix RelatedSlider z-index issue on mobile */
+// .header-mobile {
+//   z-index: 9999 !important; /* Ensure mobile header is above everything */
+//   position: relative !important;
+// }
+
+// /* Override any existing mobile header z-index */
+// .header-mobile.header_sticky {
+//   z-index: 9999 !important;
+// }
+
+// .header-mobile.header_sticky-active {
+//   z-index: 9999 !important;
+// }
+
+// .products-carousel {
+//   position: relative !important;
+//   z-index: 1 !important; /* Ensure RelatedSlider is below mobile header */
+// }
+
+/* Ensure proper spacing for mobile header */
+@media (max-width: 991.98px) {
+  .products-carousel {
+    margin-top: 0 !important;
+    padding-bottom: 80px !important; /* Add more top padding to clear mobile header */
+  }
+}
+  
+//   /* Ensure mobile header stays on top with higher z-index */
+//   .header-mobile {
+//     z-index: 9999 !important;
+//     position: relative !important;
+//   }
+  
+//   /* Fix any sticky positioning issues */
+//   .header-mobile.header_sticky-active {
+//     position: fixed !important;
+//     top: 0 !important;
+//     left: 0 !important;
+//     right: 0 !important;
+//     z-index: 9999 !important;
+//   }
+  
+//   /* Additional fix for any container that might be causing issues */
+//   .container {
+//     position: relative !important;
+//     z-index: 1 !important;
+//   }
+  
+//   /* Ensure the main content area has proper z-index */
+//   main {
+//     position: relative !important;
+//     z-index: 1 !important;
+//   }
+// }
+
 /* Payment Method Section Styles */
 .payment-methods-wrapper {
   display: flex;

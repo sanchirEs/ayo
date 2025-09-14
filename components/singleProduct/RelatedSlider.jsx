@@ -138,7 +138,7 @@ export default function RelatedSlider({ currentProduct }) {
   }
 
   return (
-    <section className="products-carousel container">
+    <section className="products-carousel container" style={{ position: 'relative', zIndex: 1 }}>
       <h2 className="h3 text-uppercase mb-4 pb-xl-2 mb-xl-4">
         Төстэй <strong>бүтээгдэхүүн</strong>
       </h2>
