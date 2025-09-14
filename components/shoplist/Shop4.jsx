@@ -1185,7 +1185,7 @@ export default function Shop4({
                       <button
                         className="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside"
                         onClick={() => addProductToCart(id)}
-                        title={isAddedToCartProducts(id) ? "Already Added" : "Add to Cart"}
+                        title={isAddedToCartProducts(id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
                         disabled={!inStock}
                       >
                         {!inStock ? "Out of Stock" : isAddedToCartProducts(id) ? "Already Added" : "Add To Cart"}

@@ -334,6 +334,10 @@ export default function SearchPopup() {
                        <button
                          onClick={handleSearchSubmit}
                          className="btn btn-primary btn-sm px-4"
+                         style={{
+                          backgroundColor: '#495D35',
+                      
+                         }}
                        >
                          Бүх үр дүнг харах
                        </button>
