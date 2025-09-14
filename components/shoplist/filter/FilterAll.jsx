@@ -1428,51 +1428,61 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
              style={{
                transition: 'all 0.3s ease',
                maxHeight: expandedAccordions.has('advanced') ? '200px' : '0',
-               overflow: 'hidden'
+                overflowY: 'hidden',   // дээд/доод тал таслагдахгүй
+    overflowX: 'visible'
              }}
            >
              <div className="accordion-body px-0 pb-0">
-               <div className="row g-3">
-                 <div className="col-6">
-                   <div className="form-check form-switch">
-                     <input
-                       className="form-check-input"
-                       type="checkbox"
-                       checked={inStock}
-                       onChange={(e) => setInStock(e.target.checked)}
-                       id="inStockSwitch"
-                       style={{
-                         backgroundColor: inStock ? '#495D35' : '#ccc',
-                         borderColor: inStock ? '#495D35' : '#ccc',
-                         boxShadow: inStock ? '0 0 0 0.2rem rgba(73, 93, 53, 0.25)' : 'none'
-                       }}
-                     />
-                     <label className="form-check-label fw-medium" htmlFor="inStockSwitch">
-                       📦 Нөөцтэй
-                     </label>
-                   </div>
-                 </div>
-                 <div className="col-6">
-                   <div className="form-check form-switch">
-                     <input
-                       className="form-check-input"
-                       type="checkbox"
-                       checked={hasDiscount}
-                       onChange={(e) => setHasDiscount(e.target.checked)}
-                       id="hasDiscountSwitch"
-                       style={{
-                         backgroundColor: hasDiscount ? '#495D35' : '#ccc',
-                         borderColor: hasDiscount ? '#495D35' : '#ccc',
-                         boxShadow: hasDiscount ? '0 0 0 0.2rem rgba(73, 93, 53, 0.25)' : 'none'
-                       }}
-                     />
-                     <label className="form-check-label fw-medium" htmlFor="hasDiscountSwitch">
-                       🏷️ Хямдралтай
-                     </label>
-                   </div>
-                 </div>
-               </div>
-             </div>
+  <div className="d-flex gap-4">
+    <div className="form-check form-switch d-flex align-items-center">
+      <input
+        className="form-check-input me-2"
+        type="checkbox"
+        checked={inStock}
+        onChange={(e) => setInStock(e.target.checked)}
+        id="inStockSwitch"
+        style={{
+          
+          width: '2.5rem',
+          height: '1.2rem',
+          backgroundColor: inStock ? '#495D35' : '#ccc',
+          borderColor: inStock ? '#495D35' : '#ccc',
+          boxShadow: inStock ? '0.1rem 0.1rem 0 0.1rem rgba(73, 93, 53, 0.25)' : 'none'
+        }}
+      />
+      <label
+        className="form-check-label fw-medium small mb-0"
+        htmlFor="inStockSwitch"
+      >
+        📦 Нөөцтэй
+      </label>
+    </div>
+
+    <div className="form-check form-switch d-flex align-items-center">
+      <input
+        className="form-check-input me-2"
+        type="checkbox"
+        checked={hasDiscount}
+        onChange={(e) => setHasDiscount(e.target.checked)}
+        id="hasDiscountSwitch"
+        style={{
+          width: '2.5rem',
+          height: '1.2rem',
+          backgroundColor: hasDiscount ? '#495D35' : '#ccc',
+          borderColor: hasDiscount ? '#495D35' : '#ccc',
+          boxShadow: inStock ? '0.1rem 0.1rem 0 0.1rem rgba(73, 93, 53, 0.25)' : 'none'
+        }}
+      />
+      <label
+        className="form-check-label fw-medium small mb-0"
+        htmlFor="hasDiscountSwitch"
+      >
+        🏷️ Хямдралтай
+      </label>
+    </div>
+  </div>
+</div>
+
            </div>
          </div>
        </div>
