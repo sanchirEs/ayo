@@ -69,8 +69,8 @@ const setQuantity = async (id, q) => {
   // Нийт (жишээнд байсан VAT=19, flat=49, pickup=8)
   const shippingFee =
     (checkboxes.flat_rate ? 49 : 0) + (checkboxes.local_pickup ? 8 : 0);
-  const vat = 19;
-  const grandTotal = computedSubtotal + shippingFee + vat;
+  const vat = 6000;
+  const grandTotal = computedSubtotal  + vat;
 
   // Захиалга өгөх товчийг дарахад нэвтрээгүй үед login modal харуулах
   const handleCheckout = () => {
