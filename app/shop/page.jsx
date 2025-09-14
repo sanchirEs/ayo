@@ -10,16 +10,12 @@ export default function ShopPage() {
           <div className="spinner-border text-primary mb-3" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
-          <h6 className="text-primary">Ангилалын бүтээгдэхүүн ачаалж байна...</h6>
+          <h6 className="text-primary">Бүтээгдэхүүн ачаалж байна...</h6>
         </div>
       </div>
     }>
       <ShopLayoutWrapper 
-        categoryId={categoryId}
-        initialPage={page}
-        initialLimit={limit}
-        initialSort={sort}
-        initialFilters={urlFilters}
+    
       />
     </Suspense>
   </div>
