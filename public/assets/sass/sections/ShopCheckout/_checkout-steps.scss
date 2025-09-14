@@ -1,8 +1,12 @@
 .shop-checkout {
   .page-title {
     font-size: 2.1875rem;
-    margin-bottom: 3.125rem;
+    margin-bottom: 1.125rem;
     text-transform: uppercase;
+    
+    @include media-breakpoint-up(md) {
+      margin-bottom: 3.125rem;
+    }
   }
 
   .checkout-steps {

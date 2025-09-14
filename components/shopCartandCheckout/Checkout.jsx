@@ -583,7 +583,7 @@ export default function Checkout() {
       <form onSubmit={(e) => e.preventDefault()}>
         <div className="checkout-form">
         <div className="billing-info__wrapper">
-          <h4>ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
+          <h4 className="mb-3">ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
           
           {/* Address Selection Buttons */}
           <div className="address-selection__wrapper mb-4">
@@ -635,12 +635,12 @@ export default function Checkout() {
                     }}>{addresses.length}</span>
                   )}
                 </button>
-                {!session?.user && (
+                {/* {!session?.user && (
                   <small className="text-muted d-block mt-1">Нэвтэрсэн хэрэглэгч л ашиглах боломжтой</small>
-                )}
-                {session?.user && addresses.length === 0 && (
+                )} */}
+                {/* {session?.user && addresses.length === 0 && (
                   <small className="text-muted d-block mt-1">Хадгалсан хаяг байхгүй байна</small>
-                )}
+                )} */}
               </div>
               <div className="col-md-6">
                 <button
@@ -1394,9 +1394,9 @@ export default function Checkout() {
                  </div>
                ) : (
                  <div className="text-center py-4 text-muted">
-                   <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
+                   {/* <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
                    <div>Хадгалсан хаяг байхгүй байна</div>
-                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small>
+                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small> */}
                  </div>
                )}
              </div>

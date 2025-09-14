@@ -11,7 +11,9 @@ export default function () {
         <div className="mb-2 pb-2 mb-md-4 pb-md-4"></div>
         <section className="shop-checkout container">
           <h2 className="page-title fs-4 fs-md-3">ORDER RECEIVED</h2>
-          <ChectoutSteps />
+          <div className="d-none d-md-block">
+            <ChectoutSteps />
+          </div>
           <Suspense fallback={<div>Loading order details...</div>}>
             <OrderCompleted />
           </Suspense>
