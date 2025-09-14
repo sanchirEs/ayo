@@ -15,17 +15,17 @@ export default function Categories() {
   // List of all available category images from the folder
   const categoryImages = [
     '/assets/images/categories/АМПУЛЬ.png',
-    '/assets/images/categories/БИЕИЙН ТОС.png',
-    '/assets/images/categories/БИЕИЙН ШИНГЭН САВАН.png',
-    '/assets/images/categories/ГАРЫН ТОС.png',
+    '/assets/images/categories/БИЕИЙН-ТОС.png',
+    '/assets/images/categories/БИЕИЙН-ШИНГЭН-САВАН.png',
+    '/assets/images/categories/ГАРЫН-ТОС.png',
     '/assets/images/categories/МАСК.png',
-    '/assets/images/categories/НАРНЫ ТОС.png',
-    '/assets/images/categories/НҮҮРНИЙ ТОС.png',
+    '/assets/images/categories/НАРНЫ-ТОС.png',
+    '/assets/images/categories/НҮҮРНИЙ-ТОС.png',
     '/assets/images/categories/ТОНЕР.png',
-    '/assets/images/categories/УРУУЛЫН БАЛМ.png',
+    '/assets/images/categories/УРУУЛЫН-БАЛМ.png',
     '/assets/images/categories/ҮНЭРТЭН.png',
     '/assets/images/categories/ШАМПУНЬ.png',
-    '/assets/images/categories/ШҮДНИЙ ОО.png'
+    '/assets/images/categories/ШҮДНИЙ-ОО.png'
   ];
 
   // Function to get category name from image path
