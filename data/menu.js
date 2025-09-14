@@ -197,7 +197,7 @@ export const dashboardMenuItems = [
   {
     id: 5,
     href: "/account_wishlist",
-    title: "Wishlist",
+    title: "Хүслийн жагсаалт",
   },
   {
     id: 6,
