@@ -306,6 +306,18 @@ body {
   width: 2em; /* match $nav-link-active-bottom-width */
 }
 
+/* Fix navigation link underline to start from center */
+.navigation__link::after {
+  left: 0% !important;
+  transform: translateX(0%) !important;
+  transition: width 0.3s ease, left 0.3s ease, transform 0.3s ease !important;
+}
+
+.navigation__link:hover::after {
+  left: 0% !important;
+  transform: translateX(0%) !important;
+}
+
 /* Make main nav text non-bold */
 .navigation__link {
   font-weight: 500 !important; /* normal */
