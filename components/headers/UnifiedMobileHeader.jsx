@@ -27,7 +27,7 @@ export default function UnifiedMobileHeader({
 
     if (titleType === "category") {
       if (!categoryId) {
-        setDisplayTitle("Онцлох бүтээгдэхүүн");
+        setDisplayTitle("Бүтээгдэхүүнүүд");
         setLoading(false);
         return;
       }
@@ -140,3 +140,5 @@ export default function UnifiedMobileHeader({
     </div>
   );
 }
+
+

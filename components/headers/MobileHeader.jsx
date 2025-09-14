@@ -23,6 +23,7 @@ export default function MobileHeader() {
   const [recentSearches, setRecentSearches] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef(null);
+  const searchDropdownRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -120,20 +121,29 @@ export default function MobileHeader() {
   // Handle click outside to close search
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if the click is outside the search container
-      const searchContainer = document.querySelector('.search-field');
-      if (searchContainer && !searchContainer.contains(event.target)) {
-        setIsSearchOpen(false);
+      // Check if clicking inside search input or dropdown
+      if (searchInputRef.current?.contains(event.target) || 
+          searchDropdownRef.current?.contains(event.target)) {
+        return; // Don't close if clicking inside search area
       }
+      
+      // Close search if clicking outside
+      setIsSearchOpen(false);
     };
 
     if (isSearchOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      // Use setTimeout to avoid immediate closure
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 100);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
     }
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => {};
   }, [isSearchOpen]);
 
   // Handle search submit
@@ -146,7 +156,21 @@ export default function MobileHeader() {
       setIsSearchOpen(false);
       setSearchQuery("");
       setSearchResults([]);
+      // Scroll to top when navigating to shop page
+      window.scrollTo(0, 0);
     }
+  };
+
+  // Handle recent search click
+  const handleRecentSearchClick = (search) => {
+    saveToRecentSearches(search);
+    const currentPath = window.location.pathname + window.location.search;
+    router.push(`/shop?search=${encodeURIComponent(search)}&redirect=${encodeURIComponent(currentPath)}`);
+    setIsSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    // Scroll to top when navigating to shop page
+    window.scrollTo(0, 0);
   };
 
   // Handle search result click
@@ -267,6 +291,7 @@ export default function MobileHeader() {
             {/* Search Results Dropdown */}
             {isSearchOpen && (
               <div 
+                ref={searchDropdownRef}
                 className="position-absolute start-0 top-100 m-0 w-100 bg-white border rounded-3 shadow-lg"
                 style={{ 
                   zIndex: 1000,
@@ -293,7 +318,7 @@ export default function MobileHeader() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                setSearchQuery(search);
+                                handleRecentSearchClick(search);
                               }}
                               className="btn btn-link p-0 text-start text-decoration-none"
                               style={{ 
@@ -453,41 +478,38 @@ export default function MobileHeader() {
                       <div className="d-flex flex-column gap-2">
                         <Link 
                           href="/shop" 
-                          className="btn btn-outline-primary rounded-pill text-start fw-medium py-2"
+                          className="btn  text-start fw-medium py-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsSearchOpen(false);
+                            window.scrollTo(0, 0);
                           }}
                         >
-                          <svg width="16" height="16" className="me-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                       
                           Шинэ бүтээгдэхүүн
                         </Link>
                         <Link 
                           href="/shop" 
-                          className="btn btn-outline-success rounded-pill text-start fw-medium py-2"
+                          className="btn  text-start fw-medium py-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsSearchOpen(false);
+                            window.scrollTo(0, 0);
                           }}
                         >
-                          <svg width="16" height="16" className="me-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7 13L12 18L17 13M7 6L12 11L17 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                      
                           Хямдралтай
                         </Link>
                         <Link 
                           href="/shop" 
-                          className="btn btn-outline-warning rounded-pill text-start fw-medium py-2"
+                          className="btn  text-start fw-medium py-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsSearchOpen(false);
+                            window.scrollTo(0, 0);
                           }}
                         >
-                          <svg width="16" height="16" className="me-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                      
                           Хамгийн их зарагдсан
                         </Link>
                       </div>

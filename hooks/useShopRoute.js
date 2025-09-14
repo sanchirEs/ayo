@@ -5,7 +5,7 @@ import { useMemo } from "react";
 export function useShopRoute() {
   const pathname = usePathname();
   return useMemo(() => {
-    const isShopRoute = pathname.startsWith('/shop/');
+    const isShopRoute = pathname.startsWith('/shop');
     const isProductRoute = pathname.startsWith('/product1_simple/');
     const isCartRoute = pathname.startsWith('/shop_cart');
     const isCheckoutRoute = pathname.startsWith('/shop_checkout');
