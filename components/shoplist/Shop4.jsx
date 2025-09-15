@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -82,6 +82,17 @@ export default function Shop4({
 
   const [selectedColView, setSelectedColView] = useState(4);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  
+  // Selected variants state for each product
+  const [selectedVariants, setSelectedVariants] = useState({});
+  
+  // Handle variant selection change
+  const handleVariantChange = useCallback((productId, variantId) => {
+    setSelectedVariants(prev => ({
+      ...prev,
+      [productId]: variantId
+    }));
+  }, []);
 
   // ---- products state ----
   const [products, setProducts] = useState([]);
@@ -354,6 +365,18 @@ export default function Shop4({
       setProducts(productList);
       setPagination(mappedPagination);
       setLastFilterUpdate(typeof window !== 'undefined' ? Date.now() : 0);
+      
+      // Set initial selected variants for products with variants
+      const initialVariants = {};
+      productList.forEach(product => {
+        if (product.variants && product.variants.length > 0) {
+          const defaultVariant = product.variants.find(v => v.isDefault) || product.variants[0];
+          if (defaultVariant) {
+            initialVariants[product.id] = defaultVariant.id;
+          }
+        }
+      });
+      setSelectedVariants(initialVariants);
 
     } catch (e) {
       // Sophisticated error handling
@@ -1188,13 +1211,13 @@ export default function Shop4({
                         title={isAddedToCartProducts(id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
                         disabled={!inStock}
                       >
-                        {!inStock ? "Out of Stock" : isAddedToCartProducts(id) ? "Already Added" : "Add To Cart"}
+                        {!inStock ? "Out of Stock" : isAddedToCartProducts(id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
                       </button>
                     </div>
 
                     <div className="pc__info position-relative">
                       <p className="pc__category">{p.brand?.name || p.category?.name || p.categoryName || ""}</p>
-                      <h6 className="pc__title">
+                      <h6 className="pc__title pe-4">
                         <Link href={`/product1_simple/${id}`}>{title}</Link>
                       </h6>
 
@@ -1210,7 +1233,13 @@ export default function Shop4({
                       </div>
 
                       {p.variants?.length ? (
-                        <div className="d-flex align-items-center mt-1"><ColorSelection /></div>
+                        <div className="d-flex align-items-center mt-1">
+                          <ColorSelection 
+                            variants={p.variants}
+                            selectedVariantId={selectedVariants[id]}
+                            onVariantChange={(variantId) => handleVariantChange(id, variantId)}
+                          />
+                        </div>
                       ) : null}
 
                       {rating.average > 0 ? (

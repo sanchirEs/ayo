@@ -360,6 +360,22 @@ button.js-add-wishlist.active {
   &.swatch_active {
     border: 2px solid $primary;
   }
+  
+  &.out-of-stock {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background-color: #dc3545;
+      transform: translate(-50%, -50%) rotate(45deg);
+      z-index: 1;
+    }
+  }
 }
 
 .pc-labels {
