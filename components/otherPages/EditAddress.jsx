@@ -181,8 +181,8 @@ export default function EditAddress() {
 
   return (
     <div className="col-lg-9">
-      <div className="page-content my-account__address">
-        <div className="d-flex justify-content-between align-items-center">
+      <div className="page-content my-account__address" >
+        <div className="d-flex justify-content-between align-items-center mb-3 mb-md-0">
           <h4 className="mb-0">Миний хаягууд</h4>
           <button 
             className="btn btn-primary"

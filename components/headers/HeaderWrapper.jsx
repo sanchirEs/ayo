@@ -12,7 +12,7 @@ export default function HeaderWrapper() {
   }
   
   if (isCheckoutRoute) {
-    return <UnifiedMobileHeader title="Миний захиалга" titleType="static" />;
+    return <UnifiedMobileHeader title="Захиалгын хэсэг" titleType="static" />;
   }
   
   if (isProductRoute) {

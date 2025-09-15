@@ -33,14 +33,14 @@ export function useShopRoute() {
       // Map dashboard routes to titles
       const titleMap = {
         '/account_edit': 'Профайл дэлгэрэнгүй',
-        '/account_orders': 'Миний захиалгууд',
+        '/account_orders': 'Захиалга',
         '/account_edit_address': 'Хаягийн мэдээлэл',
         '/account_wishlist': 'Хүслийн жагсаалт'
       };
       
       // Check for dynamic order detail route
       if (pathname.startsWith('/account_orders/') && pathname !== '/account_orders') {
-        dashboardTitle = 'Миний захиалга';
+        dashboardTitle = 'Захиалгын хэсэг';
       } else {
         dashboardTitle = titleMap[pathname] || 'Миний профайл';
       }

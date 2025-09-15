@@ -11,7 +11,8 @@ export default function AccountWishlistPage() {
     <>
       <div className="mb-4 pb-4"></div>
       <section className="my-account container" style={{backgroundColor: "#FBFFFC"}}>
-        <h2 className="page-title py-3 d-none d-lg-block">Хүслийн жагсаалт</h2>
+      <h2 className="page-title fs-3 fs-md-4 d-none d-lg-block" style={{ color: '#495D35' }}>Хүслийн жагсаалт</h2>
+        {/* <h2 className="page-title py-3 d-none d-lg-block">Хүслийн жагсаалт</h2> */}
         <div className="row">
           <DashboardSidebar />
           <AccountWishlist />
