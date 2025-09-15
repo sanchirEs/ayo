@@ -145,14 +145,23 @@ export default function AccountWishlist() {
     <div className="col-12 col-lg-9">
       <div className="page-content my-account__wishlist">
         {/* Header */}
-        <div className="d-flex align-items-center mb-4">
+       
+        {wishlistProducts.length > 0 ? (
+           <div className="d-flex align-items-center mb-4">
           <h4 className="mb-0 me-2" style={{ color: '#6c757d', fontWeight: 'normal' }}>
-            Танд хадгалсан
-          </h4>
-          <span className="text-muted">
+          Танд хадгалсан
+        </h4>
+        <span className="text-muted">
+        
             {wishlistProducts.length} бараа байна.
-          </span>
+    
+        </span>
         </div>
+        ) : (
+          <span></span>
+        )}
+          
+        
 
         {wishlistProducts.length > 0 ? (
           <div
@@ -226,7 +235,7 @@ export default function AccountWishlist() {
           </div>
         ) : (
           <div className="text-center py-5">
-            <div className="fs-18 mb-3">No products added to wishlist yet</div>
+            <div className="fs-18 mb-3">Танд хадгалсан бараа байхгүй байна.</div>
             {/* <Link href="/shop-1" className="btn btn-primary">
               Continue Shopping
             </Link> */}
