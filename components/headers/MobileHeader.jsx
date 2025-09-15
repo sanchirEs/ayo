@@ -152,12 +152,11 @@ export default function MobileHeader() {
     if (searchQuery.trim()) {
       saveToRecentSearches(searchQuery);
       const currentPath = window.location.pathname + window.location.search;
-      router.push(`/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`);
+      // Use window.location.href instead of router.push for proper navigation
+      window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`;
       setIsSearchOpen(false);
       setSearchQuery("");
       setSearchResults([]);
-      // Scroll to top when navigating to shop page
-      window.scrollTo(0, 0);
     }
   };
 
@@ -165,12 +164,11 @@ export default function MobileHeader() {
   const handleRecentSearchClick = (search) => {
     saveToRecentSearches(search);
     const currentPath = window.location.pathname + window.location.search;
-    router.push(`/shop?search=${encodeURIComponent(search)}&redirect=${encodeURIComponent(currentPath)}`);
+    // Use window.location.href instead of router.push for proper navigation
+    window.location.href = `/shop?search=${encodeURIComponent(search)}&redirect=${encodeURIComponent(currentPath)}`;
     setIsSearchOpen(false);
     setSearchQuery("");
     setSearchResults([]);
-    // Scroll to top when navigating to shop page
-    window.scrollTo(0, 0);
   };
 
   // Handle search result click
@@ -178,7 +176,8 @@ export default function MobileHeader() {
     e.preventDefault();
     e.stopPropagation();
     saveToRecentSearches(searchQuery);
-    router.push(`/product1_simple/${product.id}`);
+    // Use window.location.href instead of router.push for proper navigation
+    window.location.href = `/product1_simple/${product.id}`;
     setIsSearchOpen(false);
     setSearchQuery("");
     setSearchResults([]);

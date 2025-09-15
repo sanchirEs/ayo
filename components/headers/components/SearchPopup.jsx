@@ -99,7 +99,8 @@ export default function SearchPopup() {
     if (searchQuery.trim()) {
       saveToRecentSearches(searchQuery);
       const currentPath = window.location.pathname + window.location.search;
-              router.push(`/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`);
+      // Use window.location.href instead of router.push for proper navigation
+      window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`;
       setIsPopupOpen(false);
       setSearchQuery("");
       setSearchResults([]);
@@ -109,7 +110,8 @@ export default function SearchPopup() {
   // Handle search result click
   const handleResultClick = (product) => {
     saveToRecentSearches(searchQuery);
-    router.push(`/product1_simple/${product.id}`);
+    // Use window.location.href instead of router.push for proper navigation
+    window.location.href = `/product1_simple/${product.id}`;
     setIsPopupOpen(false);
     setSearchQuery("");
     setSearchResults([]);

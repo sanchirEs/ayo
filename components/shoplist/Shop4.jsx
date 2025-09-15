@@ -85,6 +85,11 @@ export default function Shop4({
   
   // Selected variants state for each product
   const [selectedVariants, setSelectedVariants] = useState({});
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   // Handle variant selection change
   const handleVariantChange = useCallback((productId, variantId) => {
