@@ -28,7 +28,7 @@ export default function DiscountedProducts() {
         // Extract discounted products from homepage response
         const discountedProducts = res.data?.discounted || [];
         setProducts(discountedProducts);
-        console.log("discounted products: ", discountedProducts)
+        // console.log("discounted products: ", discountedProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load discounted products"))
       .finally(() => setLoading(false));

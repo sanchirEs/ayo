@@ -128,7 +128,7 @@ export default function EditAddress() {
       ...formData,
     };
 
-    console.log("submitData", submitData);
+    // console.log("submitData", submitData);
     try {
       if (showEditModal && selectedAddress) {
         await updateAddress(selectedAddress.id, submitData);

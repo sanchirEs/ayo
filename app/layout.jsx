@@ -53,7 +53,7 @@ export default function RootLayout({ children }) {
             event.reason?.message?.includes('Not Found') ||
             event.reason?.message?.includes('fetch')) {
           event.preventDefault();
-          console.log('Suppressing 404/network error from global handler');
+          // console.log('Suppressing 404/network error from global handler');
         }
       };
       

@@ -57,7 +57,7 @@ export default function OrderDetail({ orderId }) {
       try {
         setLoading(true);
         const response = await api.orders.getOrderDetails(orderId);
-        console.log("response in order detail: ", response);
+        // console.log("response in order detail: ", response);
         
         if (response.success) {
           setOrder(response.data);
@@ -151,12 +151,12 @@ export default function OrderDetail({ orderId }) {
       };
 
       const response = await api.payments.create(paymentData);
-      console.log("res in order detail: ", response);
+        // console.log("res in order detail: ", response);
       if (response.success) {
         const result = response.data;
         const payment = result.payment;
-        console.log("payment in order detail: ", payment);
-        console.log("result in order detail: ", result);
+        // console.log("payment in order detail: ", payment);
+        // console.log("result in order detail: ", result);
         
         const paymentDataToSet = {
           orderId: order.id,
@@ -172,7 +172,7 @@ export default function OrderDetail({ orderId }) {
           expiresAt: payment.expiresAt
         };
         
-        console.log("Setting payment data:", paymentDataToSet);
+        // console.log("Setting payment data:", paymentDataToSet);
         setPaymentData(paymentDataToSet);
         setShowPaymentModal(true);
       }
@@ -585,7 +585,7 @@ export default function OrderDetail({ orderId }) {
                             e.target.style.display = 'none';
                           }}
                           onLoad={() => {
-                            console.log('QR Image loaded successfully:', paymentData.qrImage);
+                            // console.log('QR Image loaded successfully:', paymentData.qrImage);
                           }}
                         />
                         

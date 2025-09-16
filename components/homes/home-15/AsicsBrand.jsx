@@ -24,7 +24,7 @@ export default function AsicsBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("asics products: ", featuredProducts)
+        // console.log("asics products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load asics products"))
       .finally(() => setLoading(false));

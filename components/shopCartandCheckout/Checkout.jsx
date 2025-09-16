@@ -119,7 +119,7 @@ export default function Checkout() {
       // If it's GZIP compressed base64
       if (data.startsWith('H4sI')) {
         try {
-          console.log('Processing GZIP compressed QR data:', data.substring(0, 50) + '...');
+          // console.log('Processing GZIP compressed QR data:', data.substring(0, 50) + '...');
           
           // Convert base64 to binary
           const binary = atob(data);
@@ -132,7 +132,7 @@ export default function Checkout() {
           const decompressed = pako.inflate(bytes);
           const processedData = String.fromCharCode.apply(null, decompressed);
 
-          console.log('Decompressed string length:', processedData.length);
+          // console.log('Decompressed string length:', processedData.length);
           return processedData;
         } catch (err) {
           console.error('Failed to process GZIP QR data:', err);
@@ -259,7 +259,7 @@ export default function Checkout() {
 
   // Correct payment status monitoring as per SAGA documentation
   const startPaymentStatusMonitoring = (paymentId) => {
-    console.log('Starting payment status monitoring for:', paymentId);
+    // console.log('Starting payment status monitoring for:', paymentId);
     
     let checkCount = 0;
     const maxAttempts = 60; // 3 minutes with 3-second intervals (as per documentation)
@@ -267,7 +267,7 @@ export default function Checkout() {
     const interval = setInterval(async () => {
       try {
         checkCount++;
-        console.log(`Payment status check: ${paymentId} (attempt ${checkCount}/${maxAttempts})`);
+        // console.log(`Payment status check: ${paymentId} (attempt ${checkCount}/${maxAttempts})`);
         
         // Check payment status as per documentation
         const response = await api.payments.getStatus(paymentId);
@@ -275,7 +275,7 @@ export default function Checkout() {
         if (response.success && response.data) {
           const payment = response.data;
           const newStatus = payment.status;
-          console.log('Payment status updated:', newStatus);
+          // console.log('Payment status updated:', newStatus);
           
           // Update payment data
           setPaymentData(prev => ({
@@ -303,7 +303,7 @@ export default function Checkout() {
         
         // Stop monitoring after max attempts
         if (checkCount >= maxAttempts) {
-          console.log('Payment status monitoring: max attempts reached');
+          // console.log('Payment status monitoring: max attempts reached');
           clearInterval(interval);
           setStatusCheckInterval(null);
         }
@@ -312,7 +312,7 @@ export default function Checkout() {
         
         // If it's a 404 error, the payment might not exist yet, so continue monitoring
         if (error.message && error.message.includes('404')) {
-          console.log('Payment not found yet, continuing to monitor...');
+          // console.log('Payment not found yet, continuing to monitor...');
         } else {
           // For other errors, stop monitoring after a few attempts
           if (checkCount >= 3) {
@@ -329,17 +329,17 @@ export default function Checkout() {
 
   // Legacy SAGA progress tracking (kept for backward compatibility)
   const startSagaProgressTracking = (sagaId) => {
-    console.log('Starting SAGA progress tracking for:', sagaId);
+    // console.log('Starting SAGA progress tracking for:', sagaId);
     
     // Track SAGA progress every 10 seconds for up to 5 minutes
     const interval = setInterval(async () => {
       try {
         const sagaData = await api.utils.trackSagaProgress(sagaId, (progress) => {
-          console.log('SAGA Progress:', progress);
+          // console.log('SAGA Progress:', progress);
           
           // Only stop tracking on failure, not completion
           if (progress.status === 'FAILED') {
-            console.log('SAGA failed:', progress);
+            // console.log('SAGA failed:', progress);
             clearInterval(interval);
           }
           // Don't stop on COMPLETED - SAGA completion doesn't mean payment is done
@@ -402,17 +402,17 @@ export default function Checkout() {
         }
       };
 
-      console.log('Creating order with SAGA pattern:', orderData);
+      // console.log('Creating order with SAGA pattern:', orderData);
 
       // Check system health before creating order
       try {
         const healthCheck = await api.system.health(true);
         if (!healthCheck.success || healthCheck.data?.status !== 'healthy') {
-          console.warn('System health check failed:', healthCheck);
+          // console.warn('System health check failed:', healthCheck);
           // Continue anyway, but log the warning
         }
       } catch (healthError) {
-        console.warn('System health check error:', healthError);
+        // console.warn('System health check error:', healthError);
         // Continue anyway
       }
 
@@ -430,14 +430,14 @@ export default function Checkout() {
         useCustomHeaders: false // Set to true when backend supports custom headers
       });
       
-      console.log('Order creation response:', response);
-      console.log('Response data:', response.data);
-      console.log('Payment data:', response.data?.payment);
-      console.log('Order data:', response.data?.order);
+      // console.log('Order creation response:', response);
+      // console.log('Response data:', response.data);
+      // console.log('Payment data:', response.data?.payment);
+      // console.log('Order data:', response.data?.order);
       
       if (response.success) {
         const { order, payment, sagaId } = response.data;
-        console.log('Order created successfully:', { order, payment, sagaId });
+        // console.log('Order created successfully:', { order, payment, sagaId });
         
         // Set payment data for modal (SAGA format)
         setPaymentData({
@@ -527,7 +527,7 @@ export default function Checkout() {
   const handleManualStatusCheck = async () => {
     if (paymentData?.paymentId) {
       try {
-        console.log('Manual status check for payment:', paymentData.paymentId);
+        // console.log('Manual status check for payment:', paymentData.paymentId);
         
         // Check payment status as per documentation
         const response = await api.payments.getStatus(paymentData.paymentId);

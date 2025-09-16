@@ -100,7 +100,7 @@ export default function Reviews({ productId, productName }) {
     setLoadErr("");
     try {
       const res = await api.reviews.getForProduct(productId, { page: 1, limit: 20, sortOrder: "desc" });
-      console.log("reviews:", reviews)
+      // console.log("reviews:", reviews)
       // backend: { success, data: [...], pagination }
       const list =
         Array.isArray(res?.data) ? res.data :
@@ -110,7 +110,7 @@ export default function Reviews({ productId, productName }) {
     } catch (e) {
       // Authentication required error-ийг харуулахгүй
       if (e.message?.includes('Authentication required') || e.message?.includes('401')) {
-        console.log('Authentication required for reviews, but not showing error');
+        // console.log('Authentication required for reviews, but not showing error');
         setReviews([]);
       } else {
         setLoadErr(e.message || "Сэтгэгдэл ачааллахад алдаа гарлаа.");
@@ -173,7 +173,7 @@ export default function Reviews({ productId, productName }) {
     } catch (e) {
       // Authentication required error-ийг харуулахгүй
       if (e.message?.includes('Authentication required') || e.message?.includes('401')) {
-        console.log('Authentication required for delete, but not showing error');
+        // console.log('Authentication required for delete, but not showing error');
       } else {
         alert(e.message || "Устгах үед алдаа гарлаа.");
       }

@@ -17,17 +17,17 @@ export default async function ProductDetailsPage1({ params }) {
     );
   }
 
-  console.log("id: ", id)
+  // console.log("id: ", id)
 
   let product = null;
   try {
     const res = await api.products.getDetail(id); // GET /api/v1/products/:id
     // depending on your backend shape:
     product = res?.data ?? res; // if your BE returns { data: {...} }
-    console.log("product: ", product)
+    // console.log("product: ", product)
   } catch (e) {
     // optional: log/handle
-    console.error("Failed to load product:", e);
+    // console.error("Failed to load product:", e);
   }
 
   return (

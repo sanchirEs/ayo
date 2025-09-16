@@ -48,7 +48,7 @@ export default function RelatedSlider({ currentProduct }) {
   // Fetch related products
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      console.log("currentProduct", currentProduct);
+      // console.log("currentProduct", currentProduct);
       if (!currentProduct?.categoryId) {
         setLoading(false);
         return;
@@ -57,7 +57,7 @@ export default function RelatedSlider({ currentProduct }) {
       try {
         setLoading(true);
         setError(null);
-        console.log("currentProduct.category.id", currentProduct.categoryId);
+        // console.log("currentProduct.category.id", currentProduct.categoryId);
         // Try to get products by category, fallback to alternative endpoints if enhanced fails
         let response;
         try {
@@ -66,7 +66,7 @@ export default function RelatedSlider({ currentProduct }) {
             limit: 8
           });
         } catch (error) {
-          console.warn('Enhanced endpoint failed, trying alternative approach:', error);
+          // console.warn('Enhanced endpoint failed, trying alternative approach:', error);
           try {
             // Try to get all products and filter by category on frontend
             const allProducts = await api.products.new({ limit: 20 });
@@ -80,11 +80,11 @@ export default function RelatedSlider({ currentProduct }) {
               response = { data: { products: [] } };
             }
           } catch (fallbackError) {
-            console.warn('Fallback also failed:', fallbackError);
+            // console.warn('Fallback also failed:', fallbackError);
             response = { data: { products: [] } };
           }
         }
-        console.log("response related products", response);
+        // console.log("response related products", response);
         
         // Filter out current product and get products array
         const products = Array.isArray(response?.data?.products) ? response.data.products : 

@@ -24,7 +24,7 @@ export default function PumaBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("puma products: ", featuredProducts)
+        // console.log("puma products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load puma products"))
       .finally(() => setLoading(false));

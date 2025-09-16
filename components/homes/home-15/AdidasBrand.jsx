@@ -24,7 +24,7 @@ export default function AdidasBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("adidas products: ", featuredProducts)
+        // console.log("adidas products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load adidas products"))
       .finally(() => setLoading(false));

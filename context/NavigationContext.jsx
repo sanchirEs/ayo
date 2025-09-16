@@ -38,9 +38,9 @@ export function NavigationProvider({ children }) {
       }
       
       // Debug logging
-      console.log('Navigation Stack Updated:', limitedStack);
-      console.log('Current page:', pathname);
-      console.log('Previous page:', limitedStack.length >= 2 ? limitedStack[limitedStack.length - 2] : 'None');
+      // console.log('Navigation Stack Updated:', limitedStack);
+      // console.log('Current page:', pathname);
+      // console.log('Previous page:', limitedStack.length >= 2 ? limitedStack[limitedStack.length - 2] : 'None');
       
       return limitedStack;
     });

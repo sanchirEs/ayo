@@ -134,7 +134,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
     if (externalFilters && externalFilters._meta) {
       // Handle complete filter clearing
       if (externalFilters._meta.filterType === 'clear') {
-        console.log('🔄 FILTER ALL: Clearing all filters from external source');
+        // console.log('🔄 FILTER ALL: Clearing all filters from external source');
         setActiveBrands([]);
         setActiveAttributes({});
         setActiveSpecs({});
@@ -159,7 +159,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
       
       // Handle individual filter removal
       if (externalFilters._meta.filterType === 'remove') {
-        console.log('🔄 FILTER ALL: Removing individual filters from external source');
+        // console.log('🔄 FILTER ALL: Removing individual filters from external source');
         // Update local state to match external filter changes
         if (externalFilters.brands !== undefined) {
           setActiveBrands(externalFilters.brands || []);

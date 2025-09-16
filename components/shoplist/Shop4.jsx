@@ -59,10 +59,10 @@ export default function Shop4({
   initialSort = "newest",
   appliedFilters = null, // Filters from ShopLayoutWrapper
   onFiltersChange = null, // Filter change handler from ShopLayoutWrapper
-  // Debug props
-  _debugShopLayout = false,
-  _debugFilterCount = 0,
-  _debugTimestamp = null,
+  // Debug props (commented out for production)
+  // _debugShopLayout = false,
+  // _debugFilterCount = 0,
+  // _debugTimestamp = null,
   ...otherProps
 }) {
 
@@ -130,12 +130,12 @@ export default function Shop4({
     colors: [],
     sizes: [],
     price: [20, 70987],
-    // Metadata for debugging
-    _meta: {
-      totalActiveFilters: 0,
-      lastUpdate: 0,
-      filterType: 'default'
-    }
+    // Metadata for debugging (commented out for production)
+    // _meta: {
+    //   totalActiveFilters: 0,
+    //   lastUpdate: 0,
+    //   filterType: 'default'
+    // }
   };
 
   // Calculate total active filters
@@ -291,7 +291,7 @@ export default function Shop4({
         });
         if (attributeStrings.length > 0) {
           params.attributes = attributeStrings.join(',');
-          console.log('🔍 DEBUG: Attribute filters being sent:', params.attributes);
+          // console.log('🔍 DEBUG: Attribute filters being sent:', params.attributes);
         }
       }
 

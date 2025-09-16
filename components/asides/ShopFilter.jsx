@@ -21,7 +21,7 @@ export default function ShopFilter() {
   // Use the filter context for shared state
   const { appliedFilters, handleFiltersChange, clearAllFilters } = useFilterContext();
 
-  console.log('🚨 SHOP FILTER (Mobile): Component rendered with context handler:', !!handleFiltersChange);
+  // console.log('🚨 SHOP FILTER (Mobile): Component rendered with context handler:', !!handleFiltersChange);
 
   return (
     <div className="aside-filters aside aside_right" id="shopFilterAside">
@@ -61,7 +61,7 @@ export default function ShopFilter() {
             onClick={() => {
               // Clear all filters
               clearAllFilters();
-              console.log('Clear filters clicked');
+              // console.log('Clear filters clicked');
             }}
           >
             Цэвэрлэх
@@ -78,7 +78,7 @@ export default function ShopFilter() {
             }}
             onClick={() => {
               // Done logic here
-              console.log('Done clicked');
+              // console.log('Done clicked');
               closeModalShopFilter();
             }}
           >

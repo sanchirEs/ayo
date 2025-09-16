@@ -28,7 +28,7 @@ export default function Featured() {
         if (!mounted) return;
         // BE returns { products, pagination }
         setData({ products: res.data.products ?? [], pagination: res.data.pagination ?? null });
-        console.log("proods: ", res.data.products)
+        // console.log("proods: ", res.data.products)
       })
       .catch((e) => setErr(e.message || "Failed to load products"))
       .finally(() => setLoading(false));

@@ -24,7 +24,7 @@ export default function ReebokBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("reebok products: ", featuredProducts)
+        // console.log("reebok products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load reebok products"))
       .finally(() => setLoading(false));

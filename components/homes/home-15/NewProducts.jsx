@@ -23,7 +23,7 @@ export default function Featured() {
         // Extract newArrivals from homepage response
         const newArrivals = res.data?.newArrivals || [];
         setData({ products: newArrivals, pagination: null });
-        console.log("new arrivals: ", newArrivals)
+        // console.log("new arrivals: ", newArrivals)
       })
       .catch((e) => setErr(e.message || "Failed to load new products"))
       .finally(() => setLoading(false));

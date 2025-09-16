@@ -22,7 +22,7 @@ export default function FlashSaleProducts() {
         // Extract flashSale from homepage response
         const flashSaleProducts = res.data?.flashSale || [];
         setData({ products: flashSaleProducts, pagination: null });
-        console.log("flash sale products: ", flashSaleProducts)
+        // console.log("flash sale products: ", flashSaleProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load flash sale products"))
       .finally(() => setLoading(false));

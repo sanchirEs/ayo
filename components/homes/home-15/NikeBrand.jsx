@@ -24,7 +24,7 @@ export default function NikeBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("nike products: ", featuredProducts)
+        // console.log("nike products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load nike products"))
       .finally(() => setLoading(false));
