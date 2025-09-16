@@ -157,6 +157,7 @@ export default function CustomerLogin() {
               className="btn btn-primary w-100 text-uppercase"
               type="submit"
               disabled={loading}
+              style={{backgroundColor: "#495D35"}}
             >
               {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
             </button>
@@ -413,6 +414,7 @@ export default function CustomerLogin() {
                   className="btn btn-primary w-100 text-uppercase"
                   type="submit"
                   disabled={isSubmitting}
+                  style={{backgroundColor: "#495D35"}}
                 >
                   {isSubmitting ? "Бүртгүүлж байна..." : "Бүртгүүлэх"}
                 </button>

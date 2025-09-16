@@ -209,6 +209,7 @@ export default function LoginRegister() {
                 className="btn btn-primary w-100 text-uppercase"
                 type="submit"
                 disabled={loginLoading}
+                style={{backgroundColor: "#495D35"}}
               >
                 {loginLoading ? "Нэвтэрч байна..." : "Нэвтрэх"}
               </button>
@@ -470,6 +471,7 @@ export default function LoginRegister() {
                     className="btn btn-primary w-100 text-uppercase"
                     type="submit"
                     disabled={isSubmitting}
+                    style={{backgroundColor: "#495D35"}}
                   >
                     {isSubmitting ? "Бүртгүүлж байна..." : "Бүртгүүлэх"}
                   </button>
