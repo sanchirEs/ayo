@@ -560,7 +560,7 @@ export default function Shop4({
   }
 
   return (
-    <div>
+    <div className="mb-4 md:mb-0">
       {/* Active Filter Tags Styles */}
       <style jsx>{`
         .active-filters-section {

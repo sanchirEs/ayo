@@ -238,7 +238,7 @@ export default function MobileHeader() {
       </div>
       {/* <!-- /.container --> */}
 
-      <nav className="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto" style={{ display: 'none' }}>
+      <nav className="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 overflow-auto" style={{ display: 'none', backgroundColor: "#F4F7F5" }}>
         <div className="container" style={{ backgroundColor: "#F4F7F5" }}>
           <form
             onSubmit={handleSearchSubmit}
@@ -475,7 +475,20 @@ export default function MobileHeader() {
                         Шуурхай холбоосууд
                       </h6>
                       <div className="d-flex flex-column gap-2">
-                        <Link 
+                      <button 
+                           className="btn  text-start fw-medium py-2"
+                           onClick={() => {
+                            setIsSearchOpen(false);
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop/1";
+                             }, 100);
+                           }}
+                         >
+                           Арьс арчилах
+                  </button>
+                        {/* <Link 
                           href="/shop" 
                           className="btn  text-start fw-medium py-2"
                           onClick={(e) => {
@@ -486,31 +499,35 @@ export default function MobileHeader() {
                         >
                        
                           Шинэ бүтээгдэхүүн
-                        </Link>
-                        <Link 
-                          href="/shop" 
-                          className="btn  text-start fw-medium py-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                        </Link> */}
+                            <button 
+                           className="btn  text-start fw-medium py-2"
+                           onClick={() => {
                             setIsSearchOpen(false);
-                            window.scrollTo(0, 0);
-                          }}
-                        >
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop/14";
+                             }, 100);
+                           }}
+                         >
                       
                           Хямдралтай
-                        </Link>
-                        <Link 
-                          href="/shop" 
-                          className="btn  text-start fw-medium py-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                        </button>
+                        {/* <button 
+                           className="btn  text-start fw-medium py-2"
+                           onClick={() => {
                             setIsSearchOpen(false);
-                            window.scrollTo(0, 0);
-                          }}
-                        >
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop?sortBy=sales";
+                             }, 100);
+                           }}
+                         >
                       
                           Хамгийн их зарагдсан
-                        </Link>
+                        </button> */}
                       </div>
                     </div>
                   )}
@@ -533,7 +550,7 @@ export default function MobileHeader() {
         </div>
         {/* <!-- /.container --> */}
 
-        <div className="border-top mt-auto pb-2">
+        <div className="border-top mt-auto pb-2" >
           </div>
         {/* <div className="border-top mt-auto pb-2">
           <div className="customer-links container mt-4 mb-2 pb-1">

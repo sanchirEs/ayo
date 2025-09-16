@@ -254,42 +254,7 @@ export default function MobileNav() {
       ))}
 
       {/* Specific categories in order - same as Nav.jsx */}
-      {(() => {
-        const specificCategories = [
-          'Хямдралын багц',
-          'Арьс арчилгаа',
-          'Нүүр будалт',
-          'Үнэртэн',
-          'Маск',
-          'Эмэгтэйчүүдийн бүтээгдэхүүн'
-        ];
-        
-        return specificCategories.map((categoryName, index) => {
-          const category = catTree.find(cat => cat.name === categoryName);
-          if (!category) return null;
-          
-          return (
-            <li key={category.id} className="navigation__item">
-              <Link 
-                href={`/shop/${category.id}`} 
-                className="navigation__link"
-                onClick={closeMobileMenu}
-                style={{
-                  color: '#333',
-                  textDecoration: 'none',
-                  padding: '8px 0',
-                  fontWeight: '500',
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                {category.name}
-              </Link>
-            </li>
-          );
-        });
-      })()}
+    
 
       {/* Static Menu Items */}
       {/* <li className="navigation__item">
