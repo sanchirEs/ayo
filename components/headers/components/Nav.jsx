@@ -1,12 +1,5 @@
 "use client";
-import {
-  additionalShopPageitems,
-  blogmenuItems,
-  homePages,
-  othersMenuItems,
-  shopDetails,
-  shopList,
-} from "@/data/menu";
+
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";

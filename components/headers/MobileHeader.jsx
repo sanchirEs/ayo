@@ -183,6 +183,18 @@ export default function MobileHeader() {
     setSearchResults([]);
   };
 
+  // Function to close mobile menu when link is clicked
+  const closeMobileMenu = () => {
+    if (document.body.classList.contains("mobile-menu-opened")) {
+      document.body.classList.remove("mobile-menu-opened");
+      document.body.style.paddingRight = "";
+      const mobileDropdown = document.querySelector(".navigation");
+      if (mobileDropdown) {
+        mobileDropdown.style.paddingRight = "";
+      }
+    }
+  };
+
   return (
     <div
       className={`header-mobile header_sticky ${
@@ -486,7 +498,7 @@ export default function MobileHeader() {
                              }, 100);
                            }}
                          >
-                           Арьс арчилах
+                           Арьс арчлах
                   </button>
                         {/* <Link 
                           href="/shop" 
@@ -544,6 +556,15 @@ export default function MobileHeader() {
             <ul className="navigation__list list-unstyled position-relative">
               <MobileNav />
             </ul>
+            <ul className="navigation__list list-unstyled position-relative ">
+            <Link
+            href={`/brands`}
+            onClick={closeMobileMenu}
+          >
+             БРЭНДҮҮД
+          </Link>
+             
+            </ul>
             {/* <!-- /.navigation__list --> */}
           </div>
           {/* <!-- /.overflow-hidden --> */}
@@ -551,6 +572,7 @@ export default function MobileHeader() {
         {/* <!-- /.container --> */}
 
         <div className="border-top mt-auto pb-2" >
+          
           </div>
         {/* <div className="border-top mt-auto pb-2">
           <div className="customer-links container mt-4 mb-2 pb-1">

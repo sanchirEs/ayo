@@ -12,7 +12,6 @@ import Context from "@/context/Context";
 import QuickView from "@/components/modals/QuickView";
 import CartDrawer from "@/components/shopCartandCheckout/CartDrawer";
 import SiteMap from "@/components/modals/SiteMap";
-import NewsLetter from "@/components/modals/NewsLetter";
 import CookieContainer from "@/components/common/CookieContainer";
 import Header14 from "@/components/headers/Header14";
 import HeaderWrapper from "@/components/headers/HeaderWrapper";
@@ -20,7 +19,6 @@ import SizeGuide from "@/components/modals/SizeGuide";
 import Delivery from "@/components/modals/Delivery";
 import CustomerLogin from "@/components/asides/CustomerLogin";
 import ShopFilter from "@/components/asides/ShopFilter";
-import ProductDescription from "@/components/asides/ProductDescription";
 import ProductAdditionalInformation from "@/components/asides/ProductAdditionalInformation";
 import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
@@ -184,7 +182,7 @@ export default function RootLayout({ children }) {
           <SiteMap />
           <CustomerLogin />
           <ShopFilter />
-          <ProductDescription />
+     
           <ProductAdditionalInformation />
           <ProductReviews />
         </Context>

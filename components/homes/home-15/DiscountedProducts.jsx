@@ -145,8 +145,8 @@ export default function DiscountedProducts() {
                         onClick={() => addProductToCart(p.id)}
                         title={
                           isAddedToCartProducts(p.id)
-                            ? "Already Added"
-                            : "Add to Cart"
+                            ? "Сагсанд нэмэгдсэн"
+                            : "Сагсанд нэмэх"
                         }
                       >
                         <svg

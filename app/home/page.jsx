@@ -1,27 +1,14 @@
 import Brands from "@/components/common/brands/Brands";
-import Blogs from "@/components/homes/home-15/Blogs";
 import Categories from "@/components/homes/home-15/Categories";
 import Featured from "@/components/homes/home-15/NewProducts";
 import Hero from "@/components/homes/home-15/Hero";
-import Instagram from "@/components/homes/home-15/Instagram";
-import Lookbook from "@/components/homes/home-15/Lookbook";
 import PopulerProducts from "@/components/homes/home-15/PopulerProducts";
 import FlashSaleProducts from "@/components/homes/home-15/FlashSaleProducts";
 import ConditionalDiscountedProducts from "@/components/homes/home-15/ConditionalDiscountedProducts";
-import FeaturesSection from "@/components/homes/home-15/FeaturesSection";
 import BrandProduct from "@/components/homes/home-15/BrandProduct";
 import BrandProduct2 from "@/components/homes/home-15/BrandProduct2";
-import NikeBrand from "@/components/homes/home-15/NikeBrand";
-import AdidasBrand from "@/components/homes/home-15/AdidasBrand";
-import PumaBrand from "@/components/homes/home-15/PumaBrand";
-import ReebokBrand from "@/components/homes/home-15/ReebokBrand";
-import UnderArmourBrand from "@/components/homes/home-15/UnderArmourBrand";
-import NewBalanceBrand from "@/components/homes/home-15/NewBalanceBrand";
-import AsicsBrand from "@/components/homes/home-15/AsicsBrand";
 import PaymentMethod from "@/components/homes/home-15/PaymentMethod";
 import React from "react";
-import Banner from "@/components/homes/home-15/Banner";
-
 export const metadata = {
   title: "Нүүр хуудас || Ayo eCommerce",
   description: "Монголын шилдэг онлайн дэлгүүр - Ayo eCommerce",

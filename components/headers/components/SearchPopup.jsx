@@ -364,20 +364,41 @@ export default function SearchPopup() {
                  <h6 className="sub-menu__title fs-base">Шуурхай холбоосууд</h6>
                  <ul className="sub-menu__list list-unstyled">
                    <li className="sub-menu__item">
-                     <Link href="/shop" className="menu-link menu-link_us-s">
-                       Шинэ бүтээгдэхүүн
-                  </Link>
+                   <button 
+                           className="menu-link menu-link_us-s"
+                           onClick={() => {
+                            setIsPopupOpen(false);
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop/1";
+                             }, 100);
+                           }}
+                         >
+                           Арьс арчлах
+                  </button>
+                    
                 </li>
                 <li className="sub-menu__item">
-                     <Link href="/shop" className="menu-link menu-link_us-s">
+                <button 
+                           className="menu-link menu-link_us-s"
+                           onClick={() => {
+                            setIsPopupOpen(false);
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop/14";
+                             }, 100);
+                           }}
+                         >
                        Хямдралтай
-                     </Link>
+                     </button>
                 </li>
-                <li className="sub-menu__item">
+                {/* <li className="sub-menu__item">
                      <Link href="/shop" className="menu-link menu-link_us-s">
                        Хамгийн их зарагдсан
                      </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
              )}
