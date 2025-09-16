@@ -4,12 +4,14 @@ import React, { useEffect, useState } from "react";
 import MobileDashboardSidebar from "@/components/otherPages/MobileDashboardSidebar";
 import { useAuth } from "@/context/AuthContext";
 import { openModalUserlogin } from "@/utlis/aside";
+import { usePathname } from "next/navigation";
 
 export default function MobileFooter1() {
   const [showFooter, setShowFooter] = useState(false);
   const [showDashboardSidebar, setShowDashboardSidebar] = useState(false);
   const { wishList } = useContextElement();
   const { user } = useAuth();
+  const pathname = usePathname();
   
   useEffect(() => {
     setShowFooter(true);
@@ -42,6 +44,11 @@ export default function MobileFooter1() {
     setShowDashboardSidebar(true);
   };
 
+  // Check if current page is active
+  const isHomeActive = pathname === '/';
+  const isProfileActive = (pathname.startsWith('/account') && pathname !== '/account_wishlist') || pathname.startsWith('/dashboard');
+  const isWishlistActive = pathname === '/account_wishlist';
+
   return (
     <>
     <footer
@@ -54,6 +61,11 @@ export default function MobileFooter1() {
           <Link
             href="/"
             className="footer-mobile__link d-flex flex-column align-items-center"
+            style={{
+              color: isHomeActive ? '#495D35' : 'inherit',
+              textDecoration: 'none',
+              fontWeight: isHomeActive ? '600' : 'normal'
+            }}
           >
             <svg
               className="d-block"
@@ -62,10 +74,14 @@ export default function MobileFooter1() {
               viewBox="0 0 18 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              style={{ color: isHomeActive ? '#495D35' : 'inherit' }}
             >
               <use href="#icon_home" />
             </svg>
-            <span>Home</span>
+            <span style={{ 
+              color: isHomeActive ? '#495D35' : 'inherit',
+              fontWeight: isHomeActive ? '600' : 'normal'
+            }}>Нүүр</span>
           </Link>
         </div>
         {/* <!-- /.col-3 --> */}
@@ -74,7 +90,11 @@ export default function MobileFooter1() {
           <button
             onClick={handleProfileClick}
             className="footer-mobile__link d-flex flex-column align-items-center border-0 bg-transparent"
-            style={{ width: '100%' }}
+            style={{ 
+              width: '100%',
+              color: isProfileActive ? '#495D35' : 'inherit',
+              fontWeight: isProfileActive ? '600' : 'normal'
+            }}
           >
              <svg
               
@@ -84,10 +104,14 @@ export default function MobileFooter1() {
               viewBox="0 0 20 20"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              style={{ color: isProfileActive ? '#495D35' : 'inherit' }}
             >
               <use href="#icon_user" />
             </svg>
-            <span>Профайл</span>
+            <span style={{ 
+              color: isProfileActive ? '#495D35' : 'inherit',
+              fontWeight: isProfileActive ? '600' : 'normal'
+            }}>Профайл</span>
           </button>
         </div>
         {/* <!-- /.col-3 --> */}
@@ -97,6 +121,11 @@ export default function MobileFooter1() {
             href="/account_wishlist"
             className="footer-mobile__link d-flex flex-column align-items-center"
             onClick={handleWishlistClick}
+            style={{
+              color: isWishlistActive ? '#495D35' : 'inherit',
+              textDecoration: 'none',
+              fontWeight: isWishlistActive ? '600' : 'normal'
+            }}
           >
             <div className="position-relative">
               <svg
@@ -106,6 +135,7 @@ export default function MobileFooter1() {
                 viewBox="0 0 20 20"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                style={{ color: isWishlistActive ? '#495D35' : 'inherit' }}
               >
                 <use href="#icon_heart" />
               </svg>
@@ -113,7 +143,10 @@ export default function MobileFooter1() {
                 {wishList.length}
               </span>
             </div>
-            <span>Wishlist</span>
+            <span style={{ 
+              color: isWishlistActive ? '#495D35' : 'inherit',
+              fontWeight: isWishlistActive ? '600' : 'normal'
+            }}>Хадгалсан</span>
           </Link>
         </div>
         {/* <!-- /.col-3 --> */}
