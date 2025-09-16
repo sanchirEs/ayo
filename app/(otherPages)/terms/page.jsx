@@ -3,8 +3,8 @@ import Terms from "@/components/otherPages/Terms";
 import React from "react";
 
 export const metadata = {
-  title: "Terms || Ayo eCommerce",
-  description: "Ayo eCommerce",
+  title: "Үйлчилгээний нөхцөл || Ayo eCommerce",
+  description: "Ayo eCommerce үйлчилгээний нөхцөл, хууль ёсны мэдээлэл",
 };
 export default function TermsPage() {
   return (

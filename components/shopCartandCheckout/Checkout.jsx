@@ -62,6 +62,7 @@ import { useRouter } from "next/navigation";
 import pako from "pako";
 import QRCode from "qrcode";
 import { QRCodeSVG } from "qrcode.react";
+import TermsModal from "@/components/modals/TermsModal";
 
 export default function Checkout() {
   const { cartProducts, totalPrice, clearCart } = useContextElement();
@@ -86,12 +87,25 @@ export default function Checkout() {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   
   // Payment modal states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState('PENDING');
   const [statusCheckInterval, setStatusCheckInterval] = useState(null);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   
   // Form states
@@ -1006,7 +1020,7 @@ export default function Checkout() {
               </table>
             </div>
             {/* Coupon Code Section */}
-            <div className="checkout__coupon mb-4">
+            {/* <div className="checkout__coupon mb-4">
               <h4 className="mb-3" style={{ color: '#495D35' }}>Хөнгөлөлтийн код</h4>
               <div className="d-flex gap-2">
                 <input
@@ -1035,8 +1049,7 @@ export default function Checkout() {
                     }
                     
                     try {
-                      // Here you would call your coupon validation API
-                      // For now, we'll simulate a successful coupon
+                
                       setAppliedCoupon({
                         code: couponCode,
                         discount: 10,
@@ -1071,7 +1084,7 @@ export default function Checkout() {
                   ></button>
                 </div>
               )}
-            </div>
+            </div> */}
 
             <div className="checkout__payment-methods">
               <h4 className="mb-3" style={{ color: '#495D35' }}>Төлбөрийн нөхцөл</h4>
@@ -1231,9 +1244,21 @@ export default function Checkout() {
               <div className="policy-text mt-3">
                 Таны хувийн мэдээллийг захиалга боловсруулах, вэбсайтын туршлагыг дэмжих, 
                 болон бусад зорилгоор ашиглана. Дэлгэрэнгүй мэдээллийг
-                <Link href="/terms" target="_blank" className="mx-1">
-                  нууцлалын бодлогоос
-                </Link>
+                {isMobile ? (
+                  <button
+                    type="button"
+                    // className=""
+                    data-bs-toggle="modal"
+                    data-bs-target="#termsModal"
+                    style={{ color: '#c32929', border: 'none', background: 'none' }}
+                  >
+                    нууцлалын бодлогоос
+                  </button>
+                ) : (
+                  <Link href="/terms" target="_blank" className="mx-1">
+                    нууцлалын бодлогоос
+                  </Link>
+                )}
                 уншина уу.
               </div>
             </div>
@@ -1762,6 +1787,8 @@ export default function Checkout() {
        ></div>
      )}
 
+     {/* Terms Modal */}
+     <TermsModal />
 
      </>
    );
