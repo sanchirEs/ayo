@@ -90,7 +90,7 @@ export default function CustomerLogin() {
   return (
     <div
       id="userAside"
-      className="aside aside_right overflow-hidden customer-forms "
+      className="aside aside_right overflow-hidden customer-forms h-100"
     >
       <div 
         className="customer-forms__wrapper d-flex position-relative"
