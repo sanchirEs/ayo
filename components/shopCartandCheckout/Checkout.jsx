@@ -62,6 +62,7 @@ import { useRouter } from "next/navigation";
 import pako from "pako";
 import QRCode from "qrcode";
 import { QRCodeSVG } from "qrcode.react";
+import TermsModal from "@/components/modals/TermsModal";
 
 export default function Checkout() {
   const { cartProducts, totalPrice, clearCart } = useContextElement();
@@ -86,12 +87,25 @@ export default function Checkout() {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   
   // Payment modal states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState('PENDING');
   const [statusCheckInterval, setStatusCheckInterval] = useState(null);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   
   // Form states
@@ -119,7 +133,7 @@ export default function Checkout() {
       // If it's GZIP compressed base64
       if (data.startsWith('H4sI')) {
         try {
-          console.log('Processing GZIP compressed QR data:', data.substring(0, 50) + '...');
+          // console.log('Processing GZIP compressed QR data:', data.substring(0, 50) + '...');
           
           // Convert base64 to binary
           const binary = atob(data);
@@ -132,7 +146,7 @@ export default function Checkout() {
           const decompressed = pako.inflate(bytes);
           const processedData = String.fromCharCode.apply(null, decompressed);
 
-          console.log('Decompressed string length:', processedData.length);
+          // console.log('Decompressed string length:', processedData.length);
           return processedData;
         } catch (err) {
           console.error('Failed to process GZIP QR data:', err);
@@ -259,7 +273,7 @@ export default function Checkout() {
 
   // Correct payment status monitoring as per SAGA documentation
   const startPaymentStatusMonitoring = (paymentId) => {
-    console.log('Starting payment status monitoring for:', paymentId);
+    // console.log('Starting payment status monitoring for:', paymentId);
     
     let checkCount = 0;
     const maxAttempts = 60; // 3 minutes with 3-second intervals (as per documentation)
@@ -267,7 +281,7 @@ export default function Checkout() {
     const interval = setInterval(async () => {
       try {
         checkCount++;
-        console.log(`Payment status check: ${paymentId} (attempt ${checkCount}/${maxAttempts})`);
+        // console.log(`Payment status check: ${paymentId} (attempt ${checkCount}/${maxAttempts})`);
         
         // Check payment status as per documentation
         const response = await api.payments.getStatus(paymentId);
@@ -275,7 +289,7 @@ export default function Checkout() {
         if (response.success && response.data) {
           const payment = response.data;
           const newStatus = payment.status;
-          console.log('Payment status updated:', newStatus);
+          // console.log('Payment status updated:', newStatus);
           
           // Update payment data
           setPaymentData(prev => ({
@@ -303,7 +317,7 @@ export default function Checkout() {
         
         // Stop monitoring after max attempts
         if (checkCount >= maxAttempts) {
-          console.log('Payment status monitoring: max attempts reached');
+          // console.log('Payment status monitoring: max attempts reached');
           clearInterval(interval);
           setStatusCheckInterval(null);
         }
@@ -312,7 +326,7 @@ export default function Checkout() {
         
         // If it's a 404 error, the payment might not exist yet, so continue monitoring
         if (error.message && error.message.includes('404')) {
-          console.log('Payment not found yet, continuing to monitor...');
+          // console.log('Payment not found yet, continuing to monitor...');
         } else {
           // For other errors, stop monitoring after a few attempts
           if (checkCount >= 3) {
@@ -329,17 +343,17 @@ export default function Checkout() {
 
   // Legacy SAGA progress tracking (kept for backward compatibility)
   const startSagaProgressTracking = (sagaId) => {
-    console.log('Starting SAGA progress tracking for:', sagaId);
+    // console.log('Starting SAGA progress tracking for:', sagaId);
     
     // Track SAGA progress every 10 seconds for up to 5 minutes
     const interval = setInterval(async () => {
       try {
         const sagaData = await api.utils.trackSagaProgress(sagaId, (progress) => {
-          console.log('SAGA Progress:', progress);
+          // console.log('SAGA Progress:', progress);
           
           // Only stop tracking on failure, not completion
           if (progress.status === 'FAILED') {
-            console.log('SAGA failed:', progress);
+            // console.log('SAGA failed:', progress);
             clearInterval(interval);
           }
           // Don't stop on COMPLETED - SAGA completion doesn't mean payment is done
@@ -402,17 +416,17 @@ export default function Checkout() {
         }
       };
 
-      console.log('Creating order with SAGA pattern:', orderData);
+      // console.log('Creating order with SAGA pattern:', orderData);
 
       // Check system health before creating order
       try {
         const healthCheck = await api.system.health(true);
         if (!healthCheck.success || healthCheck.data?.status !== 'healthy') {
-          console.warn('System health check failed:', healthCheck);
+          // console.warn('System health check failed:', healthCheck);
           // Continue anyway, but log the warning
         }
       } catch (healthError) {
-        console.warn('System health check error:', healthError);
+        // console.warn('System health check error:', healthError);
         // Continue anyway
       }
 
@@ -430,14 +444,14 @@ export default function Checkout() {
         useCustomHeaders: false // Set to true when backend supports custom headers
       });
       
-      console.log('Order creation response:', response);
-      console.log('Response data:', response.data);
-      console.log('Payment data:', response.data?.payment);
-      console.log('Order data:', response.data?.order);
+      // console.log('Order creation response:', response);
+      // console.log('Response data:', response.data);
+      // console.log('Payment data:', response.data?.payment);
+      // console.log('Order data:', response.data?.order);
       
       if (response.success) {
         const { order, payment, sagaId } = response.data;
-        console.log('Order created successfully:', { order, payment, sagaId });
+        // console.log('Order created successfully:', { order, payment, sagaId });
         
         // Set payment data for modal (SAGA format)
         setPaymentData({
@@ -527,7 +541,7 @@ export default function Checkout() {
   const handleManualStatusCheck = async () => {
     if (paymentData?.paymentId) {
       try {
-        console.log('Manual status check for payment:', paymentData.paymentId);
+        // console.log('Manual status check for payment:', paymentData.paymentId);
         
         // Check payment status as per documentation
         const response = await api.payments.getStatus(paymentData.paymentId);
@@ -583,7 +597,7 @@ export default function Checkout() {
       <form onSubmit={(e) => e.preventDefault()}>
         <div className="checkout-form">
         <div className="billing-info__wrapper">
-          <h4>ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
+          <h4 className="mb-3">ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
           
           {/* Address Selection Buttons */}
           <div className="address-selection__wrapper mb-4">
@@ -635,12 +649,12 @@ export default function Checkout() {
                     }}>{addresses.length}</span>
                   )}
                 </button>
-                {!session?.user && (
+                {/* {!session?.user && (
                   <small className="text-muted d-block mt-1">Нэвтэрсэн хэрэглэгч л ашиглах боломжтой</small>
-                )}
-                {session?.user && addresses.length === 0 && (
+                )} */}
+                {/* {session?.user && addresses.length === 0 && (
                   <small className="text-muted d-block mt-1">Хадгалсан хаяг байхгүй байна</small>
-                )}
+                )} */}
               </div>
               <div className="col-md-6">
                 <button
@@ -1006,7 +1020,7 @@ export default function Checkout() {
               </table>
             </div>
             {/* Coupon Code Section */}
-            <div className="checkout__coupon mb-4">
+            {/* <div className="checkout__coupon mb-4">
               <h4 className="mb-3" style={{ color: '#495D35' }}>Хөнгөлөлтийн код</h4>
               <div className="d-flex gap-2">
                 <input
@@ -1035,8 +1049,7 @@ export default function Checkout() {
                     }
                     
                     try {
-                      // Here you would call your coupon validation API
-                      // For now, we'll simulate a successful coupon
+                
                       setAppliedCoupon({
                         code: couponCode,
                         discount: 10,
@@ -1071,7 +1084,7 @@ export default function Checkout() {
                   ></button>
                 </div>
               )}
-            </div>
+            </div> */}
 
             <div className="checkout__payment-methods">
               <h4 className="mb-3" style={{ color: '#495D35' }}>Төлбөрийн нөхцөл</h4>
@@ -1231,9 +1244,21 @@ export default function Checkout() {
               <div className="policy-text mt-3">
                 Таны хувийн мэдээллийг захиалга боловсруулах, вэбсайтын туршлагыг дэмжих, 
                 болон бусад зорилгоор ашиглана. Дэлгэрэнгүй мэдээллийг
-                <Link href="/terms" target="_blank" className="mx-1">
-                  нууцлалын бодлогоос
-                </Link>
+                {isMobile ? (
+                  <button
+                    type="button"
+                    // className=""
+                    data-bs-toggle="modal"
+                    data-bs-target="#termsModal"
+                    style={{ color: '#c32929', border: 'none', background: 'none' }}
+                  >
+                    нууцлалын бодлогоос
+                  </button>
+                ) : (
+                  <Link href="/terms" target="_blank" className="mx-1">
+                    нууцлалын бодлогоос
+                  </Link>
+                )}
                 уншина уу.
               </div>
             </div>
@@ -1394,9 +1419,9 @@ export default function Checkout() {
                  </div>
                ) : (
                  <div className="text-center py-4 text-muted">
-                   <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
+                   {/* <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
                    <div>Хадгалсан хаяг байхгүй байна</div>
-                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small>
+                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small> */}
                  </div>
                )}
              </div>
@@ -1762,6 +1787,8 @@ export default function Checkout() {
        ></div>
      )}
 
+     {/* Terms Modal */}
+     <TermsModal />
 
      </>
    );

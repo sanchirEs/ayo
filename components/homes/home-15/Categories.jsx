@@ -62,24 +62,24 @@ export default function Categories() {
     const loadCategories = async () => {
       try {
         // Try categories.getAll() with all=true parameter
-        console.log("Trying categories.getAll() with all=true...");
+        // console.log("Trying categories.getAll() with all=true...");
         const allCategoriesRes = await api.fetch('/categories?all=true', { auth: false });
-        console.log("categories.getAll() response: ", allCategoriesRes);
+        // console.log("categories.getAll() response: ", allCategoriesRes);
         
         if (allCategoriesRes.data && allCategoriesRes.data.length > 0) {
           setCategories(allCategoriesRes.data);
-          console.log("Loaded categories from getAll(): ", allCategoriesRes.data.length, "items");
+          // console.log("Loaded categories from getAll(): ", allCategoriesRes.data.length, "items");
           return;
         }
       } catch (e) {
-        console.log("categories.getAll() failed: ", e.message);
+        // console.log("categories.getAll() failed: ", e.message);
       }
 
       try {
         // Try categories.getTree() for hierarchical data
-        console.log("Trying categories.getTree()...");
+        // console.log("Trying categories.getTree()...");
         const treeRes = await api.categories.getTree();
-        console.log("categories.getTree() response: ", treeRes);
+        // console.log("categories.getTree() response: ", treeRes);
         
         if (treeRes.data && treeRes.data.length > 0) {
           // Flatten the tree to get all categories
@@ -96,29 +96,29 @@ export default function Categories() {
           
           const flattened = flattenCategories(treeRes.data);
           setCategories(flattened);
-          console.log("Loaded categories from getTree(): ", flattened.length, "items");
+          // console.log("Loaded categories from getTree(): ", flattened.length, "items");
           return;
         }
       } catch (e) {
-        console.log("categories.getTree() failed: ", e.message);
+        // console.log("categories.getTree() failed: ", e.message);
       }
 
       try {
         // Try homepage API as fallback
-        console.log("Trying homepage API...");
+        // console.log("Trying homepage API...");
         const homepageRes = await api.homepage.bundled({ 
           sections: 'categories', 
           categoryLimit: 1000 
         });
-        console.log("Homepage API response: ", homepageRes);
+        // console.log("Homepage API response: ", homepageRes);
         
         if (homepageRes.data?.categories && homepageRes.data.categories.length > 0) {
           setCategories(homepageRes.data.categories);
-          console.log("Loaded categories from homepage: ", homepageRes.data.categories.length, "items");
+          // console.log("Loaded categories from homepage: ", homepageRes.data.categories.length, "items");
           return;
         }
       } catch (e) {
-        console.log("Homepage API failed: ", e.message);
+        // console.log("Homepage API failed: ", e.message);
       }
 
       // If all APIs fail, set error
@@ -319,8 +319,8 @@ export default function Categories() {
             
             // Debug logging
             if (!matchingCategory) {
-              console.log(`No matching category found for image: ${imageCategoryName}`);
-              console.log('Available categories:', categories.map(c => c.name));
+              // console.log(`No matching category found for image: ${imageCategoryName}`);
+              // console.log('Available categories:', categories.map(c => c.name));
             }
             
             // If no matching category found, use default category with id 1

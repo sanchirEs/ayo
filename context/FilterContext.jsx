@@ -33,8 +33,8 @@ export function FilterProvider({ children }) {
 
   // Filter change handler - called when filters change
   const handleFiltersChange = useCallback((newFilters) => {
-    console.log('🔄 FILTER CONTEXT: Filter change received:', newFilters);
-    console.log('📊 FILTER CONTEXT: Previous filters:', appliedFilters);
+    // console.log('🔄 FILTER CONTEXT: Filter change received:', newFilters);
+    // console.log('📊 FILTER CONTEXT: Previous filters:', appliedFilters);
     
     // Ensure the new filters have proper structure
     const validatedFilters = {
@@ -49,17 +49,17 @@ export function FilterProvider({ children }) {
       }
     };
     
-    console.log('🔄 FILTER CONTEXT: Validated filters:', validatedFilters);
+    // console.log('🔄 FILTER CONTEXT: Validated filters:', validatedFilters);
     
     // Update the centralized filter state
     setAppliedFilters(validatedFilters);
     
-    console.log('✅ FILTER CONTEXT: Filters updated successfully');
+    // console.log('✅ FILTER CONTEXT: Filters updated successfully');
   }, [appliedFilters]);
 
   // Clear all filters
   const clearAllFilters = useCallback(() => {
-    console.log('🗑️ FILTER CONTEXT: Clearing all filters');
+    // console.log('🗑️ FILTER CONTEXT: Clearing all filters');
     const clearedFilters = {
       brands: [],
       priceMin: null,
@@ -99,11 +99,11 @@ export function FilterProvider({ children }) {
     lastUpdate: appliedFilters._meta?.lastUpdate || 0
   };
 
-  console.log('🔍 FILTER CONTEXT: Providing value:', {
-    hasAppliedFilters: !!appliedFilters,
-    totalActiveFilters: value.totalActiveFilters,
-    hasHandler: !!handleFiltersChange
-  });
+  // console.log('🔍 FILTER CONTEXT: Providing value:', {
+  //   hasAppliedFilters: !!appliedFilters,
+  //   totalActiveFilters: value.totalActiveFilters,
+  //   hasHandler: !!handleFiltersChange
+  // });
 
   return (
     <FilterContext.Provider value={value}>
@@ -116,7 +116,7 @@ export function FilterProvider({ children }) {
 export function useFilterContext() {
   const context = useContext(FilterContext);
   if (!context) {
-    console.warn('🚨 useFilterContext must be used within a FilterProvider');
+    // console.warn('🚨 useFilterContext must be used within a FilterProvider');
     // Return default values to prevent crashes
     return {
       appliedFilters: {
@@ -135,8 +135,8 @@ export function useFilterContext() {
         price: [20, 70987],
         _meta: { totalActiveFilters: 0, lastUpdate: 0, filterType: 'initial' }
       },
-      handleFiltersChange: () => console.warn('No filter handler available'),
-      clearAllFilters: () => console.warn('No clear handler available'),
+      handleFiltersChange: () => {/* console.warn('No filter handler available') */},
+      clearAllFilters: () => {/* console.warn('No clear handler available') */},
       hasActiveFilters: false,
       totalActiveFilters: 0,
       lastUpdate: 0

@@ -86,7 +86,8 @@ const setQuantity = async (id, q) => {
   };
 
   return (
-    <div className="shopping-cart" style={{ minHeight: "calc(100vh - 300px)" }}>
+    // style={{ minHeight: "calc(100vh - 300px)" }}
+    <div className="shopping-cart" >
       <div className="cart-table__wrapper">
         {cartProducts.length ? (
           <>
@@ -279,10 +280,8 @@ const setQuantity = async (id, q) => {
           </>
         ) : (
           <>
-            <div className="fs-20">Shop cart is empty</div>
-            <button className="btn mt-3 btn-light">
-              <Link href={"/"}>Explore Products</Link>
-            </button>
+            <div className="fs-20">Таны сагс хоосон байна</div>
+           
           </>
         )}
       </div>

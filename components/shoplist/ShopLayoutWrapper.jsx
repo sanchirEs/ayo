@@ -25,7 +25,7 @@ export default function ShopLayoutWrapper({
   // Initialize filters from URL if provided
   React.useEffect(() => {
     if (initialFilters && Object.keys(initialFilters).length > 0) {
-      console.log('🔄 SHOP LAYOUT: Initializing filters from URL:', initialFilters);
+      // console.log('🔄 SHOP LAYOUT: Initializing filters from URL:', initialFilters);
       handleFiltersChange(initialFilters);
     }
   }, [initialFilters, handleFiltersChange]);

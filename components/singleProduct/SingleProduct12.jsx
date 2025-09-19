@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import ProductSlider1 from "./sliders/ProductSlider1";
 import BreadCumb from "./BreadCumb";
 import Star from "../common/Star";
@@ -19,6 +19,11 @@ export default function SingleProduct12({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [showIngredients, setShowIngredients] = useState(false);
   const [showHowToUse, setShowHowToUse] = useState(false);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // --- Backend талбаруудыг тааруулах ---
   const images = product?.ProductImages?.map((i) => i.imageUrl) ?? [];

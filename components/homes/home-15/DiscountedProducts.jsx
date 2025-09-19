@@ -28,7 +28,7 @@ export default function DiscountedProducts() {
         // Extract discounted products from homepage response
         const discountedProducts = res.data?.discounted || [];
         setProducts(discountedProducts);
-        console.log("discounted products: ", discountedProducts)
+        // console.log("discounted products: ", discountedProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load discounted products"))
       .finally(() => setLoading(false));
@@ -145,8 +145,8 @@ export default function DiscountedProducts() {
                         onClick={() => addProductToCart(p.id)}
                         title={
                           isAddedToCartProducts(p.id)
-                            ? "Already Added"
-                            : "Add to Cart"
+                            ? "Сагсанд нэмэгдсэн"
+                            : "Сагсанд нэмэх"
                         }
                       >
                         <svg

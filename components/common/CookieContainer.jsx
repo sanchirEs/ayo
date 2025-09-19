@@ -6,7 +6,8 @@ export default function CookieContainer() {
   const [show, setShow] = useState(true);
   return (
     <>
-      {show && (
+    <div></div>
+      {/* {show && (
         <div
           className="cookieConsentContainer"
           style={{ opacity: 1, display: "block" }}
@@ -22,7 +23,7 @@ export default function CookieContainer() {
             <a onClick={() => setShow(false)}>Accept</a>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

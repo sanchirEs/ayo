@@ -1,12 +1,5 @@
 "use client";
-import {
-  additionalShopPageitems,
-  blogmenuItems,
-  homePages,
-  othersMenuItems,
-  shopDetails,
-  shopList,
-} from "@/data/menu";
+
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -216,7 +209,7 @@ export default function Nav() {
               >
                 <div className="container d-flex">
                   {/* Left: root categories list */}
-                  <div className="col-2 pe-4 allcats__left" style={{ 
+                  <div className="col-2.5 pe-4 allcats__left" style={{ 
                     maxHeight: '60vh', 
                     overflowY: 'auto',
                     scrollbarWidth: 'none',

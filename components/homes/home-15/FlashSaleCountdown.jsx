@@ -48,7 +48,7 @@ export default function FlashSaleCountdown() {
     setTimeout(() => setShowNotification(false), 3000);
     
     // In a real app, you would send this to your backend
-    console.log("User requested notification for flash sale");
+    // console.log("User requested notification for flash sale");
   };
 
   return (

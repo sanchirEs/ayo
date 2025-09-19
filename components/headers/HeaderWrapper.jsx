@@ -1,38 +1,34 @@
 "use client";
 import { useShopRoute } from "@/hooks/useShopRoute";
 import MobileHeader from "./MobileHeader";
-import CategoryHeader from "../shoplist/CategoryHeader";
-import ProductHeader from "../shoplist/ProductHeader";
-import CartHeader from "../shoplist/CartHeader";
-import CheckoutHeader from "../shoplist/CheckoutHeader";
-import StoreHeader from "../shoplist/StoreHeader";
-import DashboardHeader from "../otherPages/DashboardHeader";
+import UnifiedMobileHeader from "./UnifiedMobileHeader";
 
 export default function HeaderWrapper() {
   const { isShopRoute, isProductRoute, isCartRoute, isCheckoutRoute, isStoreLocationsRoute, isDashboardRoute, categoryId, productId, dashboardTitle } = useShopRoute();
   
-  if (isShopRoute) {
-    return <CategoryHeader categoryId={categoryId} />;
-  }
-  
-  if (isProductRoute) {
-    return <ProductHeader productId={productId} />;
+  // Check specific routes first (more specific before general)
+  if (isCartRoute) {
+    return <UnifiedMobileHeader title="Сагс" titleType="static" />;
   }
   
   if (isCheckoutRoute) {
-    return <CheckoutHeader />;
+    return <UnifiedMobileHeader title="Захиалгын хэсэг" titleType="static" />;
+  }
+  
+  if (isProductRoute) {
+    return <UnifiedMobileHeader titleType="product" productId={productId} />;
   }
   
   if (isStoreLocationsRoute) {
-    return <StoreHeader />;
-  }
-  
-  if (isCartRoute) {
-    return <CartHeader />;
+    return <UnifiedMobileHeader title="Салбарууд" titleType="static" />;
   }
   
   if (isDashboardRoute) {
-    return <DashboardHeader title={dashboardTitle} />;
+    return <UnifiedMobileHeader title={dashboardTitle} titleType="static" />;
+  }
+  
+  if (isShopRoute) {
+    return <UnifiedMobileHeader titleType="category" categoryId={categoryId} />;
   }
   
   return <MobileHeader />;

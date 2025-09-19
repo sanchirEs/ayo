@@ -24,7 +24,7 @@ export default function UnderArmourBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("under armour products: ", featuredProducts)
+        // console.log("under armour products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load under armour products"))
       .finally(() => setLoading(false));

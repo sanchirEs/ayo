@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -59,10 +59,10 @@ export default function Shop4({
   initialSort = "newest",
   appliedFilters = null, // Filters from ShopLayoutWrapper
   onFiltersChange = null, // Filter change handler from ShopLayoutWrapper
-  // Debug props
-  _debugShopLayout = false,
-  _debugFilterCount = 0,
-  _debugTimestamp = null,
+  // Debug props (commented out for production)
+  // _debugShopLayout = false,
+  // _debugFilterCount = 0,
+  // _debugTimestamp = null,
   ...otherProps
 }) {
 
@@ -82,6 +82,22 @@ export default function Shop4({
 
   const [selectedColView, setSelectedColView] = useState(4);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  
+  // Selected variants state for each product
+  const [selectedVariants, setSelectedVariants] = useState({});
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
+  // Handle variant selection change
+  const handleVariantChange = useCallback((productId, variantId) => {
+    setSelectedVariants(prev => ({
+      ...prev,
+      [productId]: variantId
+    }));
+  }, []);
 
   // ---- products state ----
   const [products, setProducts] = useState([]);
@@ -114,12 +130,12 @@ export default function Shop4({
     colors: [],
     sizes: [],
     price: [20, 70987],
-    // Metadata for debugging
-    _meta: {
-      totalActiveFilters: 0,
-      lastUpdate: 0,
-      filterType: 'default'
-    }
+    // Metadata for debugging (commented out for production)
+    // _meta: {
+    //   totalActiveFilters: 0,
+    //   lastUpdate: 0,
+    //   filterType: 'default'
+    // }
   };
 
   // Calculate total active filters
@@ -275,7 +291,7 @@ export default function Shop4({
         });
         if (attributeStrings.length > 0) {
           params.attributes = attributeStrings.join(',');
-          console.log('🔍 DEBUG: Attribute filters being sent:', params.attributes);
+          // console.log('🔍 DEBUG: Attribute filters being sent:', params.attributes);
         }
       }
 
@@ -354,6 +370,18 @@ export default function Shop4({
       setProducts(productList);
       setPagination(mappedPagination);
       setLastFilterUpdate(typeof window !== 'undefined' ? Date.now() : 0);
+      
+      // Set initial selected variants for products with variants
+      const initialVariants = {};
+      productList.forEach(product => {
+        if (product.variants && product.variants.length > 0) {
+          const defaultVariant = product.variants.find(v => v.isDefault) || product.variants[0];
+          if (defaultVariant) {
+            initialVariants[product.id] = defaultVariant.id;
+          }
+        }
+      });
+      setSelectedVariants(initialVariants);
 
     } catch (e) {
       // Sophisticated error handling
@@ -532,7 +560,7 @@ export default function Shop4({
   }
 
   return (
-    <div>
+    <div className="mb-4 md:mb-0">
       {/* Active Filter Tags Styles */}
       <style jsx>{`
         .active-filters-section {
@@ -1054,15 +1082,16 @@ export default function Shop4({
         )}
 
         {/* PRODUCTS GRID WITH SOPHISTICATED LOADING */}
-        <div
+        {/* <div
           className={`products-grid row row-cols-2 row-cols-md-3 row-cols-lg-${selectedColView}`}
           id="products-grid"
           style={{
             opacity: isFilteringActive ? 0.7 : 1,
             transition: 'opacity 0.2s ease'
           }}
-        >
+        > */}
           {loading ? (
+            
             <div className="col-12 text-center py-5">
               <div className="d-flex flex-column align-items-center">
                 <div className="spinner-border text-primary mb-3" role="status">
@@ -1106,7 +1135,7 @@ export default function Shop4({
               </div>
             </div>
           ) : products.length === 0 ? (
-            <div className="col-12 text-center py-5">
+            <div className="col-12 text-center  ">
               <div className="d-flex flex-column align-items-center">
                 <div className="empty-state-icon mb-4 p-4 bg-light rounded-circle">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-muted">
@@ -1122,7 +1151,15 @@ export default function Shop4({
               </div>
             </div>
           ) : (
-            products.map((p) => {
+            <div
+            className={`products-grid row row-cols-2 row-cols-md-3 row-cols-lg-${selectedColView}`}
+            id="products-grid"
+            style={{
+              opacity: isFilteringActive ? 0.7 : 1,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
+            {products.map((p) => {
               const id = p.id;
               const title = getTitle(p);
               const price = getPrice(p);
@@ -1138,6 +1175,7 @@ export default function Shop4({
               const showOldPrice = priceOld && discountedPrice;
 
               return (
+                
                 <div key={id} className="product-card-wrapper">
                   <div className="product-card mb-3 mb-md-4 mb-xxl-5">
                     <div className="pc__img-wrapper">
@@ -1175,16 +1213,16 @@ export default function Shop4({
                       <button
                         className="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside"
                         onClick={() => addProductToCart(id)}
-                        title={isAddedToCartProducts(id) ? "Already Added" : "Add to Cart"}
+                        title={isAddedToCartProducts(id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
                         disabled={!inStock}
                       >
-                        {!inStock ? "Out of Stock" : isAddedToCartProducts(id) ? "Already Added" : "Add To Cart"}
+                        {!inStock ? "Out of Stock" : isAddedToCartProducts(id) ? "Сагсанд нэмэгдсэн" : "Сагсанд нэмэх"}
                       </button>
                     </div>
 
                     <div className="pc__info position-relative">
                       <p className="pc__category">{p.brand?.name || p.category?.name || p.categoryName || ""}</p>
-                      <h6 className="pc__title">
+                      <h6 className="pc__title pe-4">
                         <Link href={`/product1_simple/${id}`}>{title}</Link>
                       </h6>
 
@@ -1200,7 +1238,13 @@ export default function Shop4({
                       </div>
 
                       {p.variants?.length ? (
-                        <div className="d-flex align-items-center mt-1"><ColorSelection /></div>
+                        <div className="d-flex align-items-center mt-1">
+                          <ColorSelection 
+                            variants={p.variants}
+                            selectedVariantId={selectedVariants[id]}
+                            onVariantChange={(variantId) => handleVariantChange(id, variantId)}
+                          />
+                        </div>
                       ) : null}
 
                       {rating.average > 0 ? (
@@ -1249,9 +1293,10 @@ export default function Shop4({
                   </div>
                 </div>
               );
-            })
+            })}
+            </div>
           )}
-        </div>
+        {/* </div> */}
 
         {/* Simple pagination */}
         

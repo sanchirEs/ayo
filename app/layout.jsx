@@ -12,7 +12,6 @@ import Context from "@/context/Context";
 import QuickView from "@/components/modals/QuickView";
 import CartDrawer from "@/components/shopCartandCheckout/CartDrawer";
 import SiteMap from "@/components/modals/SiteMap";
-import NewsLetter from "@/components/modals/NewsLetter";
 import CookieContainer from "@/components/common/CookieContainer";
 import Header14 from "@/components/headers/Header14";
 import HeaderWrapper from "@/components/headers/HeaderWrapper";
@@ -20,12 +19,12 @@ import SizeGuide from "@/components/modals/SizeGuide";
 import Delivery from "@/components/modals/Delivery";
 import CustomerLogin from "@/components/asides/CustomerLogin";
 import ShopFilter from "@/components/asides/ShopFilter";
-import ProductDescription from "@/components/asides/ProductDescription";
 import ProductAdditionalInformation from "@/components/asides/ProductAdditionalInformation";
 import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
 import { AuthProvider } from "@/context/AuthContext";
 import { FilterProvider } from "@/context/FilterContext";
+import { NavigationProvider } from "@/context/NavigationContext";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
 import Footer1 from "@/components/footers/Footer14";
@@ -52,7 +51,7 @@ export default function RootLayout({ children }) {
             event.reason?.message?.includes('Not Found') ||
             event.reason?.message?.includes('fetch')) {
           event.preventDefault();
-          console.log('Suppressing 404/network error from global handler');
+          // console.log('Suppressing 404/network error from global handler');
         }
       };
       
@@ -152,6 +151,7 @@ export default function RootLayout({ children }) {
   refetchWhenOffline={false}>
           <AuthProvider>
             <FilterProvider>
+              <NavigationProvider>
         <Svgs />
         <Context>
          
@@ -182,10 +182,11 @@ export default function RootLayout({ children }) {
           <SiteMap />
           <CustomerLogin />
           <ShopFilter />
-          <ProductDescription />
+     
           <ProductAdditionalInformation />
           <ProductReviews />
         </Context>
+              </NavigationProvider>
             </FilterProvider>
         <Toaster position="top-right" />
         <div className="page-overlay" id="pageOverlay"></div>

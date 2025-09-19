@@ -90,7 +90,7 @@ export default function CustomerLogin() {
   return (
     <div
       id="userAside"
-      className="aside aside_right overflow-hidden customer-forms "
+      className="aside aside_right overflow-hidden customer-forms h-100"
     >
       <div 
         className="customer-forms__wrapper d-flex position-relative"
@@ -157,6 +157,7 @@ export default function CustomerLogin() {
               className="btn btn-primary w-100 text-uppercase"
               type="submit"
               disabled={loading}
+              style={{backgroundColor: "#495D35"}}
             >
               {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
             </button>
@@ -413,6 +414,7 @@ export default function CustomerLogin() {
                   className="btn btn-primary w-100 text-uppercase"
                   type="submit"
                   disabled={isSubmitting}
+                  style={{backgroundColor: "#495D35"}}
                 >
                   {isSubmitting ? "Бүртгүүлж байна..." : "Бүртгүүлэх"}
                 </button>

@@ -12,10 +12,10 @@ export default function ContactPage() {
   return (
     <>
       <main className="page-wrapper">
-        <div className="mb-4 pb-4"></div>
+        <div className="mb-2 pb-2 mb-md-4 pb-md-4"></div>
         <section className="contact-us container">
           <div className="mw-930">
-            <h2 className="page-title">CONTACT US</h2>
+            <h2 className="page-title fs-4 fs-md-3">CONTACT US</h2>
           </div>
         </section>
 

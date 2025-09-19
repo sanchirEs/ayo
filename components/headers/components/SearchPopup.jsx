@@ -99,7 +99,8 @@ export default function SearchPopup() {
     if (searchQuery.trim()) {
       saveToRecentSearches(searchQuery);
       const currentPath = window.location.pathname + window.location.search;
-              router.push(`/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`);
+      // Use window.location.href instead of router.push for proper navigation
+      window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}&redirect=${encodeURIComponent(currentPath)}`;
       setIsPopupOpen(false);
       setSearchQuery("");
       setSearchResults([]);
@@ -109,7 +110,8 @@ export default function SearchPopup() {
   // Handle search result click
   const handleResultClick = (product) => {
     saveToRecentSearches(searchQuery);
-    router.push(`/product1_simple/${product.id}`);
+    // Use window.location.href instead of router.push for proper navigation
+    window.location.href = `/product1_simple/${product.id}`;
     setIsPopupOpen(false);
     setSearchQuery("");
     setSearchResults([]);
@@ -334,6 +336,10 @@ export default function SearchPopup() {
                        <button
                          onClick={handleSearchSubmit}
                          className="btn btn-primary btn-sm px-4"
+                         style={{
+                          backgroundColor: '#495D35',
+                      
+                         }}
                        >
                          Бүх үр дүнг харах
                        </button>
@@ -358,20 +364,41 @@ export default function SearchPopup() {
                  <h6 className="sub-menu__title fs-base">Шуурхай холбоосууд</h6>
                  <ul className="sub-menu__list list-unstyled">
                    <li className="sub-menu__item">
-                     <Link href="/shop" className="menu-link menu-link_us-s">
-                       Шинэ бүтээгдэхүүн
-                  </Link>
+                   <button 
+                           className="menu-link menu-link_us-s"
+                           onClick={() => {
+                            setIsPopupOpen(false);
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop/1";
+                             }, 100);
+                           }}
+                         >
+                           Арьс арчлах
+                  </button>
+                    
                 </li>
                 <li className="sub-menu__item">
-                     <Link href="/shop" className="menu-link menu-link_us-s">
+                <button 
+                           className="menu-link menu-link_us-s"
+                           onClick={() => {
+                            setIsPopupOpen(false);
+                            setSearchQuery("");
+                            setSearchResults([]);
+                             setTimeout(() => {
+                               window.location.href = "/shop/14";
+                             }, 100);
+                           }}
+                         >
                        Хямдралтай
-                     </Link>
+                     </button>
                 </li>
-                <li className="sub-menu__item">
+                {/* <li className="sub-menu__item">
                      <Link href="/shop" className="menu-link menu-link_us-s">
                        Хамгийн их зарагдсан
                      </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
              )}

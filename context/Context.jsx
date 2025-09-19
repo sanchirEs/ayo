@@ -41,7 +41,7 @@ export default function Context({ children }) {
           sessionId: 'guest_session_' + Math.random().toString(36).substr(2, 9)
         });
       } catch (error) {
-        console.log('Cart sync failed, using local storage:', error.message);
+        // console.log('Cart sync failed, using local storage:', error.message);
       }
 
       document
@@ -60,7 +60,7 @@ export default function Context({ children }) {
   const toggleWishlist = async (id) => {
     // Check if user is logged in and has access token
     if (!user || !user.accessToken) {
-      console.log('User not logged in or no access token, using local storage for wishlist');
+      // console.log('User not logged in or no access token, using local storage for wishlist');
       // Fallback to local storage if not logged in
       if (wishList.includes(id)) {
         setWishList((pre) => [...pre.filter((elm) => elm != id)]);
@@ -88,11 +88,11 @@ export default function Context({ children }) {
           error.message.includes('Authentication required') ||
           error.message.includes('401') ||
           error.message.includes('403')) {
-        console.log('Authentication error, using local storage for wishlist');
+        // console.log('Authentication error, using local storage for wishlist');
       } else if (error.message.includes('404') || 
                  error.message.includes('Not Found') || 
                  error.message.includes('fetch')) {
-        console.log('Wishlist API not available, using local storage');
+        // console.log('Wishlist API not available, using local storage');
       }
       
       // Fallback to local storage if API fails
@@ -124,7 +124,7 @@ export default function Context({ children }) {
     const loadWishlist = async () => {
       // Check if user is logged in and has access token
       if (!user || !user.accessToken) {
-        console.log('User not logged in or no access token, loading wishlist from local storage');
+        // console.log('User not logged in or no access token, loading wishlist from local storage');
         const items = JSON.parse(localStorage.getItem("wishlist"));
         if (items?.length) {
           setWishList(items);
@@ -145,11 +145,11 @@ export default function Context({ children }) {
             error.message.includes('Authentication required') ||
             error.message.includes('401') ||
             error.message.includes('403')) {
-          console.log('Authentication error, using local storage for wishlist');
+          // console.log('Authentication error, using local storage for wishlist');
         } else if (error.message.includes('404') || 
                    error.message.includes('Not Found') || 
                    error.message.includes('fetch')) {
-          console.log('Wishlist API not available, using local storage');
+          // console.log('Wishlist API not available, using local storage');
         }
         
         // Fallback to local storage for any error
@@ -175,7 +175,7 @@ export default function Context({ children }) {
     try {
       await api.cart.clear();
     } catch (error) {
-      console.log('Backend cart clear failed:', error.message);
+      // console.log('Backend cart clear failed:', error.message);
     }
   };
 
@@ -191,7 +191,7 @@ export default function Context({ children }) {
     try {
       await api.cart.updateItem(itemId, quantity);
     } catch (error) {
-      console.log('Cart update sync failed:', error.message);
+      // console.log('Cart update sync failed:', error.message);
     }
   };
 
@@ -203,7 +203,7 @@ export default function Context({ children }) {
     try {
       await api.cart.removeItem(itemId);
     } catch (error) {
-      console.log('Cart remove sync failed:', error.message);
+      // console.log('Cart remove sync failed:', error.message);
     }
   };
 

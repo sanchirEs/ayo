@@ -24,7 +24,7 @@ export default function NewBalanceBrand() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("new balance products: ", featuredProducts)
+        // console.log("new balance products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load new balance products"))
       .finally(() => setLoading(false));

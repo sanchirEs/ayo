@@ -24,7 +24,7 @@ export default function BrandProduct() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("converse products: ", featuredProducts)
+        // console.log("converse products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load converse products"))
       .finally(() => setLoading(false));
@@ -64,7 +64,7 @@ export default function BrandProduct() {
           <div className="converse-bg-overlay"></div>
           <div className="container">
             <div className="converse-brand-logo">
-              <h2 className="converse-logo-text">CONVERSE</h2>
+              <h2 className="converse-logo-text">Brand Name</h2>
             </div>
             <p className="text-center">Loading products…</p>
           </div>
@@ -79,7 +79,7 @@ export default function BrandProduct() {
           <div className="converse-bg-overlay"></div>
           <div className="container">
             <div className="converse-brand-logo">
-              <h2 className="converse-logo-text">CONVERSE</h2>
+              <h2 className="converse-logo-text">Brand Name</h2>
             </div>
             <p className="text-danger text-center">{err}</p>
           </div>
@@ -98,7 +98,7 @@ export default function BrandProduct() {
                 src="/assets/images/brandsBg/brands1.webp"
                 width="1920"
                 height="600"
-                alt="Converse Background"
+                alt="Brand Background"
                 className="slideshow-bg__img object-fit-cover"
               />
             </div>

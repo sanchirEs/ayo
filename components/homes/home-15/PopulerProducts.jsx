@@ -22,7 +22,7 @@ export default function PopulerProducts() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setProducts(featuredProducts);
-        console.log("featured products: ", featuredProducts)
+        // console.log("featured products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load featured products"))
       .finally(() => setLoading(false));

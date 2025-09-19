@@ -3,17 +3,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { brandImages2 } from "@/data/brands";
+import UnifiedMobileHeader from "@/components/headers/UnifiedMobileHeader";
 
 export default function BrandsPage() {
   return (
-    <div className="container py-5">
+    <>
+      <UnifiedMobileHeader 
+        title="БРЭНДҮҮД" 
+        titleType="static"
+        className="d-lg-none"
+      />
+      <div className="container py-5 mb-5 mb-lg-0">
       {/* <h1 className="h3 mb-4">Our Brands</h1> */}
 
       <div className="row g-3">
         {brandImages2.map((brand, i) => (
           <div key={i} className="col-12 col-sm-4 col-md-3">
             <Link
-              href={`/brands/${brand.slug}`}
+              href={`#`}
               className="card h-100 border-0 shadow-sm d-flex flex-row align-items-center p-3 text-decoration-none text-dark"
             >
               {/* Logo (left side, centered) */}
@@ -44,6 +51,7 @@ export default function BrandsPage() {
           </div>
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

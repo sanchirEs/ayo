@@ -55,7 +55,7 @@ export default function Pagination2({
         aria-disabled={currentPage === 1}
       >
         <svg className="me-1" width="7" height="11" viewBox="0 0 7 11"><use href="#icon_prev_sm" /></svg>
-        <span className="fw-medium">PREV</span>
+        <span className="fw-medium">Өмнөх</span>
       </a>
 
       <ul className="pagination mb-0">
@@ -82,7 +82,7 @@ export default function Pagination2({
         onClick={(e) => { e.preventDefault(); go(currentPage + 1); }}
         aria-disabled={currentPage === totalPages}
       >
-        <span className="fw-medium me-1">NEXT</span>
+        <span className="fw-medium me-1">Дараах</span>
         <svg width="7" height="11" viewBox="0 0 7 11"><use href="#icon_next_sm" /></svg>
       </a>
     </nav>
