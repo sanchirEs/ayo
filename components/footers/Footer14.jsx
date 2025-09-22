@@ -40,7 +40,7 @@ export default function Footer14() {
                               <strong className="fw-medium">sanchirenkhamgalan@gmail.com</strong>
             </p>
             <p>
-              <strong className="fw-medium">+976 7200 9191</strong>
+              <strong className="fw-medium">+976 80940575</strong>
             </p>
 
             <ul className="social-links list-unstyled d-flex flex-wrap mb-0">

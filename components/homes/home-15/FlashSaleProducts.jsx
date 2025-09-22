@@ -76,7 +76,7 @@ export default function FlashSaleProducts() {
     return (
       <section className="products-carousel container">
         <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Flash Sale
+          10 минутын хямдрал	
         </h2>
         <p className="text-danger text-center">{err}</p>
       </section>

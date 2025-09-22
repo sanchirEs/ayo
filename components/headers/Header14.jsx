@@ -142,7 +142,7 @@ export default function Header14() {
                   className="service-promotion__content fs-base mb-0"
                   style={{ color: "var(--color-text)" }}
                 >
-                  +976 7200 9191
+                  +976 80940575
                 </p>
               </div>
             </div>
