@@ -27,7 +27,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "Бүтэн сайн: Амарна",
-      image: "/assets/images/stores/maxmall.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 2,
@@ -38,7 +38,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "Бүтэн сайн өдөр: Амарна",
-      image: "/assets/images/stores/tumen-plaza.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 3,
@@ -49,7 +49,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "Мягмар амарна",
-      image: "/assets/images/stores/solo-mall.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 4,
@@ -60,7 +60,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "Даваа: Амарна",
-      image: "/assets/images/stores/emart.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 5,
@@ -71,7 +71,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 13:30-14:30",
       phone: "80940575",
       closed_day: "4дахь өдөр амарна",
-      image: "/assets/images/stores/state-dept.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 6,
@@ -82,7 +82,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "1 дахь өдөр : Амарна",
-      image: "/assets/images/stores/central-tower.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 7,
@@ -93,7 +93,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "Баасан: Амарна",
-      image: "/assets/images/stores/maxmall.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 8,
@@ -104,7 +104,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:30-15:30",
       phone: "80940575",
       closed_day: "Хагас сайн өдөр: Амарна",
-      image: "/assets/images/stores/tumen-plaza.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     },
     {
       id: 9,
@@ -115,7 +115,7 @@ export default function StoreLocationPage() {
       lunchBreak: "Цайны цаг: 14:00-15:00",
       phone: "80940575",
       closed_day: "3дахь өдөр : Амарна",
-      image: "/assets/images/stores/solo-mall.webp"
+      image: "https://via.placeholder.com/400x200/495D35/FFFFFF?text=AYO+Store"
     }
   ];
 
@@ -214,64 +214,64 @@ export default function StoreLocationPage() {
                        </div>
                      </div>
                      {/* Content on the right */}
-                     <div className="col-md-8">
-                       <div className="p-4 h-100 d-flex flex-column justify-content-between">
-                         <h5 className="card-title mb-3" style={{ color: "#495D35", fontSize: "19px", fontWeight: "600", lineHeight: "1.3" }}>
-                           {store.name}
-                         </h5>
-                         <div className="store-details flex-grow-1">
-                           <div className="mb-3">
-                             <div className="d-flex align-items-start">
-                               <i className="fas fa-map-marker-alt me-2 mt-1" style={{ color: "#6c757d", fontSize: "12px", minWidth: "16px" }}></i>
-                               <span style={{ fontSize: "13px", color: "#6c757d", lineHeight: "1.5" }}>
-                                 {store.address}
-                               </span>
-                             </div>
-                           </div>
-                           <div className="mb-3">
-                             <div className="d-flex align-items-start">
-                               <i className="fas fa-clock me-2 mt-1" style={{ color: "#6c757d", fontSize: "12px", minWidth: "16px" }}></i>
-                               <div style={{ fontSize: "13px", color: "#6c757d", lineHeight: "1.5" }}>
-                                 <div className="mb-1" style={{ fontWeight: "500", color: "#495D35" }}>
-                                   {store.hours}
-                                 </div>
-                                 {store.lunchBreak && (
-                                   <div style={{ fontSize: "12px", color: "#8a8a8a", fontStyle: "italic" }}>
-                                     {store.lunchBreak}
-                                   </div>
-                                 )}
-                               </div>
-                             </div>
-                           </div>
-                          <div className="mb-2">
-                            <div className="d-flex align-items-center">
-                              <i className="fas fa-phone me-2" style={{ color: "#6c757d", fontSize: "12px", minWidth: "16px" }}></i>
-                              <a 
-                                href={`tel:${store.phone}`}
-                                style={{ 
-                                  fontSize: "13px", 
-                                  color: "#495D35",
-                                  textDecoration: "none",
-                                  fontWeight: "600"
-                                }}
-                              >
-                                {store.phone}
-                              </a>
-                            </div>
-                          </div>
-                          {store.closed_day && (
-                            <div className="mb-0">
-                              <div className="d-flex align-items-center">
-                                <i className="fas fa-calendar-times me-2" style={{ color: "#dc3545", fontSize: "12px", minWidth: "16px" }}></i>
-                                <span style={{ fontSize: "12px", color: "#dc3545", fontWeight: "500" }}>
-                                  {store.closed_day}
+                      <div className="col-md-8">
+                        <div className="p-4 h-100 d-flex flex-column justify-content-between">
+                          <h5 className="card-title mb-3" style={{ color: "#495D35", fontSize: "19px", fontWeight: "600", lineHeight: "1.3" }}>
+                            {store.name}
+                          </h5>
+                          <div className="store-details flex-grow-1">
+                            <div className="mb-3">
+                              <div className="d-flex align-items-start">
+                                <i className="fas fa-map-marker-alt me-2 mt-1" style={{ color: "#6c757d", fontSize: "12px", minWidth: "16px" }}></i>
+                                <span style={{ fontSize: "13px", color: "#6c757d", lineHeight: "1.5" }}>
+                                  {store.address}
                                 </span>
                               </div>
                             </div>
-                          )}
-                         </div>
-                       </div>
-                     </div>
+                            <div className="mb-3">
+                              <div className="d-flex align-items-start">
+                                <i className="fas fa-clock me-2 mt-1" style={{ color: "#6c757d", fontSize: "12px", minWidth: "16px" }}></i>
+                                <div style={{ fontSize: "13px", color: "#6c757d", lineHeight: "1.5" }}>
+                                  <div className="mb-1" style={{ fontWeight: "500", color: "#495D35" }}>
+                                    {store.hours}
+                                  </div>
+                                  {store.lunchBreak && (
+                                    <div style={{ fontSize: "12px", color: "#8a8a8a", fontStyle: "italic" }}>
+                                      {store.lunchBreak}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mb-2">
+                              <div className="d-flex align-items-center">
+                                <i className="fas fa-phone me-2" style={{ color: "#6c757d", fontSize: "12px", minWidth: "16px" }}></i>
+                                <a 
+                                  href={`tel:${store.phone}`}
+                                  style={{ 
+                                    fontSize: "13px", 
+                                    color: "#495D35",
+                                    textDecoration: "none",
+                                    fontWeight: "600"
+                                  }}
+                                >
+                                  {store.phone}
+                                </a>
+                              </div>
+                            </div>
+                            {store.closed_day && (
+                              <div className="mb-0">
+                                <div className="d-flex align-items-center">
+                                  <i className="fas fa-calendar-times me-2" style={{ color: "#dc3545", fontSize: "12px", minWidth: "16px" }}></i>
+                                  <span style={{ fontSize: "12px", color: "#dc3545", fontWeight: "500" }}>
+                                    {store.closed_day}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                    </div>
                  </div>
                </div>

@@ -57,10 +57,18 @@ export default function OrderDetail({ orderId }) {
       try {
         setLoading(true);
         const response = await api.orders.getOrderDetails(orderId);
-        // console.log("response in order detail: ", response);
+        console.log("Order detail response: ", response);
         
         if (response.success) {
-          setOrder(response.data);
+          // Handle enhanced response structure
+          // Enhanced endpoint returns { order, analytics, timeline }
+          if (response.data.order) {
+            // Use the order data from the enhanced response
+            setOrder(response.data.order);
+          } else {
+            // Fallback for basic response structure
+            setOrder(response.data);
+          }
         } else {
           setError('Захиалгын мэдээлэл олдсонгүй');
         }

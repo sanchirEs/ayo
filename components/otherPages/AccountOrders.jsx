@@ -101,14 +101,14 @@ export default function AccountOrders() {
   }, [isDropdownOpen]);
 
   // Filter orders based on active tab
-  const filteredOrders = orders ? orders.filter(order => {
+  const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
     if (activeTab === 'all') return true;
     return order.status === activeTab;
   }) : [];
 
   // Get order counts for each tab
   const getOrderCount = (status) => {
-    if (!orders) return 0;
+    if (!Array.isArray(orders)) return 0;
     if (status === 'all') return orders.length;
     return orders.filter(order => order.status === status).length;
   };
@@ -588,7 +588,7 @@ export default function AccountOrders() {
             </div>
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
+            {(pagination.totalPages > 1 || pagination.pages > 1) && (
               <nav className="mt-4">
                 <ul className="pagination justify-content-center">
                   <li className={`page-item ${pagination.currentPage === 1 ? 'disabled' : ''}`}>
@@ -601,7 +601,7 @@ export default function AccountOrders() {
                     </button>
                   </li>
                   
-                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                  {Array.from({ length: pagination.pages || pagination.totalPages }, (_, i) => i + 1).map((page) => (
                     <li key={page} className={`page-item ${page === pagination.currentPage ? 'active' : ''}`}>
                       <button 
                         className="page-link" 
@@ -612,11 +612,11 @@ export default function AccountOrders() {
                     </li>
                   ))}
                   
-                  <li className={`page-item ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}`}>
+                  <li className={`page-item ${pagination.currentPage === (pagination.pages || pagination.totalPages) ? 'disabled' : ''}`}>
                     <button 
                       className="page-link" 
                       onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      disabled={pagination.currentPage === pagination.totalPages}
+                      disabled={pagination.currentPage === (pagination.pages || pagination.totalPages)}
                     >
                       Дараах
                     </button>

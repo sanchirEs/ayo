@@ -26,10 +26,36 @@ export default function Context({ children }) {
 
   const addProductToCart = async (id, variantId = null) => {
     if (!cartProducts.filter((elm) => elm.id == id)[0]) {
-      const item = {
-        ...allProducts.filter((elm) => elm.id == id)[0],
-        quantity: 1,
-      };
+      let item = null;
+      
+      // First try to get real product data from backend
+      try {
+        const response = await api.products.get(id);
+        if (response?.success && response?.data) {
+          item = {
+            ...response.data,
+            quantity: 1,
+            id: response.data.id || id,
+          };
+        }
+      } catch (error) {
+        console.log('Failed to fetch product from backend, using static data:', error.message);
+      }
+      
+      // Fallback to static data if backend fails
+      if (!item) {
+        const staticProduct = allProducts.filter((elm) => elm.id == id)[0];
+        if (staticProduct) {
+          item = {
+            ...staticProduct,
+            quantity: 1,
+          };
+        } else {
+          console.error(`Product with id ${id} not found in static data`);
+          return;
+        }
+      }
+      
       setCartProducts((pre) => [...pre, item]);
 
       // Try to sync with backend cart
@@ -109,11 +135,36 @@ export default function Context({ children }) {
     }
     return false;
   };
+  // Load cart from backend on mount, fallback to localStorage
   useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("cartList"));
-    if (items?.length) {
-      setCartProducts(items);
-    }
+    const loadCart = async () => {
+      try {
+        // First try to load from backend
+        const response = await api.cart.get();
+        if (response?.success && response?.data && Array.isArray(response.data) && response.data.length > 0) {
+          // Map backend cart data to frontend format
+          const backendCartItems = response.data.map(item => ({
+            ...item,
+            // Ensure we have the required fields for frontend
+            id: item.productId || item.id,
+            quantity: item.quantity || 1,
+            price: item.price || 0,
+          }));
+          setCartProducts(backendCartItems);
+          return; // Don't load from localStorage if backend has data
+        }
+      } catch (error) {
+        console.log('Failed to load cart from backend, using localStorage:', error.message);
+      }
+      
+      // Fallback to localStorage if backend fails or has no data
+      const items = JSON.parse(localStorage.getItem("cartList"));
+      if (items?.length) {
+        setCartProducts(items);
+      }
+    };
+
+    loadCart();
   }, []);
 
   useEffect(() => {

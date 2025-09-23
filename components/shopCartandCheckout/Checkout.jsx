@@ -1231,7 +1231,14 @@ export default function Checkout() {
                       name="checkout_payment_method"
                       id="checkout_payment_method_4"
                       checked={selectedPaymentMethod === 'STOREPAY'}
-                      onChange={() => setSelectedPaymentMethod('STOREPAY')}
+                      onChange={() => {
+                        const totalAmount = totalPrice + 6000; // Including shipping
+                        if (totalAmount < 100000) {
+                          alert('Storepay ашиглахын тулд захиалгын дүн 100,000₮-с их байх ёстой');
+                          return;
+                        }
+                        setSelectedPaymentMethod('STOREPAY');
+                      }}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
