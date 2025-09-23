@@ -361,8 +361,8 @@ export default function Nav() {
               'Нүүр будалт',
               'Үнэртэн',
               'Маск',
-              'Үс, хуйх эмчилгээ'
-              // 'Эмэгтэйчүүдийн бүтээгдэхүүн'
+              // 'Үс, хуйх эмчилгээ'
+              'Эмэгтэйчүүдийн бүтээгдэхүүн'
             ];
             
             return specificCategories.map((categoryName, index) => {

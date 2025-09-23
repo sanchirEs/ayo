@@ -844,7 +844,7 @@ export default function Shop4({
 
         {/* ACTIVE FILTERS DISPLAY - Web only */}
         {totalActiveFilters > 0 && (
-          <div className="active-filters-section mb-4 d-none d-md-block">
+          <div className="active-filters-section mb-0 py-0 d-none d-md-block">
             <div className="d-flex flex-wrap align-items-center gap-2">
               {/* Display active attribute filters */}
               {Object.entries(filters.attributes || {}).map(([attrKey, values]) => {
