@@ -973,7 +973,7 @@
 /* Banner Container System - Prevents stretching on large screens */
 .banner-container {
   width: 100% !important;
-  max-width: 1200px !important;
+  max-width: 1400px !important;
   margin: 0 auto !important;
   padding: 0 15px !important;
   display: block !important;
@@ -988,7 +988,7 @@
 .theme-15 main .hero-banner-container,
 .theme-15 .hero-banner-container {
   width: 100% !important;
-  max-width: 1200px !important;
+  max-width: 1400px !important;
   margin: 0 auto !important;
   padding: 0 15px !important;
   box-sizing: border-box !important;
@@ -1004,7 +1004,7 @@ body .banner-container,
 .theme-15 main div.hero-banner-container,
 .theme-15 main div.banner-container {
   width: 100% !important;
-  max-width: 1200px !important;
+  max-width: 1400px !important;
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: 15px !important;
@@ -1019,7 +1019,7 @@ html body .theme-15 main .hero-banner-container,
 html body .theme-15 main .banner-container,
 html body .hero-banner-container,
 html body .banner-container {
-  max-width: 1200px !important;
+  max-width: 1400px !important;
   margin: 0 auto !important;
   padding: 0 15px !important;
   width: 100% !important;
@@ -1037,14 +1037,14 @@ html body .banner-container {
 
 .banner-container-wide {
   width: 100% !important;
-  max-width: 1400px !important;
+  max-width: 1600px !important;
   margin: 0 auto !important;
   padding: 0 15px !important;
 }
 
 .banner-container-narrow {
   width: 100% !important;
-  max-width: 1000px !important;
+  max-width: 1200px !important;
   margin: 0 auto !important;
   padding: 0 15px !important;
 }
@@ -1052,7 +1052,7 @@ html body .banner-container {
 /* Hero Banner Container - High specificity to override SCSS */
 .hero-banner-container {
   width: 100% !important;
-  max-width: 1200px !important;
+  max-width: 1400px !important;
   margin: 0 auto !important;
   padding: 0 15px !important;
   overflow: hidden !important;
@@ -1227,49 +1227,49 @@ html body .banner-container {
 /* Responsive container adjustments */
 @media (min-width: 1400px) {
   .banner-container {
-    max-width: 1320px !important;
+    max-width: 1520px !important;
   }
   
   .banner-container-wide {
-    max-width: 1600px !important;
+    max-width: 1800px !important;
   }
   
   .banner-container-narrow {
-    max-width: 1100px !important;
+    max-width: 1300px !important;
   }
   
   .hero-banner-container {
-    max-width: 1320px !important;
+    max-width: 1520px !important;
   }
 }
 
 @media (max-width: 1399px) and (min-width: 1200px) {
   .banner-container,
   .hero-banner-container {
-    max-width: 1140px !important;
+    max-width: 1340px !important;
   }
   
   .banner-container-wide {
-    max-width: 1320px !important;
+    max-width: 1520px !important;
   }
   
   .banner-container-narrow {
-    max-width: 1000px !important;
+    max-width: 1200px !important;
   }
 }
 
 @media (max-width: 1199px) and (min-width: 992px) {
   .banner-container,
   .hero-banner-container {
-    max-width: 960px !important;
+    max-width: 1160px !important;
   }
   
   .banner-container-wide {
-    max-width: 1140px !important;
+    max-width: 1340px !important;
   }
   
   .banner-container-narrow {
-    max-width: 900px !important;
+    max-width: 1100px !important;
   }
 }
 

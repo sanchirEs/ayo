@@ -71,12 +71,11 @@ export default function Header14() {
             {socialLinks.map((link, index) => (
               <li key={index}>
                 <a
-                
                   href={link.href}
                   className="footer__social-link d-flex align-items-center justify-content-center"
                   style={{
                     color: "white",
-                   
+
                     transition: "all 0.3s ease",
                   }}
                   onMouseEnter={(e) => {
@@ -116,7 +115,7 @@ export default function Header14() {
         className="header-desk_type_8"
         style={{ backgroundColor: "#F4F7F5" }}
       >
-                 <div className="header-middle py-2">
+        <div className="header-middle py-2">
           <div className="container d-flex align-items-center my-2">
             <div className="flex-1 d-flex align-items-center gap-3">
               <div className="service-promotion__icon">
@@ -146,24 +145,27 @@ export default function Header14() {
                 </p>
               </div>
             </div>
-                                                                                                       <div className="logo-container" style={{ padding: "0", margin: "0" }}>
-                 <Link href="/">
-                   <Image
-                     src="/assets/images/logoReal.png"
-                     width={130}
-                     height={50}
-                     alt="Ayo"
-                     className="logo__image"
-                     style={{
-                       objectFit: "contain",
-                       maxWidth: "100%",
-                       height: "auto",
-                       padding: "0",
-                       margin: "0"
-                     }}
-                   />
-                 </Link>
-               </div>
+            <div
+              className="logo-container"
+              style={{ padding: "0", margin: "0" }}
+            >
+              <Link href="/">
+                <Image
+                  src="/assets/images/logoReal.png"
+                  width={130}
+                  height={50}
+                  alt="Ayo"
+                  className="logo__image"
+                  style={{
+                    objectFit: "contain",
+                    maxWidth: "100%",
+                    height: "auto",
+                    padding: "0",
+                    margin: "0",
+                  }}
+                />
+              </Link>
+            </div>
             {/* <!-- /.logo --> */}
 
             <div className="header-tools d-flex align-items-center flex-1 justify-content-end me-2">
@@ -261,7 +263,7 @@ export default function Header14() {
               </Link>
 
               <a
-              onClick={() => openCart()}
+                onClick={() => openCart()}
                 className="header-tools__item header-tools__cart js-open-aside"
                 // style={{
                 //   color: "var(--color-text)",
@@ -322,31 +324,34 @@ export default function Header14() {
         >
           <div className="container">
             <nav className="navigation w-100 d-flex align-items-center justify-content-between py-2">
-              <ul className="navigation__list list-unstyled d-flex my-1 flex-1 justify-content-start" style={{ marginLeft: '0', paddingLeft: '0' }}>
+              <ul
+                className="navigation__list list-unstyled d-flex my-1 flex-1 justify-content-start"
+                style={{ marginLeft: "0", paddingLeft: "0" }}
+              >
                 <Nav />
               </ul>
               {/* Brands button on the right */}
               <div className="brands-button-container ms-3">
-                <Link 
-                  href="/brands" 
+                <Link
+                  href="/brands"
                   className="navigation__link"
                   style={{
-                    color: 'var(--color-text)',
-                    textDecoration: 'none',
-                    transition: 'color 0.3s ease',
-                    padding: '6px 12px',   
-                    borderRadius: '6px',
-                    fontWeight: '500',
-                    fontSize: '0.85rem',
-                    whiteSpace: 'nowrap'
+                    color: "var(--color-text)",
+                    textDecoration: "none",
+                    transition: "color 0.3s ease",
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                    fontWeight: "500",
+                    fontSize: "0.85rem",
+                    whiteSpace: "nowrap",
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.color = 'var(--color-primary)';
-                    e.target.style.backgroundColor = 'rgba(47, 79, 47, 0.05)';
+                    e.target.style.color = "var(--color-primary)";
+                    e.target.style.backgroundColor = "rgba(47, 79, 47, 0.05)";
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.color = 'var(--color-text)';
-                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = "var(--color-text)";
+                    e.target.style.backgroundColor = "transparent";
                   }}
                 >
                   БРЭНДҮҮД

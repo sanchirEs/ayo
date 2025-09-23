@@ -379,7 +379,7 @@ export default function Nav() {
                       color: 'var(--color-text)',
                       textDecoration: 'none',
                       transition: 'color 0.3s ease',
-                      padding: '6px 16px 6px 0',   
+                      padding: '6px 8px 6px 8px',   
                       borderRadius: '6px',
                       fontWeight: '500',
                       fontSize: '0.85rem',

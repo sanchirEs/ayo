@@ -78,7 +78,7 @@ export default function FlashSaleCountdown() {
         <div className="mb-3">
           <div className="fs-1 mb-2">⚡</div>
           <h2 className={`section-title text-uppercase fs-25 fw-bold mb-2 ${styles.countdownTitle}`}>
-            Flash Sale эхлэхэд
+            10 минутын хямдрал	
           </h2>
           <p className={`fs-16 mb-3 ${styles.countdownSubtitle}`}>
             Хямдрал эхлэхэд үлдсэн хугацаа
@@ -86,12 +86,7 @@ export default function FlashSaleCountdown() {
         </div>
       
         <div className={`${styles.countdownTimer}`}>
-              <div className="text-center">
-                <div className={`${styles.timerBox}`}>
-                  <span className={styles.timerNumber}>{formatNumber(timeLeft.days)}</span>
-                  <small className={styles.timerLabel}>Өдөр</small>
-                </div>
-              </div>
+
               
               <div className="text-center">
                 <div className={`${styles.timerBox}`}>
@@ -115,13 +110,13 @@ export default function FlashSaleCountdown() {
               </div>
             </div>
             <div className={styles.infoCard}>
-              <h3 className={styles.infoTitle}>Flash Sale Удахгүй эхлэнэ</h3>
+              <h3 className={styles.infoTitle}>Хямдрал тун удахгүй</h3>
               <p className="text-secondary mb-3">
-                Онцгой хямдралтай бараануудыг хүлээж байна:
+                Онцгой хямдралтай бараанууд хүлээж байна:
               </p>
               <ul className={styles.infoList}>
                 <li>Сонгосон бараануудад 70% хүртэл хямдрал</li>
-                <li>Зөвхөн flash sale-д зориулсан онцгой хямдрал</li>
+                <li>Зөвхөн өнөөдөрт зориулсан онцгой хямдрал</li>
               </ul>
               <div className="mt-3">
                 <button 
@@ -129,7 +124,7 @@ export default function FlashSaleCountdown() {
                   onClick={handleNotifyClick}
                   disabled={isNotified}
                 >
-                  {isNotified ? 'Мэдэгдэх болсон' : 'Мэдэгдэх'}
+                  {isNotified ? 'Мэдэгдэх' : 'Мэдэгдэл авах'}
                 </button>
                 {isNotified && (
                   <p className="text-success mt-2 mb-0">
@@ -142,11 +137,11 @@ export default function FlashSaleCountdown() {
              {/* Additional Info */}
              <div className="mt-3">
               <p className="text-white opacity-75 mb-1">
-                <small>Flash sale 10 минутын дараа эхлэнэ</small>
+                <small>Өдөр бүр аравхан минут</small>
               </p>
-              <p className="text-white opacity-75">
+              {/* <p className="text-white opacity-75">
                 <small>Хязгаарлагдмал тоо - хурдан захиална уу!</small>
-              </p>
+              </p> */}
             </div>
       </div>
              </div>
