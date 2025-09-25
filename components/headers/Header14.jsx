@@ -194,7 +194,7 @@ export default function Header14() {
                       e.target.style.backgroundColor = "transparent";
                     }}
                   >
-                    Сайн байна уу, {user.username || user.firstName || "User"}
+                    Сайн байна уу, {user.firstName || user.username || "User"}
                   </Link>
                 </div>
               ) : (
