@@ -641,11 +641,11 @@ export default function AccountOrders() {
                 : `Танд одоогоор ${getStatusText(activeTab).toLowerCase()} захиалга байхгүй байна`
               }
             </p>
-            {activeTab === 'all' && (
-            <a href="/shop-1" className="btn btn-primary">
+            {/* {activeTab === 'all' && (
+            <a href="/shop" className="btn btn-primary">
               Дэлгүүр рүү очих
             </a>
-            )}
+            )} */}
           </div>
         )}
       </div>

@@ -73,6 +73,28 @@ export default {
         }
       },
     }),
+    // OAuth providers for Google and Facebook
+    Credentials({
+      id: "oauth",
+      name: "OAuth",
+      async authorize(credentials) {
+        if (credentials?.credentialsMethod === "oauth") {
+          return {
+            id: String(credentials.id || ''),
+            userId: Number(credentials.id || 0),
+            email: String(credentials.email || ''),
+            firstName: String(credentials.firstName || ''),
+            lastName: String(credentials.lastName || ''),
+            username: String(credentials.username || ''),
+            role: String(credentials.role || 'CUSTOMER') as UserRole,
+            image: String(credentials.image || ''),
+            email_verified: Boolean(credentials.email_verified),
+            accessToken: String(credentials.accessToken || '')
+          };
+        }
+        return null;
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
