@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { sortingOptions } from "@/data/products/productCategories";
 import { useContextElement } from "@/context/Context";
+import { useFilterContext } from "@/context/FilterContext";
 
 // Smart debounce hook for price and search
 function useDebounce(value, delay) {
@@ -30,6 +31,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
   const params = useParams();
   const router = useRouter();
   const { setCurrentCategory } = useContextElement();
+  const { clearAllFilters: contextClearAllFilters } = useFilterContext();
   const currentCategoryId = params?.categoryId ? parseInt(params.categoryId) : null;
   
   // Get URL search params for filter initialization
@@ -97,6 +99,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
     const urlAttributes = parseAttributesFromURL(searchParams.get('attributes'));
     const urlSpecs = parseSpecsFromURL(searchParams.get('specs'));
     const urlTags = searchParams.get('tags') ? searchParams.get('tags').split(',') : [];
+    const urlHierarchicalTags = searchParams.get('hierarchicalTags') ? searchParams.get('hierarchicalTags').split(',') : [];
     const urlInStock = searchParams.get('inStock') === 'true';
     const urlHasDiscount = searchParams.get('hasDiscount') === 'true';
     const urlSearch = searchParams.get('search') || '';
@@ -106,7 +109,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
       brands: urlBrands,
       attributes: urlAttributes,
       specs: urlSpecs,
-      tags: urlTags,
+      tags: [...urlTags, ...urlHierarchicalTags], // Combine both simple and hierarchical tags
       search: urlSearch,
       price: urlPrice,
       inStock: urlInStock,
@@ -148,7 +151,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         if (typeof window !== 'undefined') {
           const url = new URL(window.location);
           const params = new URLSearchParams(url.search);
-          ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+          ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'hierarchicalTags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
             params.delete(param);
           });
           const newUrl = `${url.pathname}?${params.toString()}`;
@@ -201,7 +204,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
     const params = new URLSearchParams(url.search);
     
     // Clear existing filter params
-    ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+    ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'hierarchicalTags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
       params.delete(param);
     });
     
@@ -325,6 +328,20 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
         setFiltersLoading(true);
         setFiltersError(null);
         
+        // Clear all filters when category changes
+        contextClearAllFilters();
+        
+        // Also clear URL parameters
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location);
+          const params = new URLSearchParams(url.search);
+          ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'hierarchicalTags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+            params.delete(param);
+          });
+          const newUrl = `${url.pathname}?${params.toString()}`;
+          window.history.replaceState({}, '', newUrl);
+        }
+        
         // Determine context based on current category (matching backend expectations)
         const context = currentCategoryId ? 'category' : 'homepage';
         const params = {
@@ -371,18 +388,27 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
               newSet.add('brands');
               newSet.add('price');
               
-              // Auto-expand attribute accordions
-              Object.keys(newFilterOptions.attributes).forEach(key => {
-                newSet.add(`attribute-${key}`);
-              });
+              // Auto-expand hierarchical tag accordions (priority)
+              if (newFilterOptions.tags?.hierarchical?.length > 0) {
+                newFilterOptions.tags.hierarchical.forEach(tag => {
+                  newSet.add(`hierarchical-${tag.id}`);
+                });
+              }
+              
+              // Auto-expand attribute accordions (excluding ангилал which is now hierarchical)
+              Object.keys(newFilterOptions.attributes)
+                .filter(key => key.toLowerCase() !== 'ангилал')
+                .forEach(key => {
+                  newSet.add(`attribute-${key}`);
+                });
               
               // Auto-expand spec accordions
               Object.keys(newFilterOptions.specs).forEach(key => {
                 newSet.add(`spec-${key}`);
               });
               
-              // Auto-expand tags if available
-              if (newFilterOptions.tags.simple?.length > 0 || newFilterOptions.tags.hierarchical?.length > 0) {
+              // Auto-expand simple tags if available
+              if (newFilterOptions.tags.simple?.length > 0) {
                 newSet.add('tags');
               }
               
@@ -443,6 +469,24 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
       expandParentIfChildSelected(currentCategoryId);
     }
   }, [currentCategoryId, catTree]);
+
+  // Clear filters on page refresh (when component mounts without URL filters)
+  useEffect(() => {
+    // Only run on initial mount
+    const hasURLFilters = typeof window !== 'undefined' && (() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      return searchParams.has('tags') || searchParams.has('brands') || searchParams.has('attributes') || 
+             searchParams.has('specs') || searchParams.has('priceMin') || searchParams.has('priceMax') ||
+             searchParams.has('hasDiscount') || searchParams.has('search');
+    })();
+    
+    // If no URL filters on page load, clear any existing filters
+    if (!hasURLFilters) {
+      contextClearAllFilters();
+    }
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run on mount
 
   // Calculate total active filters for sophisticated UX
   const totalActiveFilters = useMemo(() => {
@@ -630,7 +674,18 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
                 e.stopPropagation();
                 
                 // Clear all filters when switching categories
-                // clearAllFilters();
+                contextClearAllFilters();
+                
+                // Also clear URL parameters
+                if (typeof window !== 'undefined') {
+                  const url = new URL(window.location);
+                  const params = new URLSearchParams(url.search);
+                  ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'hierarchicalTags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+                    params.delete(param);
+                  });
+                  const newUrl = `${url.pathname}?${params.toString()}`;
+                  window.history.replaceState({}, '', newUrl);
+                }
                 
                 // Save category info to context
                 setCurrentCategory({
@@ -737,7 +792,7 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location);
       const params = new URLSearchParams(url.search);
-      ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
+      ['brands', 'priceMin', 'priceMax', 'attributes', 'specs', 'tags', 'hierarchicalTags', 'inStock', 'hasDiscount', 'search', 'price'].forEach(param => {
         params.delete(param);
       });
       const newUrl = `${url.pathname}?${params.toString()}`;
@@ -879,8 +934,116 @@ export default function FilterAll({ onFiltersChange, externalFilters = null }) {
       </div>
       {/* /.accordion-item */}
 
-      {/* DYNAMIC ATTRIBUTES SECTION - Renders all attributes from backend */}
-      {Object.keys(attributeOptions).map((attributeKey) => {
+      {/* HIERARCHICAL TAGS SECTION - Show at the top with priority */}
+      {filterOptions.tags?.hierarchical?.map((hierarchicalTag) => {
+        const tagId = `hierarchical-${hierarchicalTag.id}`;
+        const isExpanded = expandedAccordions.has(tagId);
+        const currentValues = activeTags || [];
+        
+        return (
+          <div key={hierarchicalTag.id} className="accordion" id={`hierarchical-${hierarchicalTag.id}-filters`}>
+            <div className="accordion-item mb-4">
+              <h5 className="accordion-header">
+                <button
+                  className="accordion-button p-0 border-0 fs-6 text-uppercase"
+                  type="button"
+                  onClick={() => toggleAccordion(tagId)}
+                  aria-expanded={isExpanded}
+                >
+                  {hierarchicalTag.name}
+                  <svg 
+                    width="18" 
+                    height="18" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="1.5"
+                    className="accordion-icon"
+                    style={{ 
+                      color: '#495D35',
+                      marginLeft: 'auto',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease-in-out'
+                    }}
+                  >
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+              </h5>
+              <div
+                className={`accordion-collapse border-0 ${isExpanded ? 'show' : 'collapse'}`}
+                style={{
+                  transition: 'all 0.3s ease',
+                  maxHeight: isExpanded ? '400px' : '0',
+                  overflow: 'hidden'
+                }}
+              >
+                <div className="accordion-body px-0 pb-0">
+                  {filtersLoading ? (
+                    <div className="text-center py-3">
+                      <div className="spinner-border spinner-border-sm text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  ) : filtersError ? (
+                    <div className="text-danger small py-2">{filtersError}</div>
+                  ) : hierarchicalTag.options?.length > 0 ? (
+                    <div className="filter-options-list">
+                      {hierarchicalTag.options.map((option, index) => (
+                        <div key={option.id || index} className="filter-option-item d-flex align-items-center justify-content-between py-1">
+                          <div className="d-flex align-items-center">
+                            <label 
+                              className="d-flex align-items-center"
+                              style={{
+                                margin: 0,
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                color: '#333',
+                                fontWeight: '400'
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={currentValues.includes(option.value)}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  toggleTag(option.value);
+                                }}
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  marginRight: '8px',
+                                  accentColor: '#495D35',
+                                  cursor: 'pointer'
+                                }}
+                              />
+                              {option.name || option.value}
+                            </label>
+                          </div>
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#999',
+                            fontWeight: '400'
+                          }}>
+                            {option.count || 0}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-muted small py-2">{hierarchicalTag.name} байхгүй</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* DYNAMIC ATTRIBUTES SECTION - Renders all attributes from backend (excluding ангилал which is now shown as hierarchical tags) */}
+      {Object.keys(attributeOptions)
+        .filter(attributeKey => attributeKey.toLowerCase() !== 'ангилал') // Filter out ангилал attribute
+        .map((attributeKey) => {
         const attribute = attributeOptions[attributeKey];
         const attributeId = `attribute-${attributeKey}`;
         const isExpanded = expandedAccordions.has(attributeId);

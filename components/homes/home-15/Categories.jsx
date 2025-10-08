@@ -12,27 +12,86 @@ export default function Categories() {
   const [err, setErr] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
-  // List of all available category images from the folder
+  // List of all available category images with their types (category or tag)
+  // Tags match exactly what's in the database/filter sidebar
   const categoryImages = [
-    '/assets/images/categories/АМПУЛЬ.png',
-    '/assets/images/categories/БИЕИЙН-ТОС.png',
-    '/assets/images/categories/БИЕИЙН-ШИНГЭН-САВАН.png',
-    '/assets/images/categories/ГАРЫН-ТОС.png',
-    '/assets/images/categories/МАСК.png',
-    '/assets/images/categories/НАРНЫ-ТОС.png',
-    '/assets/images/categories/НҮҮРНИЙ-ТОС.png',
-    '/assets/images/categories/ТОНЕР.png',
-    '/assets/images/categories/УРУУЛЫН-БАЛМ.png',
-    '/assets/images/categories/ҮНЭРТЭН.png',
-    '/assets/images/categories/ШАМПУНЬ.png',
-    '/assets/images/categories/ШҮДНИЙ-ОО.png'
+    {
+      image: '/assets/images/categories/АМПУЛЬ.png',
+      name: 'Ампуль', // Exact name from your filter
+      type: 'tag'
+    },
+    {
+      image: '/assets/images/categories/БИЕИЙН-ТОС.png',
+      name: 'БИЕИЙН ТОС',
+      type: 'category'
+    },
+    {
+      image: '/assets/images/categories/БИЕИЙН-ШИНГЭН-САВАН.png',
+      name: 'БИЕИЙН ШИНГЭН САВАН',
+      type: 'category'
+    },
+    {
+      image: '/assets/images/categories/ГАРЫН-ТОС.png',
+      name: 'ГАРЫН ТОС',
+      type: 'category'
+    },
+    {
+      image: '/assets/images/categories/МАСК.png',
+      name: 'Маск', // Exact name from your filter
+      type: 'tag'
+    },
+    {
+      image: '/assets/images/categories/НАРНЫ-ТОС.png',
+      name: 'Нарны тос', // Exact name from your filter
+      type: 'tag'
+    },
+    {
+      image: '/assets/images/categories/НҮҮРНИЙ-ТОС.png',
+      name: 'Нүүрний тос', // Exact name from your filter
+      type: 'tag'
+    },
+    {
+      image: '/assets/images/categories/ТОНЕР.png',
+      name: 'Тонер', // Exact name from your filter
+      type: 'tag'
+    },
+    {
+      image: '/assets/images/categories/УРУУЛЫН-БАЛМ.png',
+      name: 'УРУУЛЫН БАЛМ',
+      type: 'category'
+    },
+    {
+      image: '/assets/images/categories/ҮНЭРТЭН.png',
+      name: 'ҮНЭРТЭН',
+      type: 'category'
+    },
+    {
+      image: '/assets/images/categories/ШАМПУНЬ.png',
+      name: 'ШАМПУНЬ',
+      type: 'category'
+    },
+    {
+      image: '/assets/images/categories/ШҮДНИЙ-ОО.png',
+      name: 'ШҮДНИЙ ОО',
+      type: 'category'
+    }
   ];
 
-  // Function to get category name from image path
-  const getCategoryNameFromImage = (imagePath) => {
-    const fileName = imagePath.split('/').pop(); // Get filename
-    const nameWithoutExtension = fileName.replace('.png', ''); // Remove .png
-    return nameWithoutExtension;
+  // Function to generate the correct URL based on type
+  const generateUrl = (item) => {
+    if (item.type === 'tag') {
+      // For tags, use /shop?tags= with proper URL encoding
+      const encodedTag = encodeURIComponent(item.name);
+      return `/shop?tags=${encodedTag}`;
+    } else {
+      // For categories, find matching category from backend
+      const matchingCategory = findMatchingCategory(item.name, categories);
+      if (matchingCategory) {
+        return `/shop/${matchingCategory.id}`;
+      }
+      // Fallback to shop page without filters
+      return '/shop';
+    }
   };
 
   // Function to find matching category from backend based on image name
@@ -58,76 +117,38 @@ export default function Categories() {
   useEffect(() => {
     let mounted = true;
     
-    // Try multiple API endpoints to get all categories
+    // Optimized category loading - only fetch if we have category-type items
     const loadCategories = async () => {
+      // Check if we have any category-type items
+      const hasCategories = categoryImages.some(item => item.type === 'category');
+      
+      if (!hasCategories) {
+        // No need to fetch categories if all items are tags
+        if (mounted) setLoading(false);
+        return;
+      }
+
       try {
-        // Try categories.getAll() with all=true parameter
-        // console.log("Trying categories.getAll() with all=true...");
+        // Single API call to get all categories
         const allCategoriesRes = await api.fetch('/categories?all=true', { auth: false });
-        // console.log("categories.getAll() response: ", allCategoriesRes);
         
-        if (allCategoriesRes.data && allCategoriesRes.data.length > 0) {
+        if (mounted && allCategoriesRes.data && allCategoriesRes.data.length > 0) {
           setCategories(allCategoriesRes.data);
-          // console.log("Loaded categories from getAll(): ", allCategoriesRes.data.length, "items");
+          setLoading(false);
           return;
         }
       } catch (e) {
-        // console.log("categories.getAll() failed: ", e.message);
+        console.error("Failed to load categories:", e.message);
       }
 
-      try {
-        // Try categories.getTree() for hierarchical data
-        // console.log("Trying categories.getTree()...");
-        const treeRes = await api.categories.getTree();
-        // console.log("categories.getTree() response: ", treeRes);
-        
-        if (treeRes.data && treeRes.data.length > 0) {
-          // Flatten the tree to get all categories
-          const flattenCategories = (categories) => {
-            let result = [];
-            categories.forEach(cat => {
-              result.push(cat);
-              if (cat.children && cat.children.length > 0) {
-                result = result.concat(flattenCategories(cat.children));
-              }
-            });
-            return result;
-          };
-          
-          const flattened = flattenCategories(treeRes.data);
-          setCategories(flattened);
-          // console.log("Loaded categories from getTree(): ", flattened.length, "items");
-          return;
-        }
-      } catch (e) {
-        // console.log("categories.getTree() failed: ", e.message);
+      // If API fails, still set loading to false
+      if (mounted) {
+        setLoading(false);
+        setErr("Failed to load categories");
       }
-
-      try {
-        // Try homepage API as fallback
-        // console.log("Trying homepage API...");
-        const homepageRes = await api.homepage.bundled({ 
-          sections: 'categories', 
-          categoryLimit: 1000 
-        });
-        // console.log("Homepage API response: ", homepageRes);
-        
-        if (homepageRes.data?.categories && homepageRes.data.categories.length > 0) {
-          setCategories(homepageRes.data.categories);
-          // console.log("Loaded categories from homepage: ", homepageRes.data.categories.length, "items");
-          return;
-        }
-      } catch (e) {
-        // console.log("Homepage API failed: ", e.message);
-      }
-
-      // If all APIs fail, set error
-      setErr("Failed to load categories from all endpoints");
     };
 
-    loadCategories().finally(() => {
-      if (mounted) setLoading(false);
-    });
+    loadCategories();
       
     return () => {
       mounted = false;
@@ -254,19 +275,11 @@ export default function Categories() {
               padding: '0'
             }}
           >
-            {categoryImages.map((imagePath, i) => {
-              // Get category name from image filename
-              const imageCategoryName = getCategoryNameFromImage(imagePath);
-              // Find matching category from backend
-              const matchingCategory = findMatchingCategory(imageCategoryName, categories);
-              
-              // If no matching category found, use default category with id 1
-              const displayCategory = matchingCategory || { id: 1, name: imageCategoryName };
-
+            {categoryImages.map((item, i) => {
               return (
                 <Link 
-                  key={`mobile-category-${i}-${imageCategoryName}`} 
-                  href={`/shop/${displayCategory.id}`} 
+                  key={`mobile-category-${i}-${item.name}`} 
+                  href={generateUrl(item)} 
                   style={{
                     display: 'block',
                     textAlign: 'center',
@@ -275,10 +288,10 @@ export default function Categories() {
                   }}
                 >
                   <Image
-                    src={imagePath}
+                    src={item.image}
                     width={150}
                     height={150}
-                    alt={displayCategory.name}
+                    alt={item.name}
                     style={{ 
                       width: '100%',
                       height: 'auto',
@@ -296,7 +309,7 @@ export default function Categories() {
                     textAlign: 'center',
                     lineHeight: '1.2'
                   }}>
-                    {displayCategory.name}
+                    {item.name}
                   </div> */}
                 </Link>
               );
@@ -311,31 +324,17 @@ export default function Categories() {
           
             {...swiperOptions}
           >
-          {categoryImages.map((imagePath, i) => {
-            // Get category name from image filename
-            const imageCategoryName = getCategoryNameFromImage(imagePath);
-            // Find matching category from backend
-            const matchingCategory = findMatchingCategory(imageCategoryName, categories);
-            
-            // Debug logging
-            if (!matchingCategory) {
-              // console.log(`No matching category found for image: ${imageCategoryName}`);
-              // console.log('Available categories:', categories.map(c => c.name));
-            }
-            
-            // If no matching category found, use default category with id 1
-            const displayCategory = matchingCategory || { id: 1, name: imageCategoryName };
-
+          {categoryImages.map((item, i) => {
             return (
               <SwiperSlide 
-                key={`category-${i}-${imageCategoryName}`} 
+                key={`category-${i}-${item.name}`} 
                 className="swiper-slide product-card"
              
               >
                  <div className="text-center">
                 
                   <Link
-                    href={`/shop/${displayCategory.id}`}
+                    href={generateUrl(item)}
                     className="category-link d-block "
                    
                   >
@@ -344,10 +343,10 @@ export default function Categories() {
                     
                       <Image
                         loading="lazy"
-                        src={imagePath}
+                        src={item.image}
                         width={300}
                         height={300}
-                        alt={displayCategory.name}
+                        alt={item.name}
                         className="category-image"
                         style={{ 
                           objectFit: 'cover',
@@ -370,7 +369,7 @@ export default function Categories() {
                         width: '100%'
                       }}
                     >
-                      {matchingCategory.name}
+                      {item.name}
                     </div> */}
                    </div>
                   </Link>

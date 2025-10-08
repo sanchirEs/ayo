@@ -415,14 +415,31 @@ export default function Shop4({
 
   // эхний ачаалт + dependency өөрчлөгдөхөд дахин ачаал
   useEffect(() => {
-    // Only show loading for initial load or when categoryId changes from null to a value
-    const shouldShowLoading = !products.length || (categoryId && !pagination.total);
-    loadProducts({ 
-      page: 1, 
-      limit: initialLimit, 
-      sortValue: initialSort, 
-      showLoading: shouldShowLoading 
-    });
+    // Check if there are URL filters present - if so, let the filter useEffect handle the initial load
+    const hasURLFilters = typeof window !== 'undefined' && (() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      return searchParams.has('tags') || searchParams.has('brands') || searchParams.has('attributes') || 
+             searchParams.has('specs') || searchParams.has('priceMin') || searchParams.has('priceMax') ||
+             searchParams.has('hasDiscount') || searchParams.has('search');
+    })();
+    
+    // Clear products when category changes to show loading state
+    if (categoryId !== null) {
+      setProducts([]);
+      setPagination(prev => ({ ...prev, total: 0 }));
+    }
+    
+    // Only load products if there are no URL filters to avoid race condition
+    if (!hasURLFilters) {
+      // Only show loading for initial load or when categoryId changes from null to a value
+      const shouldShowLoading = !products.length || (categoryId && !pagination.total);
+      loadProducts({ 
+        page: 1, 
+        limit: initialLimit, 
+        sortValue: initialSort, 
+        showLoading: shouldShowLoading 
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId, initialLimit, initialSort]);
 
@@ -439,8 +456,32 @@ export default function Shop4({
 
   // ENHANCED filter change handling
   useEffect(() => {
-    // Don't process if appliedFilters is null/undefined (initial state)
-    if (!appliedFilters) {
+    // Check if there are URL filters on initial load
+    const hasURLFilters = typeof window !== 'undefined' && (() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      return searchParams.has('tags') || searchParams.has('brands') || searchParams.has('attributes') || 
+             searchParams.has('specs') || searchParams.has('priceMin') || searchParams.has('priceMax') ||
+             searchParams.has('hasDiscount') || searchParams.has('search');
+    })();
+    
+    // If there are URL filters but no appliedFilters yet, wait for FilterAll to initialize
+    if (hasURLFilters && !appliedFilters) {
+      return;
+    }
+    
+    // If no URL filters and no appliedFilters, load products without filters
+    if (!hasURLFilters && !appliedFilters) {
+      loadProducts({ 
+        page: 1, 
+        limit: pagination.limit, 
+        sortValue: sort, 
+        showLoading: !products.length
+      });
+      return;
+    }
+    
+    // Don't process if appliedFilters is null/undefined (initial state) and there are no URL filters
+    if (!appliedFilters && !hasURLFilters) {
       return;
     }
     
@@ -635,7 +676,7 @@ export default function Shop4({
         }
       `}</style>
         
-        <div className="d-flex justify-content-between mb-4 pb-md-2">
+        <div className="d-flex justify-content-between pb-md-2">
           <div className="breadcrumb mb-0 d-none d-md-block flex-grow-1">
             <BreadCumb />
           </div>
@@ -845,7 +886,7 @@ export default function Shop4({
         {/* ACTIVE FILTERS DISPLAY - Web only */}
         {totalActiveFilters > 0 && (
           <div className="active-filters-section mb-0 py-0 d-none d-md-block">
-            <div className="d-flex flex-wrap align-items-center gap-2">
+            <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
               {/* Display active attribute filters */}
               {Object.entries(filters.attributes || {}).map(([attrKey, values]) => {
                 if (!Array.isArray(values) || values.length === 0) return null;
@@ -943,7 +984,7 @@ export default function Shop4({
               {/* Display active tag filters */}
               {filters.tags && filters.tags.length > 0 && (
                 <div className="active-filter-tag">
-                  <span className="filter-label">Таг:</span>
+                  <span className="filter-label">Төрөл:</span>
                   <span className="filter-value">{filters.tags.join(', ')}</span>
                   <button
                     className="filter-remove-btn"
