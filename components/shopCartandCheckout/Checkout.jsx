@@ -91,6 +91,7 @@ export default function Checkout() {
   
   // Payment modal states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showBankModal, setShowBankModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState('PENDING');
   const [statusCheckInterval, setStatusCheckInterval] = useState(null);
@@ -452,8 +453,13 @@ export default function Checkout() {
       if (response.success) {
         const { order, payment, sagaId } = response.data;
         // console.log('Order created successfully:', { order, payment, sagaId });
+        // // console.log('Order created successfully:', { order, payment, sagaId });
         
-        // Set payment data for modal (SAGA format)
+        // // Set payment data for modal (SAGA format)
+        // console.log('Payment data from backend:', payment);
+        // console.log('Bank URLs from backend:', payment.bankUrls);
+        // console.log('Bank URLs length:', payment.bankUrls?.length || 0);
+        
         setPaymentData({
           sagaId: sagaId,
           orderId: order.id,
@@ -466,7 +472,8 @@ export default function Checkout() {
           qrCode: payment.qrCode,
           paymentUrl: payment.paymentUrl,
           transactionId: payment.transactionId,
-          expiresAt: payment.expiresAt
+          expiresAt: payment.expiresAt,
+          bankUrls: payment.bankUrls || [] // Add bankUrls from payment response
         });
         
         // Start monitoring payment status if it's pending
@@ -1586,6 +1593,44 @@ export default function Checkout() {
                           {getPaymentAppName(paymentData.paymentMethod)} апп-аа нээж QR кодыг уншуулна уу
                         </small>
                       </div>
+
+                   
+
+                      {/* Alternative Payment - Bank List Button (Mobile Only) */}
+                      {paymentData.paymentUrl && isMobile && (
+                        <div className="mt-4 d-block d-md-none">
+                          <div className="text-center mb-3">
+                            <span className="text-muted" style={{ 
+                              fontSize: '0.9rem',
+                              fontWeight: '500',
+                              color: '#6c757d'
+                            }}>
+                              Эсвэл
+                            </span>
+                          </div>
+                          
+                          <button 
+                            onClick={() => setShowBankModal(true)}
+                            className="btn btn-primary w-100 mb-2"
+                            style={{
+                              borderRadius: '8px',
+                              padding: '0.75rem 1.5rem',
+                              fontSize: '1rem',
+                              fontWeight: '500',
+                              backgroundColor: '#495D35',
+                              borderColor: '#495D35',
+                              transition: 'all 0.3s ease'
+                            }}
+                          >
+                            <i className="fas fa-university me-2"></i>
+                            Интернет банкаар төлөх 
+                            {/* ({paymentData.bankUrls?.length || 0} банк) */}
+                            {/* Debug: {console.log('UI - paymentData.bankUrls:', paymentData.bankUrls)} */}
+                          </button>
+                          
+                          
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1792,6 +1837,188 @@ export default function Checkout() {
            }
          }}
        ></div>
+     )}
+{/* <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+          <div className="modal-dialog modal-lg" style={{ 
+            maxHeight: '90vh', 
+            margin: '1.75rem auto',
+            maxWidth: '600px'
+          }}>
+            <div className="modal-content" style={{ 
+              maxHeight: '90vh',
+              borderRadius: '8px'
+            }}></div> */}
+     {/* Bank List Modal */}
+     {showBankModal && paymentData?.bankUrls && (
+       <div 
+         className="modal fade show" 
+         style={{ 
+           display: 'block',
+           zIndex: 1060
+         }} 
+         tabIndex="-1"
+       >
+         <div className="modal-dialog modal-lg" style={{ 
+            maxHeight: '90vh', 
+            margin: '1.75rem auto',
+            maxWidth: '600px'
+          }}>
+          <div className="modal-content" style={{ 
+              maxHeight: '90vh',
+              borderRadius: '8px',
+              paddingBottom: '1.5rem',
+              
+            }}>
+             <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
+               <h5 className="modal-title" style={{ fontWeight: '600' }}>
+                 <i className="fas fa-university me-2"></i>
+                 Банк сонгох
+               </h5>
+               <button
+                 type="button"
+                 className="btn-close"
+                 onClick={() => setShowBankModal(false)}
+                //  style={{ filter: 'brightness(0) invert(1)' }}
+               />
+              
+             </div>
+             <div className="modal-body" style={{ 
+               maxHeight: '80vh', 
+               overflowY: 'auto',
+               padding: '1rem'
+             }}>
+               <p className="text-muted mb-4" style={{ fontSize: '0.95rem' }}>
+                 <i className="fas fa-info-circle me-2"></i>
+                 Доорх банкуудаас сонгоно уу
+               </p>
+               
+               <div className="row g-3">
+                 {paymentData.bankUrls.map((bank, index) => (
+                   <div key={index} className="col-12">
+                     <a
+                       href={bank.link}
+                       className="d-flex align-items-center p-3 border rounded-3 text-decoration-none"
+                       style={{
+                         backgroundColor: '#f8f9fa',
+                         borderColor: '#dee2e6',
+                         transition: 'all 0.2s ease',
+                         cursor: 'pointer'
+                       }}
+                       onMouseEnter={(e) => {
+                         e.currentTarget.style.backgroundColor = '#e9ecef';
+                         e.currentTarget.style.borderColor = '#28a745';
+                         e.currentTarget.style.transform = 'translateY(-2px)';
+                         e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                       }}
+                       onMouseLeave={(e) => {
+                         e.currentTarget.style.backgroundColor = '#f8f9fa';
+                         e.currentTarget.style.borderColor = '#dee2e6';
+                         e.currentTarget.style.transform = 'translateY(0)';
+                         e.currentTarget.style.boxShadow = 'none';
+                       }}
+                     >
+                       <div className="me-3" style={{ 
+                         width: '60px', 
+                         height: '60px',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center',
+                         backgroundColor: 'white',
+                         borderRadius: '8px',
+                         padding: '8px',
+                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                       }}>
+                         <img 
+                           src={bank.logo} 
+                           alt={bank.name}
+                           style={{ 
+                             maxWidth: '100%',
+                             maxHeight: '100%',
+                             objectFit: 'contain'
+                           }}
+                           onError={(e) => {
+                             e.target.style.display = 'none';
+                             e.target.nextSibling.style.display = 'flex';
+                           }}
+                         />
+                         <div style={{ 
+                           display: 'none',
+                           width: '100%',
+                           height: '100%',
+                           alignItems: 'center',
+                           justifyContent: 'center',
+                           fontSize: '1.5rem',
+                           color: '#28a745'
+                         }}>
+                           <i className="fas fa-university"></i>
+                         </div>
+                       </div>
+                       <div className="flex-grow-1">
+                         <h6 className="mb-1" style={{ 
+                           color: '#212529',
+                           fontWeight: '600',
+                           fontSize: '1rem'
+                         }}>
+                           {bank.name}
+                         </h6>
+                         <p className="mb-0" style={{ 
+                           color: '#6c757d',
+                           fontSize: '0.875rem'
+                         }}>
+                           {bank.description || bank.name}
+                         </p>
+                       </div>
+                       <div className="ms-auto">
+                         <i className="fas fa-chevron-right" style={{ 
+                           color: '#28a745',
+                           fontSize: '1.2rem'
+                         }}></i>
+                       </div>
+                     </a>
+                   </div>
+                 ))}
+               </div>
+
+               <div className="alert alert-warning mt-4 mb-0" style={{
+                 backgroundColor: '#fff3cd',
+                 borderColor: '#ffc107',
+                 borderRadius: '8px',
+                 padding: '1rem'
+               }}>
+                 <small style={{ fontSize: '0.875rem' }}>
+                   <i className="fas fa-exclamation-triangle me-2"></i>
+                   <strong>Анхаар:</strong> Банкны апп танд суусан байх ёстой. 
+                   Апп нээгдэхгүй бол QPay веб хуудсаар төлөх боломжтой.
+                 </small>
+               </div>
+             </div>
+             {/* <div  style={{ 
+         
+               padding: '1rem 1.5rem',
+             
+             }}>
+               
+             </div> */}
+           </div>
+         </div>
+       </div>
+     )}
+
+     {/* Bank Modal Backdrop */}
+     {showBankModal && (
+       <div 
+         className="modal-backdrop fade show" 
+         onClick={() => setShowBankModal(false)}
+         style={{
+           position: 'fixed',
+           top: 0,
+           left: 0,
+           width: '100%',
+           height: '100%',
+           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+           zIndex: 1050
+         }}
+       />
      )}
 
      {/* Terms Modal */}
