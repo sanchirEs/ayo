@@ -9,9 +9,10 @@ export const metadata = {
 export default function AccountWishlistPage() {
   return (
     <>
-      <div className="mb-4 pb-4"></div>
+      <div className="mb-2 mb-md-4 pb-2 pb-md-4"></div>
       <section className="my-account container" style={{backgroundColor: "#FBFFFC"}}>
-        <h2 className="page-title">Wishlist</h2>
+      <h2 className="page-title fs-3 fs-md-4 d-none d-lg-block" style={{ color: '#495D35' }}>Хүслийн жагсаалт</h2>
+        {/* <h2 className="page-title py-3 d-none d-lg-block">Хүслийн жагсаалт</h2> */}
         <div className="row">
           <DashboardSidebar />
           <AccountWishlist />

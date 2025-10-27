@@ -12,7 +12,7 @@ export default function DashboardSidebar() {
   const { logout } = useAuth();
 
   return (
-    <div className="col-lg-3">
+    <div className="col-lg-3 d-none d-lg-block">
       <ul className="account-nav">
         {dashboardMenuItems.map((elm, i) => (
           <li key={i}>

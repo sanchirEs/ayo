@@ -48,7 +48,7 @@ export default function RelatedSlider({ currentProduct }) {
   // Fetch related products
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      console.log("currentProduct", currentProduct);
+      // console.log("currentProduct", currentProduct);
       if (!currentProduct?.categoryId) {
         setLoading(false);
         return;
@@ -57,13 +57,34 @@ export default function RelatedSlider({ currentProduct }) {
       try {
         setLoading(true);
         setError(null);
-        console.log("currentProduct.category.id", currentProduct.categoryId);
-        const response = await api.products.getAll({
-          categoryId: currentProduct.categoryId,
-          limit: 8,
-          excludeId: currentProduct.id // Exclude current product
-        });
-        console.log("response related products", response);
+        // console.log("currentProduct.category.id", currentProduct.categoryId);
+        // Try to get products by category, fallback to alternative endpoints if enhanced fails
+        let response;
+        try {
+          response = await api.products.enhanced({
+            categoryId: currentProduct.categoryId,
+            limit: 8
+          });
+        } catch (error) {
+          // console.warn('Enhanced endpoint failed, trying alternative approach:', error);
+          try {
+            // Try to get all products and filter by category on frontend
+            const allProducts = await api.products.new({ limit: 20 });
+            if (allProducts?.data?.products) {
+              // Filter products by category and exclude current product
+              const filteredProducts = allProducts.data.products
+                .filter(p => p.categoryId === currentProduct.categoryId && p.id !== currentProduct.id)
+                .slice(0, 8);
+              response = { data: { products: filteredProducts } };
+            } else {
+              response = { data: { products: [] } };
+            }
+          } catch (fallbackError) {
+            // console.warn('Fallback also failed:', fallbackError);
+            response = { data: { products: [] } };
+          }
+        }
+        // console.log("response related products", response);
         
         // Filter out current product and get products array
         const products = Array.isArray(response?.data?.products) ? response.data.products : 
@@ -117,7 +138,7 @@ export default function RelatedSlider({ currentProduct }) {
   }
 
   return (
-    <section className="products-carousel container">
+    <section className="products-carousel container" style={{ position: 'relative', zIndex: 1 }}>
       <h2 className="h3 text-uppercase mb-4 pb-xl-2 mb-xl-4">
         Төстэй <strong>бүтээгдэхүүн</strong>
       </h2>

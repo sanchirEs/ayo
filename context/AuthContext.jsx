@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import api from "@/lib/api";
+import { getLocalizedErrorMessage } from "@/lib/errorMessages";
 
 const AuthCtx = createContext(null);
 
@@ -40,7 +41,12 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async ({ identifier, password }) => {
     const r = await signIn("credentials", { identifier, password, redirect: false });
-    if (r?.error) throw new Error(r.error);
+    if (r?.error) {
+      // Use the code field if available (contains backend message), otherwise use error
+      const errorMessage = r.code || r.error;
+      const localizedError = getLocalizedErrorMessage(errorMessage);
+      throw new Error(localizedError);
+    }
     // амжилттай бол status → "authenticated" болж, дээрх effect hydrate-ыг дуудна
   }, []);
 

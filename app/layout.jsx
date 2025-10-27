@@ -12,24 +12,29 @@ import Context from "@/context/Context";
 import QuickView from "@/components/modals/QuickView";
 import CartDrawer from "@/components/shopCartandCheckout/CartDrawer";
 import SiteMap from "@/components/modals/SiteMap";
-import NewsLetter from "@/components/modals/NewsLetter";
 import CookieContainer from "@/components/common/CookieContainer";
 import Header14 from "@/components/headers/Header14";
-import MobileHeader from "@/components/headers/MobileHeader";
+import HeaderWrapper from "@/components/headers/HeaderWrapper";
 import SizeGuide from "@/components/modals/SizeGuide";
 import Delivery from "@/components/modals/Delivery";
 import CustomerLogin from "@/components/asides/CustomerLogin";
 import ShopFilter from "@/components/asides/ShopFilter";
-import ProductDescription from "@/components/asides/ProductDescription";
 import ProductAdditionalInformation from "@/components/asides/ProductAdditionalInformation";
 import ProductReviews from "@/components/asides/ProductReviews";
 import MobileFooter1 from "@/components/footers/MobileFooter1";
 import { AuthProvider } from "@/context/AuthContext";
+import { FilterProvider } from "@/context/FilterContext";
+import { NavigationProvider } from "@/context/NavigationContext";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
 import Footer1 from "@/components/footers/Footer14";
+import { useShopRoute } from "@/hooks/useShopRoute";
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({ children }) {
+  const { isShopRoute, isProductRoute, isCartRoute, isCheckoutRoute, isDashboardRoute } = useShopRoute();
+  const pathname = usePathname();
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Import the script only on the client side
@@ -46,7 +51,7 @@ export default function RootLayout({ children }) {
             event.reason?.message?.includes('Not Found') ||
             event.reason?.message?.includes('fetch')) {
           event.preventDefault();
-          console.log('Suppressing 404/network error from global handler');
+          // console.log('Suppressing 404/network error from global handler');
         }
       };
       
@@ -101,15 +106,52 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100;200;300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+        <style jsx global>{`
+          /* NUCLEAR NOTO SANS OVERRIDE - DESTROY ALL JOST */
+          * {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          h1, h2, h3, h4, h5, h6 {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          body, html, div, span, p, a, button, input, textarea, select, label {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          .container, .row, .col-*, .btn, .form-control {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          .product-card, .pc__title, .pc__category, .money, .price, .section-title {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          [class*=""] {
+            font-family: "Noto Sans", sans-serif !important;
+          }
+          
+          :root {
+            --font-family-base: "Noto Sans", sans-serif !important;
+            --font-heading: "Noto Sans", sans-serif !important;
+          }
+        `}</style>
       </head>
           
-      <body>
+      <body style={{ fontFamily: 'var(--font-family-base)' }}>
           <SessionProvider
             
               refetchInterval={0}
   refetchOnWindowFocus={false}
   refetchWhenOffline={false}>
           <AuthProvider>
+            <FilterProvider>
+              <NavigationProvider>
         <Svgs />
         <Context>
          
@@ -121,11 +163,12 @@ export default function RootLayout({ children }) {
             backgroundColor: 'white'
           }}>
             <Header14 />
-            <MobileHeader />
+            <HeaderWrapper />
           </div>
             {children}
-            <Footer1 />
-            <MobileFooter1 />
+            <div className="d-none d-lg-block"><Footer1 /></div>
+            {pathname === '/' && <div className="d-lg-none"><Footer1 /></div>}
+            {!isCartRoute && !isCheckoutRoute && <MobileFooter1 />}
           </main>
         
           {/* //modals and asides */}
@@ -139,10 +182,12 @@ export default function RootLayout({ children }) {
           <SiteMap />
           <CustomerLogin />
           <ShopFilter />
-          <ProductDescription />
+     
           <ProductAdditionalInformation />
           <ProductReviews />
         </Context>
+              </NavigationProvider>
+            </FilterProvider>
         <Toaster position="top-right" />
         <div className="page-overlay" id="pageOverlay"></div>
         <ScrollTop />

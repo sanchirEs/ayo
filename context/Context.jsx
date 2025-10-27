@@ -15,6 +15,8 @@ export default function Context({ children }) {
   const [wishList, setWishList] = useState([]);
   const [quickViewItem, setQuickViewItem] = useState(allProducts[0]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [currentCategory, setCurrentCategory] = useState(null);
+  const [currentProduct, setCurrentProduct] = useState(null);
   useEffect(() => {
     const subtotal = cartProducts.reduce((accumulator, product) => {
       return accumulator + product.quantity * product.price;
@@ -22,13 +24,51 @@ export default function Context({ children }) {
     setTotalPrice(subtotal);
   }, [cartProducts]);
 
-  const addProductToCart = (id) => {
+  const addProductToCart = async (id, variantId = null) => {
     if (!cartProducts.filter((elm) => elm.id == id)[0]) {
-      const item = {
-        ...allProducts.filter((elm) => elm.id == id)[0],
-        quantity: 1,
-      };
+      let item = null;
+      
+      // First try to get real product data from backend
+      try {
+        const response = await api.products.get(id);
+        if (response?.success && response?.data) {
+          item = {
+            ...response.data,
+            quantity: 1,
+            id: response.data.id || id,
+          };
+        }
+      } catch (error) {
+        console.log('Failed to fetch product from backend, using static data:', error.message);
+      }
+      
+      // Fallback to static data if backend fails
+      if (!item) {
+        const staticProduct = allProducts.filter((elm) => elm.id == id)[0];
+        if (staticProduct) {
+          item = {
+            ...staticProduct,
+            quantity: 1,
+          };
+        } else {
+          console.error(`Product with id ${id} not found in static data`);
+          return;
+        }
+      }
+      
       setCartProducts((pre) => [...pre, item]);
+
+      // Try to sync with backend cart
+      try {
+        await api.cart.addItem({
+          productId: id,
+          variantId: variantId,
+          quantity: 1,
+          sessionId: 'guest_session_' + Math.random().toString(36).substr(2, 9)
+        });
+      } catch (error) {
+        // console.log('Cart sync failed, using local storage:', error.message);
+      }
 
       document
         .getElementById("cartDrawerOverlay")
@@ -44,9 +84,9 @@ export default function Context({ children }) {
   };
 
   const toggleWishlist = async (id) => {
-    // Check if user is logged in
-    if (!user) {
-      console.log('User not logged in, using local storage for wishlist');
+    // Check if user is logged in and has access token
+    if (!user || !user.accessToken) {
+      // console.log('User not logged in or no access token, using local storage for wishlist');
       // Fallback to local storage if not logged in
       if (wishList.includes(id)) {
         setWishList((pre) => [...pre.filter((elm) => elm != id)]);
@@ -69,9 +109,16 @@ export default function Context({ children }) {
     } catch (error) {
       console.error('Wishlist toggle error:', error);
       
-      // Don't show error for 404 or network issues, just use local storage
-      if (error.message.includes('404') || error.message.includes('Not Found') || error.message.includes('fetch')) {
-        console.log('Wishlist API not available, using local storage');
+      // Handle authentication errors specifically
+      if (error.message.includes('Invalid TOKEN') || 
+          error.message.includes('Authentication required') ||
+          error.message.includes('401') ||
+          error.message.includes('403')) {
+        // console.log('Authentication error, using local storage for wishlist');
+      } else if (error.message.includes('404') || 
+                 error.message.includes('Not Found') || 
+                 error.message.includes('fetch')) {
+        // console.log('Wishlist API not available, using local storage');
       }
       
       // Fallback to local storage if API fails
@@ -88,11 +135,36 @@ export default function Context({ children }) {
     }
     return false;
   };
+  // Load cart from backend on mount, fallback to localStorage
   useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("cartList"));
-    if (items?.length) {
-      setCartProducts(items);
-    }
+    const loadCart = async () => {
+      try {
+        // First try to load from backend
+        const response = await api.cart.get();
+        if (response?.success && response?.data && Array.isArray(response.data) && response.data.length > 0) {
+          // Map backend cart data to frontend format
+          const backendCartItems = response.data.map(item => ({
+            ...item,
+            // Ensure we have the required fields for frontend
+            id: item.productId || item.id,
+            quantity: item.quantity || 1,
+            price: item.price || 0,
+          }));
+          setCartProducts(backendCartItems);
+          return; // Don't load from localStorage if backend has data
+        }
+      } catch (error) {
+        console.log('Failed to load cart from backend, using localStorage:', error.message);
+      }
+      
+      // Fallback to localStorage if backend fails or has no data
+      const items = JSON.parse(localStorage.getItem("cartList"));
+      if (items?.length) {
+        setCartProducts(items);
+      }
+    };
+
+    loadCart();
   }, []);
 
   useEffect(() => {
@@ -101,9 +173,9 @@ export default function Context({ children }) {
   // Load wishlist from backend on component mount
   useEffect(() => {
     const loadWishlist = async () => {
-      // Check if user is logged in
-      if (!user) {
-        console.log('User not logged in, loading wishlist from local storage');
+      // Check if user is logged in and has access token
+      if (!user || !user.accessToken) {
+        // console.log('User not logged in or no access token, loading wishlist from local storage');
         const items = JSON.parse(localStorage.getItem("wishlist"));
         if (items?.length) {
           setWishList(items);
@@ -119,12 +191,19 @@ export default function Context({ children }) {
       } catch (error) {
         console.error('Failed to load wishlist from backend:', error);
         
-        // Don't show error for 404 or network issues, just use local storage
-        if (error.message.includes('404') || error.message.includes('Not Found') || error.message.includes('fetch')) {
-          console.log('Wishlist API not available, using local storage');
+        // Handle authentication errors specifically
+        if (error.message.includes('Invalid TOKEN') || 
+            error.message.includes('Authentication required') ||
+            error.message.includes('401') ||
+            error.message.includes('403')) {
+          // console.log('Authentication error, using local storage for wishlist');
+        } else if (error.message.includes('404') || 
+                   error.message.includes('Not Found') || 
+                   error.message.includes('fetch')) {
+          // console.log('Wishlist API not available, using local storage');
         }
         
-        // Fallback to local storage
+        // Fallback to local storage for any error
         const items = JSON.parse(localStorage.getItem("wishlist"));
         if (items?.length) {
           setWishList(items);
@@ -139,9 +218,44 @@ export default function Context({ children }) {
     localStorage.setItem("wishlist", JSON.stringify(wishList));
   }, [wishList]);
 
-  const clearCart = () => {
+  const clearCart = async () => {
     setCartProducts([]);
     localStorage.removeItem("cartList");
+    
+    // Try to clear backend cart
+    try {
+      await api.cart.clear();
+    } catch (error) {
+      // console.log('Backend cart clear failed:', error.message);
+    }
+  };
+
+  const updateCartItemQuantity = async (itemId, quantity) => {
+    // Update local cart
+    setCartProducts(prev => 
+      prev.map(item => 
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+
+    // Try to sync with backend
+    try {
+      await api.cart.updateItem(itemId, quantity);
+    } catch (error) {
+      // console.log('Cart update sync failed:', error.message);
+    }
+  };
+
+  const removeCartItem = async (itemId) => {
+    // Remove from local cart
+    setCartProducts(prev => prev.filter(item => item.id !== itemId));
+
+    // Try to sync with backend
+    try {
+      await api.cart.removeItem(itemId);
+    } catch (error) {
+      // console.log('Cart remove sync failed:', error.message);
+    }
   };
 
   const contextElement = {
@@ -156,6 +270,12 @@ export default function Context({ children }) {
     wishList,
     setQuickViewItem,
     clearCart,
+    updateCartItemQuantity,
+    removeCartItem,
+    currentCategory,
+    setCurrentCategory,
+    currentProduct,
+    setCurrentProduct,
   };
   return (
     <dataContext.Provider value={contextElement}>

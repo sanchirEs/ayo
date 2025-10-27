@@ -114,7 +114,7 @@
   }
 
   &[type="password"] {
-    font-family: 'Trebuchet MS', sans-serif;
+    font-family: var(--font-family-base) !important;
     letter-spacing: 0.18em;
   }
 }

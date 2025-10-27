@@ -2,73 +2,58 @@ import React from "react";
 
 export default function Terms() {
   return (
-    <section className="container mw-930 lh-30">
+    <section className="container mw-930 lh-30 mt-5 ">
       <h2 className="section-title text-uppercase fw-bold mb-5">
-        Terms & Conditions
+        Үйлчилгээний нөхцөл
       </h2>
       <h6 className="mb-3">
-        Your use of this is governed by these terms of use
+        Энэхүү вэб сайтыг ашиглах нь доорх нөхцөлүүдээр зохион байгуулагдана
       </h6>
       <p className="mb-4 pb-3">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
+        Ayo eCommerce вэб сайтыг ашиглахдаа та доорх нөхцөлүүдийг хүлээн зөвшөөрч, дагаж мөрдөх үүрэгтэй. 
+        Хэрэв та эдгээр нөхцөлтэй санал нийлэхгүй бол вэб сайтыг ашиглахыг хориглоно. 
+        Бид эдгээр нөхцөлийг ямар ч үед өөрчлөх эрхтэй бөгөөд өөрчлөлт оруулах үед вэб сайт дээр мэдээлэх болно.
       </p>
-      <h6 className="mb-3">Use of the content on this website</h6>
+      <h6 className="mb-3">Вэб сайтын агуулгыг ашиглах</h6>
       <p className="mb-4 pb-3">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
+        Вэб сайтын бүх агуулга, зураг, текст, дизайн болон бусад материалууд нь зохиогчийн эрхээр хамгаалагдсан. 
+        Та зөвхөн хувийн хэрэглээнд зориулж агуулгыг татаж авах эрхтэй. 
+        Арилжааны зорилгоор ашиглах, хуваалцах, хуулбарлах, өөрчлөх нь хориглогдсон.
       </p>
-      <h6 className="mb-3">How long will It take to get my package</h6>
+      <h6 className="mb-3">Захиалгын хүргэлт</h6>
       <p className="mb-4 pb-3">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
+        Захиалга хүлээн авсны дараа 1-3 ажлын өдрийн дотор бэлтгэж, хүргэх болно. 
+        Улаанбаатар хотод 1-2 хоног, аймгуудад 3-5 хоног зарцуулна. 
+        Хүргэлтийн хугацаа цаг агаарын нөхцөл, замын байдал зэргээс хамаарч өөрчлөгдөж болно. 
+        Хүргэлт хойшлогдсон тохиолдолд танд мэдэгдэх болно.
       </p>
       <h6 className="mb-3">
-        Will I receive the same product that see the picture
+        Бүтээгдэхүүний чанар болон зурагтай таарах эсэх
       </h6>
       <p className="mb-4 pb-3">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
+        Бид зураг дээр үзүүлсэн бүтээгдэхүүнийг бодитоор хүргэхдээ хамгийн сайн чанарыг хангахыг хичээдэг. 
       </p>
-      <h6 className="mb-3">Limitation of liability</h6>
+      <h6 className="mb-3">Хариуцлага хязгаарлах</h6>
       <p className="mb-4 pb-3">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
+        Бид вэб сайтын ашиглалтаас үүдэлтэй шууд болон шууд бус алдагдлын хариуцлага хүлээхгүй. 
+        Вэб сайт дээрх мэдээлэл зөв, бүрэн гэдэгт баталгаа өгөхгүй. 
+        Хэрэв таны тоног төхөөрөмж, мэдээлэлд хохирол учирвал бид хариуцлага хүлээхгүй.
       </p>
-      <h6 className="mb-3">Governing Law & Jurisdiction</h6>
+      <h6 className="mb-3">Хууль болон эрх мэдэл</h6>
       <p className="mb-4 pb-3">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
+        Энэхүү нөхцөлүүд нь Монгол Улсын хуулиар зохион байгуулагдана. 
+        Маргаан гарсан тохиолдолд Улаанбаатар хотын шүүхэд шийдвэрлүүлнэ. 
+        Хэрэв нөхцөлийн аль нэг хэсэг хүчинтэй биш бол бусад хэсгүүд хүчинтэй хэвээр үлдэнэ.
+      </p>
+      <h6 className="mb-3">Хувийн мэдээллийн хамгаалалт</h6>
+      <p className="mb-4 pb-3">
+        Бид таны хувийн мэдээллийг нууцлалын зарчмаар хамгаалж, зөвхөн захиалга боловсруулах, 
+        хүргэлт хийх зорилгоор ашиглана. Таны мэдээллийг гуравдагч этгээдэд дамжуулахгүй. 
+        Мэдээлэл ашиглах тухай дэлгэрэнгүй мэдээллийг "Нууцлалын бодлого" хэсэгт оруулсан болно.
+      </p>
+      <h6 className="mb-3">Төлбөрийн нөхцөл</h6>
+      <p className="mb-4 pb-3">
+        Төлбөрийг карт, банкны шилжүүлэг, мобайл төлбөрөөр төлж болно. 
       </p>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import ProductSlider1 from "./sliders/ProductSlider1";
 import BreadCumb from "./BreadCumb";
 import Star from "../common/Star";
@@ -13,9 +13,17 @@ import { useContextElement } from "@/context/Context";
 import Link from "next/link";
 
 export default function SingleProduct12({ product }) {
-  const { cartProducts, setCartProducts } = useContextElement();
+  const { toggleWishlist, isAddedtoWishlist, cartProducts, setCartProducts } = useContextElement();
   const [quantity, setQuantity] = useState(1);
   const [warn, setWarn] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [showIngredients, setShowIngredients] = useState(false);
+  const [showHowToUse, setShowHowToUse] = useState(false);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // --- Backend талбаруудыг тааруулах ---
   const images = product?.ProductImages?.map((i) => i.imageUrl) ?? [];
@@ -72,7 +80,7 @@ export default function SingleProduct12({ product }) {
       setQuantity(qty);
     }
   };
-
+  const isInWishlist = isAddedtoWishlist(product.id);
   const addToCart = () => {
     if (outOfStock) return;
     if (isIncludeCard()) return;
@@ -97,6 +105,9 @@ export default function SingleProduct12({ product }) {
     setCartProducts((prev) => [...prev, item]);
   };
 
+  const handleWishlistToggle = async () => {
+    await toggleWishlist(product.id);
+  };
   // Вариантуудаас атрибутуудын нэрсийг цуглуулах
   const attributeNameSet = useMemo(() => {
     const s = new Set();
@@ -132,7 +143,7 @@ export default function SingleProduct12({ product }) {
               <BreadCumb />
             </div>
 
-            <div className="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
+            {/* <div className="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
               <a className="text-uppercase fw-medium">
                 <svg className="mb-1px" width="10" height="10" viewBox="0 0 25 25">
                   <use href="#icon_prev_md" />
@@ -145,20 +156,34 @@ export default function SingleProduct12({ product }) {
                   <use href="#icon_next_md" />
                 </svg>
               </a>
-            </div>
+            </div> */}
           </div>
 
           <h1 className="product-single__name">{product?.name}</h1>
+          
+          {/* Product SKU and Category */}
+          <div className="product-single__meta mb-2">
+            <small className="text-muted">
+              {product?.category?.name && (
+                <span className="me-3">
+                  <strong>{product.category.name}</strong>
+                </span>
+              )}
+              {product?.sku && (
+                <span>#{product.sku}</span>
+              )}
+            </small>
+          </div>
 
           <div className="product-single__rating">
             <div className="reviews-group d-flex">
               <Star stars={5} />
             </div>
-            <span className="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
+            {/* <span className="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span> */}
           </div>
 
           <div className="product-single__price">
-            <span className="current-price">${price.toLocaleString()}</span>
+            <span className="current-price">{price.toLocaleString()}₮</span>
           </div>
 
           {/* ✅ Үлдэгдэл */}
@@ -169,7 +194,7 @@ export default function SingleProduct12({ product }) {
               </span>
             ) : (
               <span className="text-secondary">
-                Боломжит үлдэгдэл: <strong>{selectedStock}</strong>
+                {/* Боломжит үлдэгдэл: <strong>{selectedStock}</strong> */}
               </span>
             )}
           </div>
@@ -182,6 +207,198 @@ export default function SingleProduct12({ product }) {
           <div className="product-single__short-desc">
             <p>{product?.description || "No description."}</p>
           </div>
+
+          {/* Product Specifications */}
+          {product?.specs && product.specs.length > 0 && (
+            <div className="product-specifications mb-4">
+              <h6 className="fw-semibold mb-3 text-dark">Барааны тодорхойлолт</h6>
+              <div className="specs-container" style={{
+                backgroundColor: '#f8f9fa',
+                padding: '1rem',
+                borderRadius: '8px'
+              }}>
+                {product.specs.map((spec, index) => (
+                  <div key={index} className="spec-item d-flex justify-content-between align-items-center py-1" style={{
+                    borderBottom: index < product.specs.length - 1 ? '1px solid #e9ecef' : 'none'
+                  }}>
+                    <span className="spec-label text-dark" style={{ color: '#2d5a27' }}>
+                      {spec.type?.toUpperCase() || 'N/A'}
+                    </span>
+                    <span className="spec-value text-dark" style={{ color: '#2d5a27' }}>
+                      {spec.value || 'N/A'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Product Variants */}
+          {product?.variants && product.variants.length > 0 && (
+            <div className="product-variants mb-4">
+              {/* <h6 className="fw-semibold mb-3 text-dark">Бараа</h6> */}
+              
+              {/* Variant Type Selection (e.g., Color, Scent) */}
+              {(() => {
+                const variantTypes = new Set();
+                product.variants.forEach(variant => {
+                  variant.attributes?.forEach(attr => {
+                    if (attr?.option?.attribute?.name) {
+                      variantTypes.add(attr.option.attribute.name);
+                    }
+                  });
+                });
+                
+                return Array.from(variantTypes).map(type => {
+                  const options = product.variants
+                    .filter(variant => 
+                      variant.attributes?.some(attr => 
+                        attr?.option?.attribute?.name === type
+                      )
+                    )
+                    .map(variant => {
+                      const attr = variant.attributes?.find(a => 
+                        a?.option?.attribute?.name === type
+                      );
+                      return {
+                        variantId: variant.id,
+                        value: attr?.option?.value || 'N/A',
+                        image: variant.images?.[0]?.imageUrl,
+                        price: variant.price,
+                        isDefault: variant.isDefault,
+                        inStock: variant.inventory?.quantity > 0,
+                        variant: variant // Keep full variant object for reference
+                      };
+                    });
+
+                  return (
+                    <div key={type} className="variant-section mb-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <label className="fw-medium text-dark me-2">{type}:</label>
+                        <span className="text-muted">
+                          {selectedVariant && selectedVariant.attributes?.some(attr => 
+                            attr?.option?.attribute?.name === type
+                          ) ? 
+                            selectedVariant.attributes.find(attr => 
+                              attr?.option?.attribute?.name === type
+                            )?.option?.value :
+                            options.find(opt => opt.isDefault)?.value || options[0]?.value
+                          }
+                        </span>
+                      </div>
+                      
+                      <div className="variant-options d-flex flex-wrap gap-2">
+                        {options.map((option, index) => {
+                          const isSelected = selectedVariant?.id === option.variantId || 
+                            (!selectedVariant && option.isDefault);
+                          
+                          return (
+                            <div
+                              key={option.variantId}
+                              className={`variant-option position-relative ${isSelected ? 'selected' : ''} ${!option.inStock ? 'out-of-stock' : ''}`}
+                              style={{
+                                cursor: option.inStock ? 'pointer' : 'not-allowed',
+                                opacity: option.inStock ? 1 : 0.5
+                              }}
+                              onClick={() => {
+                                if (option.inStock) {
+                                  setSelectedVariant(option.variant);
+                                  // Reset quantity when variant changes
+                                  setQuantity(1);
+                                  setWarn("");
+                                }
+                              }}
+                            >
+                              {option.image && (
+                                <img
+                                  src={option.image}
+                                  alt={option.value}
+                                  className="variant-image"
+                                  style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    objectFit: 'cover',
+                                    borderRadius: '8px',
+                                    border: isSelected ? '3px solid #000' : '2px solid #e9ecef'
+                                  }}
+                                />
+                              )}
+                              
+                              {/* Labels */}
+                              {option.isDefault && (
+                                <span className="position-absolute top-0 start-0 badge bg-success text-white" style={{ fontSize: '0.7rem' }}>
+                                  NEW
+                                </span>
+                              )}
+                              
+                              {!option.inStock && (
+                                <span className="position-absolute top-0 end-0 badge bg-danger text-white" style={{ fontSize: '0.7rem' }}>
+                                  OUT
+                                </span>
+                              )}
+                              
+                              <div className="variant-info text-center mt-1">
+                                <div className="variant-value small fw-medium">{option.value}</div>
+                                <div className="variant-price small text-muted">{Number(option.price).toLocaleString()}₮</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
+
+          {/* Ingredients Section */}
+          {product?.ingredients && (
+            <div className="ingredients-section mb-3">
+              <div className="d-flex justify-content-between align-items-center py-2" style={{
+                borderBottom: '1px solid #e9ecef'
+              }}>
+                <span className="fw-medium text-dark">Найрлага</span>
+                <button 
+                  className="btn btn-link p-0 text-decoration-none"
+                  onClick={() => setShowIngredients(!showIngredients)}
+                  style={{ fontSize: '1.2rem', lineHeight: '1' }}
+                >
+                  {showIngredients ? '−' : '+'}
+                </button>
+              </div>
+              {showIngredients && (
+                <div className="ingredients-content py-2">
+                  <p className="text-muted mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+                    {product.ingredients}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* How to Use Section */}
+          {product?.howToUse && (
+            <div className="how-to-use-section mb-3">
+              <div className="d-flex justify-content-between align-items-center py-2">
+                <span className="fw-medium text-dark">Ашиглах заавар</span>
+                <button 
+                  className="btn btn-link p-0 text-decoration-none"
+                  onClick={() => setShowHowToUse(!showHowToUse)}
+                  style={{ fontSize: '1.2rem', lineHeight: '1' }}
+                >
+                  {showHowToUse ? '−' : '+'}
+                </button>
+              </div>
+              {showHowToUse && (
+                <div className="how-to-use-content py-2">
+                  <p className="text-muted mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+                    {product.howToUse}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           <form onSubmit={(e) => e.preventDefault()}>
             {/* ✅ Size/Color аль нэг нь байвал л swatches үзүүлнэ */}
@@ -217,79 +434,111 @@ export default function SingleProduct12({ product }) {
 
             {/* ✅ Үлдэгдэлгүй үед тоо болон товчнуудыг нуух */}
             {!outOfStock && (
-              <div className="product-single__addtocart">
-                <div className="qty-control position-relative">
-                  <input
-                    type="number"
-                    name="quantity"
-                    value={isIncludeCard()?.quantity ?? quantity}
-                    min="1"
-                    max={selectedStock || undefined}
-                    onChange={(e) => setQuantityCartItem(product.id, e.target.value)}
-                    className="qty-control__number text-center"
-                  />
-                  <div
-                    onClick={() =>
-                      setQuantityCartItem(
-                        product.id,
-                        (isIncludeCard()?.quantity || quantity) - 1
-                      )
-                    }
-                    className="qty-control__reduce"
-                  >
-                    -
-                  </div>
-                  <div
-                    onClick={() =>
-                      setQuantityCartItem(
-                        product.id,
-                        (isIncludeCard()?.quantity || quantity) + 1
-                      )
-                    }
-                    className="qty-control__increase"
-                  >
-                    +
-                  </div>
-                </div>
+  <div 
+    className="product-single__addtocart d-flex align-items-center gap-2 flex-wrap"
+    style={{flexWrap:"nowrap"}} // Хүсвэл албадан нэг мөрөнд
+  >
+    <div className="qty-control position-relative" style={{flex: "0 0 auto"}}>
+      <input
+        type="number"
+        name="quantity"
+        value={isIncludeCard()?.quantity ?? quantity}
+        min="1"
+        max={selectedStock || undefined}
+        onChange={(e) => setQuantityCartItem(product.id, e.target.value)}
+        className="qty-control__number text-center"
+      />
+      <div
+        onClick={() =>
+          setQuantityCartItem(
+            product.id,
+            (isIncludeCard()?.quantity || quantity) - 1
+          )
+        }
+        className="qty-control__reduce"
+      >
+        -
+      </div>
+      <div
+        onClick={() =>
+          setQuantityCartItem(
+            product.id,
+            (isIncludeCard()?.quantity || quantity) + 1
+          )
+        }
+        className="qty-control__increase"
+      >
+        +
+      </div>
+    </div>
 
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-addtocart js-open-aside"
-                  onClick={addToCart}
-                  disabled={outOfStock}
-                >
-                  {isIncludeCard() ? "Сагсанд хийсэн" : "Сагсанд хийх"}
-                </button>
+    <button
+      type="submit"
+      className="btn btn-primary btn-addtocart js-open-aside"
+      style={{ backgroundColor: "#495D35", flex: "1 1 auto", minWidth: "90px" }}
+      onClick={addToCart}
+      disabled={outOfStock}
+    >
+      {isIncludeCard() ? "Сагсанд хийсэн" : "Сагсанд хийх"}
+    </button>
 
-                <Link
-                  href="/shop_cart"
-                  onClick={(e) => {
-                    if (outOfStock) {
-                      e.preventDefault();
-                      return;
-                    }
-                    if (!isIncludeCard()) addToCart();
-                  }}
-                  className="btn btn-primary btn-addtocart js-open-aside bg-white text-dark"
-                  aria-disabled={outOfStock}
-                >
-                  Худалдаж авах
-                </Link>
-              </div>
-            )}
+    <Link
+      href="/shop_cart"
+      onClick={(e) => {
+        if (outOfStock) {
+          e.preventDefault();
+          return;
+        }
+        if (!isIncludeCard()) addToCart();
+      }}
+      className="btn btn-primary btn-addtocart js-open-aside bg-white text-dark"
+      style={{flex: "1 1 auto", minWidth: "90px"}}
+      aria-disabled={outOfStock}
+    >
+      Худалдаж авах
+    </Link>
+  </div>
+)}
+
           </form>
 
           <div className="product-single__addtolinks">
-            <a href="#" className="menu-link menu-link_us-s add-to-wishlist">
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <a
+            className={`menu-link menu-link_us-s add-to-wishlist ${
+              isInWishlist ? "active" : ""
+            }`}
+            onClick={handleWishlistToggle}
+            title={
+              isInWishlist
+                ? "Хүслийн жагсаалтаас хасах"
+                : "Хүслийн жагсаалтад нэмэх"
+            }
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              {isInWishlist ? (
+                // Filled heart
+                <path
+                  d="M10 18s-6-4.35-9-8.35C-2 5.9 2.5 1 7.5 3.5 9.24 4.4 10 6 10 6s.76-1.6 2.5-2.5C17.5 1 22 5.9 19 9.65 16 13.65 10 18 10 18z"
+                  fill="red"
+                />
+              ) : (
+                // Outline heart (stroke only)
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <use href="#icon_heart" />
               </svg>
-              <span>Add to Wishlist</span>
-            </a>
+              )}
+            </svg>
+            <span>
+              {isInWishlist ? "Хүслийн жагсаалтаас хасах" : "Хүслийн жагсаалтад нэмэх"}
+            </span>
+          </a>
+
+          
+            
             <ShareComponent title={product?.name || "Product"} />
           </div>
 
-          <div className="product-single__meta-info">
+          {/* <div className="product-single__meta-info">
             <div className="meta-item">
               <label>SKU:</label>
               <span>{product?.sku || "N/A"}</span>
@@ -302,12 +551,12 @@ export default function SingleProduct12({ product }) {
               <label>Tags:</label>
               <span>{(product?.tags || []).map((t) => t.tag).join(", ") || "—"}</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* tabs */}
-      <div className="product-single__details-tab">
+      <div className="product-single__details-tab mt-4">
         <ul className="nav nav-tabs" id="myTab1" role="tablist">
           {/* <li className="nav-item" role="presentation">
             <a
@@ -324,7 +573,7 @@ export default function SingleProduct12({ product }) {
           </li> */}
           <li className="nav-item" role="presentation">
             <a
-              className="nav-link nav-link_underscore"
+              className="nav-link nav-link_underscore text-center"
               id="tab-reviews-tab"
               data-bs-toggle="tab"
               href="#tab-reviews"

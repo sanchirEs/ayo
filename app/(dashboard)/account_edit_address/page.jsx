@@ -10,9 +10,10 @@ export default function AccountEditAddressPage() {
   return (
     <>
       <main className="page-wrapper" style={{backgroundColor: "#FBFFFC"}}>
-        <div className="mb-4 pb-4"></div>
+      <div className="mb-2 mb-md-4 pb-2 pb-md-4"></div>
         <section className="my-account container">
-          <h2 className="page-title">Хаягийн мэдээлэл</h2>
+          <h2 className="page-title fs-3 fs-md-4 d-none d-lg-block" style={{ color: '#495D35' }}>Хаягийн мэдээлэл</h2>
+          {/* <h2 className="page-title d-none d-lg-block">Хаягийн мэдээлэл</h2> */}
           <div className="row">
             <DashboardSidebar />
             <EditAddress />

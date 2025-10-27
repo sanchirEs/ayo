@@ -1,8 +1,7 @@
-
 import OrderTrack from "@/components/shopCartandCheckout/OrderTrack";
 import React from "react";
 
-export default function () {
+export default function ShopOrderTrackingPage() {
   return (
     <>
       <main className="page-wrapper">

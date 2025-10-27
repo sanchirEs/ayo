@@ -8,9 +8,14 @@ const countries = [
   "Mongolia",
 ];
 
-// Mongolian provinces/cities
-const mongolianProvinces = [
+// Region types
+const regionTypes = [
   "Улаанбаатар",
+  "Хөдөө орон нутаг"
+];
+
+// Mongolian provinces (excluding Ulaanbaatar)
+const mongolianProvinces = [
   "Архангай",
   "Баян-Өлгий",
   "Баянхонгор",
@@ -34,13 +39,30 @@ const mongolianProvinces = [
   "Хэнтий"
 ];
 
+// Ulaanbaatar districts
+const ulaanbaatarDistricts = [
+  "Баянгол дүүрэг",
+  "Баянзүрх дүүрэг", 
+  "Сүхбаатар дүүрэг",
+  "Хан-Уул дүүрэг",
+  "Чингэлтэй дүүрэг",
+  "Сонгинохайрхан дүүрэг",
+  "Багануур дүүрэг",
+  "Багахангай дүүрэг",
+  "Налайх дүүрэг"
+];
+
 import { useContextElement } from "@/context/Context";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useUserAddresses } from "@/hooks/useUserAddresses";
 import { useSession } from "next-auth/react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import pako from "pako";
+import QRCode from "qrcode";
+import { QRCodeSVG } from "qrcode.react";
+import TermsModal from "@/components/modals/TermsModal";
 
 export default function Checkout() {
   const { cartProducts, totalPrice, clearCart } = useContextElement();
@@ -55,32 +77,193 @@ export default function Checkout() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
+  const [showRegionTypeDropdown, setShowRegionTypeDropdown] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [addressMode, setAddressMode] = useState('new'); // 'new' or 'existing'
   const [hasSelectedExistingAddress, setHasSelectedExistingAddress] = useState(false);
   const [justSavedAddress, setJustSavedAddress] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('QPAY');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   
   // Payment modal states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showBankModal, setShowBankModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState('PENDING');
   const [statusCheckInterval, setStatusCheckInterval] = useState(null);
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   
   // Form states
   const [formData, setFormData] = useState({
-    country: "Mongolia",
+    country: "", // Will store the specific district/province
     addressLine1: "",
     addressLine2: "",
-    city: "",
+    city: "", // Will store region type (Улаанбаатар or Хөдөө орон нутаг)
     postalCode: "",
     phone: "",
     userId: session?.user?.userId
   });
 
-  // Cleanup interval on unmount
+  // QR Code Display Component - Simple and efficient without state
+  const QRCodeDisplay = ({ qrData, paymentMethod }) => {
+    // Process QR data synchronously without state
+    const processQRData = (data) => {
+      if (!data) return null;
+
+      // If it's already a data URL or external URL, return as is
+      if (data.startsWith('data:') || data.startsWith('http')) {
+        return data;
+      }
+
+      // If it's GZIP compressed base64
+      if (data.startsWith('H4sI')) {
+        try {
+          // console.log('Processing GZIP compressed QR data:', data.substring(0, 50) + '...');
+          
+          // Convert base64 to binary
+          const binary = atob(data);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+
+          // Decompress using pako
+          const decompressed = pako.inflate(bytes);
+          const processedData = String.fromCharCode.apply(null, decompressed);
+
+          // console.log('Decompressed string length:', processedData.length);
+          return processedData;
+        } catch (err) {
+          console.error('Failed to process GZIP QR data:', err);
+          return data; // Return original data as fallback
+        }
+      }
+
+      // Return data as is for other cases
+      return data;
+    };
+
+    const processedData = processQRData(qrData);
+
+    if (!processedData) {
+      return (
+        <div className="alert alert-warning">
+          <i className="fas fa-info-circle me-2"></i>
+          QR код үүсгэх боломжгүй байна
+        </div>
+      );
+    }
+
+    // If it's a data URL, show as image
+    if (processedData.startsWith('data:image')) {
+      return (
+        <img 
+          src={processedData}
+          alt="QR Code" 
+          style={{ 
+            maxWidth: '250px', 
+            height: 'auto', 
+            border: '2px solid #dee2e6',
+            borderRadius: '8px',
+            padding: '10px'
+          }}
+        />
+      );
+    }
+
+    // If it's a base64 image, convert to data URL
+    if (processedData.length > 1000 && /^[A-Za-z0-9+/=]+$/.test(processedData)) {
+      const qrDataUrl = `data:image/png;base64,${processedData}`;
+      return (
+        <img 
+          src={qrDataUrl}
+          alt="QR Code" 
+          style={{ 
+            maxWidth: '250px', 
+            height: 'auto', 
+            border: '2px solid #dee2e6',
+            borderRadius: '8px',
+            padding: '10px'
+          }}
+        />
+      );
+    }
+
+    // For text data, use QRCodeSVG component (no state needed)
+    if (processedData.length < 200) {
+      return (
+        <div style={{ textAlign: 'center' }}>
+          <QRCodeSVG
+            value={processedData}
+            size={250}
+            style={{ 
+              border: '2px solid #dee2e6',
+              borderRadius: '8px',
+              padding: '10px'
+            }}
+          />
+        </div>
+      );
+    }
+
+    // For long text, show as text with instructions
+    return (
+      <div style={{
+        padding: '20px',
+        backgroundColor: '#f8f9fa',
+        border: '2px dashed #dee2e6',
+        borderRadius: '8px',
+        margin: '10px 0'
+      }}>
+        <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+          <strong>QR Кодын текст:</strong>
+        </div>
+        <div style={{
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          wordBreak: 'break-all',
+          backgroundColor: 'white',
+          padding: '10px',
+          border: '1px solid #dee2e6',
+          borderRadius: '4px'
+        }}>
+          {processedData}
+        </div>
+        <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+          Энэ нь QR кодын текст юм. Та үүнийг QR код үүсгэгч апп-аар уншуулж болно.
+        </div>
+      </div>
+    );
+  };
+
+  const getPaymentAppName = (paymentMethod) => {
+    switch (paymentMethod) {
+      case 'QPAY':
+        return 'QPay';
+      case 'POCKET':
+        return 'Pocket';
+      case 'STOREPAY':
+        return 'Storepay';
+      default:
+        return 'Төлбөрийн';
+    }
+  };  // Cleanup interval on unmount
   useEffect(() => {
     return () => {
       if (statusCheckInterval) {
@@ -89,85 +272,53 @@ export default function Checkout() {
     };
   }, [statusCheckInterval]);
 
-  // Payment status monitoring
+  // Correct payment status monitoring as per SAGA documentation
   const startPaymentStatusMonitoring = (paymentId) => {
+    // console.log('Starting payment status monitoring for:', paymentId);
+    
     let checkCount = 0;
-    const maxChecks = 12; // 1 minute (12 * 5 seconds)
+    const maxAttempts = 60; // 3 minutes with 3-second intervals (as per documentation)
     
     const interval = setInterval(async () => {
       try {
         checkCount++;
-        console.log(`Checking payment status for: ${paymentId} (attempt ${checkCount}/${maxChecks})`);
+        // console.log(`Payment status check: ${paymentId} (attempt ${checkCount}/${maxAttempts})`);
         
-        // First try to check with provider (more accurate)
-        try {
-          const checkResponse = await api.payments.checkWithProvider(paymentId);
-          
-          if (checkResponse.success && checkResponse.data) {
-            const payment = checkResponse.data;
-            const newStatus = payment.status;
-            console.log('Provider payment status updated:', newStatus);
-            console.log('Payment data:', payment);
-            
-            // Update payment data with new status
-            setPaymentData(prev => ({
-              ...prev,
-              status: newStatus
-            }));
-            
-            // If payment is completed, stop monitoring
-            if (newStatus === 'COMPLETED') {
-              clearInterval(interval);
-              setStatusCheckInterval(null);
-              setPaymentStatus('COMPLETED');
-              
-              // Show success message
-              alert('Төлбөр амжилттай төлөгдлөө!');
-              return;
-            } else if (newStatus === 'FAILED' || newStatus === 'CANCELLED') {
-              clearInterval(interval);
-              setStatusCheckInterval(null);
-              setPaymentStatus(newStatus);
-              return;
-            }
-          }
-        } catch (providerError) {
-          console.log('Provider check failed, trying local status check:', providerError.message);
-        }
-        
-        // Fallback to local status check
+        // Check payment status as per documentation
         const response = await api.payments.getStatus(paymentId);
         
         if (response.success && response.data) {
           const payment = response.data;
           const newStatus = payment.status;
-          console.log('Local payment status updated:', newStatus);
-          console.log('Payment data:', payment);
+          // console.log('Payment status updated:', newStatus);
           
-          // Update payment data with new status
+          // Update payment data
           setPaymentData(prev => ({
             ...prev,
-            status: newStatus
+            status: newStatus,
+            ...(payment.transactionId && { transactionId: payment.transactionId }),
+            ...(payment.paymentUrl && { paymentUrl: payment.paymentUrl }),
+            ...(payment.qrCode && { qrCode: payment.qrCode, qrImage: payment.qrCode })
           }));
           
-          // If payment is completed, stop monitoring
+          // Handle payment completion
           if (newStatus === 'COMPLETED') {
             clearInterval(interval);
             setStatusCheckInterval(null);
             setPaymentStatus('COMPLETED');
-            
-            // Show success message
-            alert('Төлбөр амжилттай төлөгдлөө!');
+            alert('Төлбөр амжилттай төлөгдлөө! Захиалга баталгаажлаа!');
+            return;
           } else if (newStatus === 'FAILED' || newStatus === 'CANCELLED') {
             clearInterval(interval);
             setStatusCheckInterval(null);
             setPaymentStatus(newStatus);
+            return;
           }
         }
         
         // Stop monitoring after max attempts
-        if (checkCount >= maxChecks) {
-          console.log('Max payment status checks reached, stopping monitoring');
+        if (checkCount >= maxAttempts) {
+          // console.log('Payment status monitoring: max attempts reached');
           clearInterval(interval);
           setStatusCheckInterval(null);
         }
@@ -175,27 +326,63 @@ export default function Checkout() {
         console.error('Payment status check error:', error);
         
         // If it's a 404 error, the payment might not exist yet, so continue monitoring
-        if (error.message && error.includes('404')) {
-          console.log('Payment not found yet, continuing to monitor...');
+        if (error.message && error.message.includes('404')) {
+          // console.log('Payment not found yet, continuing to monitor...');
         } else {
           // For other errors, stop monitoring after a few attempts
-          console.error('Payment status check failed, stopping monitoring');
-          clearInterval(interval);
-          setStatusCheckInterval(null);
+          if (checkCount >= 3) {
+            console.error('Payment status check failed, stopping monitoring');
+            clearInterval(interval);
+            setStatusCheckInterval(null);
+          }
         }
       }
-    }, 5000); // Check every 5 seconds
+    }, 3000); // Check every 3 seconds as per documentation
 
     setStatusCheckInterval(interval);
   };
 
-  // Function to handle order creation and payment
+  // Legacy SAGA progress tracking (kept for backward compatibility)
+  const startSagaProgressTracking = (sagaId) => {
+    // console.log('Starting SAGA progress tracking for:', sagaId);
+    
+    // Track SAGA progress every 10 seconds for up to 5 minutes
+    const interval = setInterval(async () => {
+      try {
+        const sagaData = await api.utils.trackSagaProgress(sagaId, (progress) => {
+          // console.log('SAGA Progress:', progress);
+          
+          // Only stop tracking on failure, not completion
+          if (progress.status === 'FAILED') {
+            // console.log('SAGA failed:', progress);
+            clearInterval(interval);
+          }
+          // Don't stop on COMPLETED - SAGA completion doesn't mean payment is done
+        });
+        
+        if (!sagaData) {
+          clearInterval(interval);
+        }
+      } catch (error) {
+        console.error('SAGA progress tracking error:', error);
+        clearInterval(interval);
+      }
+    }, 10000); // Check every 10 seconds
+    
+    // Stop tracking after 5 minutes
+    setTimeout(() => {
+      clearInterval(interval);
+    }, 300000);
+  };
+
+
+  // Function to handle order creation and payment using Orders SAGA
   const handleOrderAndPayment = async () => {
     try {
       setIsProcessingPayment(true);
       
       // Validate required fields
-      if (!formData.addressLine1 || !formData.city || !formData.phone) {
+      if (!formData.addressLine1 || !formData.city || !formData.country || !formData.phone) {
         alert('Бүх заавал оруулах талбаруудыг бөглөнө үү!');
         return;
       }
@@ -206,7 +393,7 @@ export default function Checkout() {
         return;
       }
 
-      // Prepare order data
+      // Prepare order data for SAGA pattern
       const orderData = {
         items: cartProducts.map(item => ({
           productId: item.id,
@@ -214,6 +401,8 @@ export default function Checkout() {
           ...(item.variantId && { variantId: item.variantId })
         })),
         provider: selectedPaymentMethod,
+        currency: 'MNT', // Default currency
+        ...(appliedCoupon && { couponCode: appliedCoupon.code }),
         shippingAddress: {
           addressLine1: formData.addressLine1,
           addressLine2: formData.addressLine2,
@@ -221,41 +410,75 @@ export default function Checkout() {
           postalCode: formData.postalCode,
           country: formData.country,
           mobile: formData.phone
+        },
+        paymentMetadata: {
+          description: `Захиалга #${Date.now()}`,
+          ...(selectedPaymentMethod === 'STOREPAY' && { mobileNumber: formData.phone })
         }
       };
 
-      console.log('Creating order with payment:', orderData);
+      // console.log('Creating order with SAGA pattern:', orderData);
 
-      // Create order with integrated payment
-      const response = await api.orders.create(orderData);
+      // Check system health before creating order
+      try {
+        const healthCheck = await api.system.health(true);
+        if (!healthCheck.success || healthCheck.data?.status !== 'healthy') {
+          // console.warn('System health check failed:', healthCheck);
+          // Continue anyway, but log the warning
+        }
+      } catch (healthError) {
+        // console.warn('System health check error:', healthError);
+        // Continue anyway
+      }
+
+      // Generate unique identifiers for SAGA (for future use when backend supports custom headers)
+      const requestId = api.utils.generateRequestId();
+      const idempotencyKey = api.utils.generateIdempotencyKey();
+
+      // Create order using Orders SAGA pattern
+      // Note: Custom headers disabled by default to avoid CORS issues
+      const response = await api.orders.createWithSaga(orderData, {
+        idempotencyKey,
+        requestId,
+        deviceType: 'web',
+        source: 'web',
+        useCustomHeaders: false // Set to true when backend supports custom headers
+      });
       
-      console.log('Order creation response:', response);
-      console.log('Response data:', response.data);
-      console.log('Payment data:', response.data?.payment);
-      console.log('QR Code in payment:', response.data?.payment?.qrCode);
-      console.log('QR Image in payment:', response.data?.payment?.qrImage);
-      console.log('Payment URL in payment:', response.data?.payment?.paymentUrl);
+      // console.log('Order creation response:', response);
+      // console.log('Response data:', response.data);
+      // console.log('Payment data:', response.data?.payment);
+      // console.log('Order data:', response.data?.order);
       
       if (response.success) {
-        const { order, payment } = response.data;
-        console.log('Order created with payment:', { order, payment });
+        const { order, payment, sagaId } = response.data;
+        // console.log('Order created successfully:', { order, payment, sagaId });
+        // // console.log('Order created successfully:', { order, payment, sagaId });
         
-        // Set payment data for modal
+        // // Set payment data for modal (SAGA format)
+        // console.log('Payment data from backend:', payment);
+        // console.log('Bank URLs from backend:', payment.bankUrls);
+        // console.log('Bank URLs length:', payment.bankUrls?.length || 0);
+        
         setPaymentData({
+          sagaId: sagaId,
           orderId: order.id,
           paymentId: payment.paymentId,
           paymentMethod: selectedPaymentMethod,
           amount: payment.amount,
           currency: payment.currency,
           status: payment.status,
-          qrImage: payment.qrCode, // Backend returns qrCode, not qrImage
+          qrImage: payment.qrCode, // SAGA returns qrCode
           qrCode: payment.qrCode,
           paymentUrl: payment.paymentUrl,
-          transactionId: payment.transactionId
+          transactionId: payment.transactionId,
+          expiresAt: payment.expiresAt,
+          bankUrls: payment.bankUrls || [] // Add bankUrls from payment response
         });
         
         // Start monitoring payment status if it's pending
         if (payment.status === 'PENDING' && payment.paymentId) {
+          // Use correct payment status monitoring as per SAGA documentation
           startPaymentStatusMonitoring(payment.paymentId);
         }
         
@@ -267,7 +490,40 @@ export default function Checkout() {
       }
     } catch (error) {
       console.error('Order creation error:', error);
-      alert('Алдаа гарлаа: ' + (error.message || 'Захиалга үүсгэхэд алдаа гарлаа'));
+      
+      // Handle specific payment provider and SAGA errors
+      let errorMessage = 'Захиалга үүсгэхэд алдаа гарлаа';
+      
+      if (error.message) {
+        // SAGA-specific errors
+        if (error.message.includes('SAGA Execution Failed')) {
+          errorMessage = `Захиалгын системийн алдаа: ${error.message}. Дахин оролдоно уу.`;
+        } else if (error.message.includes('SAGA timeout')) {
+          errorMessage = `Захиалгын системийн цаг дууссан. Дахин оролдоно уу.`;
+        } else if (error.message.includes('Insufficient stock')) {
+          errorMessage = `Агуулахын алдаа: ${error.message}`;
+        } else if (error.message.includes('Provider Unavailable')) {
+          errorMessage = `Төлбөрийн системийн алдаа: ${error.message}. Өөр төлбөрийн арга сонгоно уу.`;
+        } else if (error.message.includes('Rate Limited')) {
+          errorMessage = `Хэт олон захиалга. Түр хүлээгээд дахин оролдоно уу.`;
+        } else if (error.message.includes('Validation failed')) {
+          errorMessage = `Мэдээлэл буруу: ${error.message}`;
+        } else if (error.message.includes('Authentication required')) {
+          errorMessage = `Нэвтрэх шаардлагатай. Дахин нэвтэрнэ үү.`;
+        } else if (error.message.includes('хамгийн бага дүнгийн шаардлага')) {
+          errorMessage = `Төлбөрийн алдаа: ${error.message}`;
+        } else if (error.message.includes('Pocket Zero')) {
+          errorMessage = `Pocket төлбөрийн алдаа: ${error.message}`;
+        } else if (error.message.includes('Storepay')) {
+          errorMessage = `Storepay төлбөрийн алдаа: ${error.message}`;
+        } else if (error.message.includes('QPAY')) {
+          errorMessage = `QPay төлбөрийн алдаа: ${error.message}`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      alert(`${errorMessage}`);
     } finally {
       setIsProcessingPayment(false);
     }
@@ -286,62 +542,28 @@ export default function Checkout() {
     router.push('/account_orders');
   };
 
-  // Function to handle payment cancellation
-  const handlePaymentCancel = async () => {
-    if (paymentData?.paymentId && paymentData.status === 'PENDING') {
-      if (confirm('Та төлбөрийг цуцлахдаа итгэлтэй байна уу?')) {
-        try {
-          const response = await api.payments.cancel(paymentData.paymentId);
-          
-          if (response.success) {
-            // Update payment data with cancelled status
-            setPaymentData(prev => ({
-              ...prev,
-              status: 'CANCELLED'
-            }));
-            
-            // Stop monitoring
-            if (statusCheckInterval) {
-              clearInterval(statusCheckInterval);
-              setStatusCheckInterval(null);
-            }
-            
-            setPaymentStatus('CANCELLED');
-            alert('Төлбөр амжилттай цуцлагдлаа.');
-          } else {
-            alert('Төлбөр цуцлахад алдаа гарлаа');
-          }
-        } catch (error) {
-          console.error('Payment cancellation error:', error);
-          alert('Төлбөр цуцлахад алдаа гарлаа: ' + error.message);
-        }
-      }
-    } else {
-      // Just close modal if no payment to cancel
-      setShowPaymentModal(false);
-      setPaymentData(null);
-      if (statusCheckInterval) {
-        clearInterval(statusCheckInterval);
-        setStatusCheckInterval(null);
-      }
-    }
-  };
 
-  // Function to manually check payment status
+
+  // Manual status check as per SAGA documentation
   const handleManualStatusCheck = async () => {
     if (paymentData?.paymentId) {
       try {
-        // First try to check with provider
-        const checkResponse = await api.payments.checkWithProvider(paymentData.paymentId);
+        // console.log('Manual status check for payment:', paymentData.paymentId);
         
-        if (checkResponse.success && checkResponse.data) {
-          const payment = checkResponse.data;
+        // Check payment status as per documentation
+        const response = await api.payments.getStatus(paymentData.paymentId);
+        
+        if (response.success && response.data) {
+          const payment = response.data;
           const newStatus = payment.status;
           
           // Update payment data with new status
           setPaymentData(prev => ({
             ...prev,
-            status: newStatus
+            status: newStatus,
+            ...(payment.transactionId && { transactionId: payment.transactionId }),
+            ...(payment.paymentUrl && { paymentUrl: payment.paymentUrl }),
+            ...(payment.qrCode && { qrCode: payment.qrCode, qrImage: payment.qrCode })
           }));
           
           // Show status message
@@ -354,49 +576,20 @@ export default function Checkout() {
           
           alert(`Төлбөрийн статус: ${statusText[newStatus] || newStatus}`);
           
-          // If payment is completed, stop monitoring
+          // If payment is completed, stop monitoring and redirect
           if (newStatus === 'COMPLETED') {
             if (statusCheckInterval) {
               clearInterval(statusCheckInterval);
               setStatusCheckInterval(null);
             }
             setPaymentStatus('COMPLETED');
+            
+            if (confirm('Төлбөр амжилттай! Захиалга баталгаажлаа! Захиалга хуудас руу очих уу?')) {
+              router.push('/account_orders');
+            }
           }
         } else {
-          // Fallback to local status check
-          const response = await api.payments.getStatus(paymentData.paymentId);
-          
-          if (response.success && response.data) {
-            const payment = response.data;
-            const newStatus = payment.status;
-            
-            // Update payment data with new status
-            setPaymentData(prev => ({
-              ...prev,
-              status: newStatus
-            }));
-            
-            // Show status message
-            const statusText = {
-              'PENDING': 'Хүлээгдэж буй',
-              'COMPLETED': 'Амжилттай',
-              'FAILED': 'Амжилтгүй',
-              'CANCELLED': 'Цуцлагдсан'
-            };
-            
-            alert(`Төлбөрийн статус: ${statusText[newStatus] || newStatus}`);
-            
-            // If payment is completed, stop monitoring
-            if (newStatus === 'COMPLETED') {
-              if (statusCheckInterval) {
-                clearInterval(statusCheckInterval);
-                setStatusCheckInterval(null);
-              }
-              setPaymentStatus('COMPLETED');
-            }
-          } else {
-            alert('Статус шалгахад алдаа гарлаа');
-          }
+          alert('Статус шалгахад алдаа гарлаа');
         }
       } catch (error) {
         console.error('Manual status check error:', error);
@@ -411,7 +604,7 @@ export default function Checkout() {
       <form onSubmit={(e) => e.preventDefault()}>
         <div className="checkout-form">
         <div className="billing-info__wrapper">
-          <h4>ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
+          <h4 className="mb-3">ХАЯГИЙН МЭДЭЭЛЭЛ</h4>
           
           {/* Address Selection Buttons */}
           <div className="address-selection__wrapper mb-4">
@@ -421,7 +614,7 @@ export default function Checkout() {
                 <i className={`me-2 ${justSavedAddress ? 'fas fa-check-circle' : 'fas fa-map-marker-alt'}`}></i>
                 <strong>
                   {justSavedAddress ? 'Шинээр хадгалсан хаяг:' : 'Сонгосон хаяг:'}
-                </strong> {selectedAddress?.addressLine1}, {selectedAddress?.city}
+                </strong> {selectedAddress?.addressLine1}, {selectedAddress?.country}
                 {justSavedAddress && (
                   <span className="ms-2 badge bg-success">Шинэ</span>
                 )}
@@ -463,12 +656,12 @@ export default function Checkout() {
                     }}>{addresses.length}</span>
                   )}
                 </button>
-                {!session?.user && (
+                {/* {!session?.user && (
                   <small className="text-muted d-block mt-1">Нэвтэрсэн хэрэглэгч л ашиглах боломжтой</small>
-                )}
-                {session?.user && addresses.length === 0 && (
+                )} */}
+                {/* {session?.user && addresses.length === 0 && (
                   <small className="text-muted d-block mt-1">Хадгалсан хаяг байхгүй байна</small>
-                )}
+                )} */}
               </div>
               <div className="col-md-6">
                 <button
@@ -531,6 +724,109 @@ export default function Checkout() {
                 <label htmlFor="checkout_phone">Утасны дугаар *</label>
               </div>
             </div>
+             {/* Region Type Selection */}
+             <div className="col-md-12">
+              <div className="form-floating my-3">
+                <div className={`form-label-fixed hover-container ${
+                  showRegionTypeDropdown ? "js-content_visible" : ""
+                }`}>
+                  <label htmlFor="checkout_region_type" className="form-label">
+                    Бүс нутаг *
+                  </label>
+                  <div className="js-hover__open">
+                    <input
+                      type="text"
+                      className="form-control form-control-lg search-field__actor search-field__arrow-down"
+                      id="checkout_region_type"
+                      value={formData.city}
+                      readOnly
+                      placeholder="Улаанбаатар эсвэл хөдөө орон нутаг сонгоно уу..."
+                      onClick={() => setShowRegionTypeDropdown((prev) => !prev)}
+                    />
+                  </div>
+                  {showRegionTypeDropdown && (
+                    <div className="filters-container js-hidden-content mt-2">
+                      <ul className="search-suggestion list-unstyled">
+                        {regionTypes.map((regionType, i) => (
+                          <li
+                            onClick={() => {
+                              setFormData({...formData, city: regionType, country: ""});
+                              setShowRegionTypeDropdown(false);
+                              setShowProvinceDropdown(false);
+                            }}
+                            key={i}
+                            className="search-suggestion__item js-search-select"
+                            style={{ cursor: 'pointer', padding: '8px 12px' }}
+                          >
+                            {regionType}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Specific Location Selection */}
+            {formData.city && (
+              <div className="col-md-12">
+                <div className="form-floating my-3">
+                  <div className={`form-label-fixed hover-container ${
+                    showProvinceDropdown ? "js-content_visible" : ""
+                  }`}>
+                    <label htmlFor="checkout_location" className="form-label">
+                      {formData.city === "Улаанбаатар" ? "Дүүрэг *" : "Аймаг *"}
+                    </label>
+                    <div className="js-hover__open">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg search-field__actor search-field__arrow-down"
+                        id="checkout_location"
+                        value={formData.country}
+                        readOnly
+                        placeholder={formData.city === "Улаанбаатар" ? "Дүүрэг сонгоно уу..." : "Аймаг сонгоно уу..."}
+                        onClick={() => setShowProvinceDropdown((prev) => !prev)}
+                      />
+                    </div>
+                    {showProvinceDropdown && (
+                      <div className="filters-container js-hidden-content mt-2">
+                        <div className="search-field__input-wrapper">
+                          <input
+                            type="text"
+                            className="search-field__input form-control form-control-sm bg-lighter border-lighter"
+                            placeholder="Хайх..."
+                            onChange={(e) => {
+                              setSearchQuery(e.target.value);
+                            }}
+                          />
+                        </div>
+                        <ul className="search-suggestion list-unstyled">
+                          {(formData.city === "Улаанбаатар" ? ulaanbaatarDistricts : mongolianProvinces)
+                            .filter((location) =>
+                              location.toLowerCase().includes(searchQuery.toLowerCase())
+                            )
+                            .map((location, i) => (
+                              <li
+                                onClick={() => {
+                                  setFormData({...formData, country: location});
+                                  setShowProvinceDropdown(false);
+                                  setSearchQuery("");
+                                }}
+                                key={i}
+                                className="search-suggestion__item js-search-select"
+                                style={{ cursor: 'pointer', padding: '8px 12px' }}
+                              >
+                                {location}
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="col-md-12">
               <div className="form-floating mt-3 mb-3">
                 <input
@@ -548,69 +844,14 @@ export default function Checkout() {
                   type="text"
                   className="form-control"
                   id="checkout_street_address_2"
-                  placeholder="Нэмэлт мэдээлэл (Хаягийн талаар өөр бусад мэдээлэл оруулах боломжтой)"
+                  placeholder="Нэмэлт мэдээлэл"
                   value={formData.addressLine2}
                   onChange={(e) => setFormData({...formData, addressLine2: e.target.value})}
                 />
-                <label htmlFor="checkout_street_address_2">Нэмэлт мэдээлэл (Хаягийн талаар өөр бусад мэдээлэл оруулах боломжтой)</label>
+                <label htmlFor="checkout_street_address_2">Нэмэлт мэдээлэл</label>
               </div>
             </div>
-            <div className="col-md-12">
-              <div className="form-floating my-3">
-                <div className={`form-label-fixed hover-container ${
-                  showProvinceDropdown ? "js-content_visible" : ""
-                }`}>
-                  <label htmlFor="checkout_city" className="form-label">
-                    Аймаг / Хот *
-                  </label>
-                  <div className="js-hover__open">
-                    <input
-                      type="text"
-                      className="form-control form-control-lg search-field__actor search-field__arrow-down"
-                      id="checkout_city"
-                      value={formData.city}
-                      readOnly
-                      placeholder="Аймаг эсвэл хот сонгоно уу..."
-                      onClick={() => setShowProvinceDropdown((prev) => !prev)}
-                    />
-                  </div>
-                  {showProvinceDropdown && (
-                    <div className="filters-container js-hidden-content mt-2">
-                      <div className="search-field__input-wrapper">
-                        <input
-                          type="text"
-                          className="search-field__input form-control form-control-sm bg-lighter border-lighter"
-                          placeholder="Хайх..."
-                          onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                          }}
-                        />
-                      </div>
-                      <ul className="search-suggestion list-unstyled">
-                        {mongolianProvinces
-                          .filter((province) =>
-                            province.toLowerCase().includes(searchQuery.toLowerCase())
-                          )
-                          .map((province, i) => (
-                            <li
-                              onClick={() => {
-                                setFormData({...formData, city: province});
-                                setShowProvinceDropdown(false);
-                                setSearchQuery("");
-                              }}
-                              key={i}
-                              className="search-suggestion__item js-search-select"
-                              style={{ cursor: 'pointer', padding: '8px 12px' }}
-                            >
-                              {province}
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+           
             <div className="col-md-12">
               <div className="form-floating my-3">
                 <input
@@ -621,7 +862,7 @@ export default function Checkout() {
                   value={formData.postalCode}
                   onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
                 />
-                <label htmlFor="checkout_zipcode">Шуудангийн код *</label>
+                <label htmlFor="checkout_zipcode">Шуудангийн код</label>
               </div>
             </div>
             {/* <div className="col-md-12">
@@ -758,7 +999,7 @@ export default function Checkout() {
                       <td>
                         {elm.title} x {elm.quantity}
                       </td>
-                      <td>${elm.price * elm.quantity}</td>
+                      <td>{elm.price * elm.quantity}₮</td>
                     </tr>
                   ))}
                 </tbody>
@@ -771,7 +1012,7 @@ export default function Checkout() {
                   </tr> */}
                   <tr>
                     <th>ХҮРГЭЛТ</th>
-                    <td>${totalPrice && 19}</td>
+                    <td>{totalPrice && 6000}₮</td>
                     {/* <td>Үнэгүй</td> */}
                   </tr>
                   {/* <tr>
@@ -780,53 +1021,85 @@ export default function Checkout() {
                   </tr> */}
                   <tr>
                     <th>НИЙТ ДҮН</th>
-                    <td>${totalPrice && totalPrice + 19}</td>
+                    <td>{totalPrice && totalPrice + 6000}₮</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            {/* Coupon Code Section */}
+            {/* <div className="checkout__coupon mb-4">
+              <h4 className="mb-3" style={{ color: '#495D35' }}>Хөнгөлөлтийн код</h4>
+              <div className="d-flex gap-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Хөнгөлөлтийн код оруулах"
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value);
+                    setCouponError('');
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    border: '1px solid #495D35',
+                    color: 'white',
+                    backgroundColor: '#495D35',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onClick={async () => {
+                    if (!couponCode.trim()) {
+                      setCouponError('Хөнгөлөлтийн код оруулна уу');
+                      return;
+                    }
+                    
+                    try {
+                
+                      setAppliedCoupon({
+                        code: couponCode,
+                        discount: 10,
+                        type: 'percentage'
+                      });
+                      setCouponError('');
+                      setCouponCode('');
+                    } catch (error) {
+                      setCouponError('Хөнгөлөлтийн код буруу эсвэл хугацаа дууссан байна');
+                    }
+                  }}
+                >
+                  Хэрэглэх
+                </button>
+              </div>
+              
+              {couponError && (
+                <div className="alert alert-danger mt-2">
+                  <i className="fas fa-exclamation-triangle me-2"></i>
+                  {couponError}
+                </div>
+              )}
+              
+              {appliedCoupon && (
+                <div className="alert alert-success mt-2">
+                  <i className="fas fa-check-circle me-2"></i>
+                  Хөнгөлөлтийн код амжилттай хэрэглэгдлээ: {appliedCoupon.code}
+                  <button
+                    type="button"
+                    className="btn-close ms-2"
+                    onClick={() => setAppliedCoupon(null)}
+                  ></button>
+                </div>
+              )}
+            </div> */}
+
             <div className="checkout__payment-methods">
               <h4 className="mb-3" style={{ color: '#495D35' }}>Төлбөрийн нөхцөл</h4>
               
               <div className="payment-options">
-                <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
-                  backgroundColor: '#F4F7F5',
-                  borderColor: '#E9ECEF',
-                  transition: 'all 0.2s ease',
-                  cursor: 'pointer'
-                }}>
-                  <label
-                    className="form-check-label d-flex align-items-center w-100"
-                    htmlFor="checkout_payment_method_1"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="payment-icon me-3 d-flex align-items-center justify-content-center" style={{ 
-                      width: '50px', 
-                      height: '50px', 
-                      backgroundColor: '#fff',
-                      borderRadius: '8px',
-                      border: '1px solid #E9ECEF'
-                    }}>
-                      <i className="fas fa-university fa-2x" style={{ color: '#495D35' }}></i>
-                    </div>
-                    <div className="flex-grow-1">
-                      <div className="fw-medium">Дансаар шилжүүлэх</div>
-                      <small className="text-muted">Банкны данс руу төлбөр хийх</small>
-                    </div>
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="checkout_payment_method"
-                      id="checkout_payment_method_1"
-                      checked={selectedPaymentMethod === 'QPAY'}
-                      onChange={() => setSelectedPaymentMethod('QPAY')}
-                      style={{ 
-                        marginLeft: '10px',
-                        transform: 'scale(1.2)'
-                      }}
-                    />
-                  </label>
-                </div>
+                
+                
+                
 
                 <div className="form-check payment-option mb-3 p-3 border rounded" style={{ 
                   backgroundColor: '#F4F7F5',
@@ -908,14 +1181,15 @@ export default function Checkout() {
                     <div className="flex-grow-1">
                       <div className="fw-medium">Pocket</div>
                       <small className="text-muted">Pocket-аар төлбөр хийх</small>
+                      {/* <small className="text-warning d-block">Хамгийн бага: 1,000₮</small> */}
                     </div>
                     <input
                       className="form-check-input"
                       type="radio"
                       name="checkout_payment_method"
                       id="checkout_payment_method_3"
-                      checked={selectedPaymentMethod === 'STOREPAY'}
-                      onChange={() => setSelectedPaymentMethod('STOREPAY')}
+                      checked={selectedPaymentMethod === 'POCKET'}
+                      onChange={() => setSelectedPaymentMethod('POCKET')}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -956,6 +1230,7 @@ export default function Checkout() {
                     <div className="flex-grow-1">
                       <div className="fw-medium">Storepay</div>
                       <small className="text-muted">Storepay-аар төлбөр хийх</small>
+                      {/* <small className="text-warning d-block">Хамгийн бага: 1,000₮</small> */}
                     </div>
                     <input
                       className="form-check-input"
@@ -963,7 +1238,14 @@ export default function Checkout() {
                       name="checkout_payment_method"
                       id="checkout_payment_method_4"
                       checked={selectedPaymentMethod === 'STOREPAY'}
-                      onChange={() => setSelectedPaymentMethod('STOREPAY')}
+                      onChange={() => {
+                        const totalAmount = totalPrice + 6000; // Including shipping
+                        if (totalAmount < 100000) {
+                          alert('Storepay ашиглахын тулд захиалгын дүн 100,000₮-с их байх ёстой');
+                          return;
+                        }
+                        setSelectedPaymentMethod('STOREPAY');
+                      }}
                       style={{ 
                         marginLeft: '10px',
                         transform: 'scale(1.2)'
@@ -976,44 +1258,101 @@ export default function Checkout() {
               <div className="policy-text mt-3">
                 Таны хувийн мэдээллийг захиалга боловсруулах, вэбсайтын туршлагыг дэмжих, 
                 болон бусад зорилгоор ашиглана. Дэлгэрэнгүй мэдээллийг
-                <Link href="/terms" target="_blank" className="mx-1">
-                  нууцлалын бодлогоос
-                </Link>
+                {isMobile ? (
+                  <button
+                    type="button"
+                    // className=""
+                    data-bs-toggle="modal"
+                    data-bs-target="#termsModal"
+                    style={{ color: '#c32929', border: 'none', background: 'none' }}
+                  >
+                    нууцлалын бодлогоос
+                  </button>
+                ) : (
+                  <Link href="/terms" target="_blank" className="mx-1">
+                    нууцлалын бодлогоос
+                  </Link>
+                )}
                 уншина уу.
               </div>
             </div>
-            <button 
-              className="btn btn-checkout"
-              style={{
-                border: '1px solid #495D35',
-                color: 'white',
-                backgroundColor: '#495D35',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (!isProcessingPayment) {
-                  e.target.style.backgroundColor = '#6B8E5A';
-                  e.target.style.borderColor = '#6B8E5A';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isProcessingPayment) {
-                  e.target.style.backgroundColor = '#495D35';
-                  e.target.style.borderColor = '#495D35';
-                }
-              }}
-              disabled={isProcessingPayment}
-              onClick={handleOrderAndPayment}
-            >
-              {isProcessingPayment ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Төлбөр хийж байна...
-                </>
-              ) : (
-                'ЗАХИАЛГА ХИЙХ'
-              )}
-            </button>
+            {/* <div className="d-flex flex-column gap-2"> */}
+              <button 
+                className="btn btn-checkout"
+                style={{
+                  border: '1px solid #495D35',
+                  color: 'white',
+                  backgroundColor: '#495D35',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = '#6B8E5A';
+                    e.target.style.borderColor = '#6B8E5A';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = '#495D35';
+                    e.target.style.borderColor = '#495D35';
+                  }
+                }}
+                disabled={isProcessingPayment}
+                onClick={handleOrderAndPayment}
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Захиалга үүсгэж байна...
+                  </>
+                ) : (
+                  'ЗАХИАЛГА ХИЙХ'
+                )}
+              </button>
+{/*               
+              <button 
+                className="btn btn-outline-secondary"
+                style={{
+                  border: '1px solid #6c757d',
+                  color: '#6c757d',
+                  backgroundColor: 'transparent',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = '#6c757d';
+                    e.target.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isProcessingPayment) {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#6c757d';
+                  }
+                }}
+                disabled={isProcessingPayment}
+                onClick={handlePayLater}
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Захиалга үүсгэж байна...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-clock me-2"></i>
+                    Дараа төлөх
+                  </>
+                )}
+              </button>
+              
+              <div className="text-center">
+                <small className="text-muted">
+                  "Дараа төлөх" дээр дарахад захиалга хадгалагдаж, 
+                  захиалгын жагсаалт дээр төлбөр төлөх боломжтой
+                </small>
+              </div> */}
+            {/* </div> */}
           </div>
         </div>
       </div>
@@ -1094,9 +1433,9 @@ export default function Checkout() {
                  </div>
                ) : (
                  <div className="text-center py-4 text-muted">
-                   <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
+                   {/* <i className="fas fa-map-marker-alt fa-2x mb-3" style={{ color: '#495D35' }}></i>
                    <div>Хадгалсан хаяг байхгүй байна</div>
-                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small>
+                   <small>Шинэ хаяг нэмэхийн тулд дээрх талбаруудыг бөглөнө үү</small> */}
                  </div>
                )}
              </div>
@@ -1154,7 +1493,6 @@ export default function Checkout() {
                        addressLine2: selectedAddress.addressLine2 || "",
                        city: selectedAddress.city,
                        postalCode: selectedAddress.postalCode,
-                       province: selectedAddress.province || "",
                        phone: selectedAddress.mobile,
                        email: formData.email
                      });
@@ -1196,12 +1534,17 @@ export default function Checkout() {
               <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
                 <h5 className="modal-title">
                   <i className="fas fa-credit-card me-2"></i>
-                  Төлбөр хийх
+                  Төлбөр хийх 
                 </h5>
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={handlePaymentCancel}
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    if (paymentData?.orderId) {
+                      router.push(`/account_orders/${paymentData.orderId}`);
+                    }
+                  }}
                 ></button>
               </div>
               <div className="modal-body" style={{ 
@@ -1232,43 +1575,62 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                {/* QR Code Section */}
+                {/* QR Code Section - Only show once when payment data is available */}
                 {(paymentData.qrImage || paymentData.qrCode) && (
                   <div className="text-center">
-                    {/* <div className="card-header bg-light"> */}
-                      <h6 className="mb-0">
+                    <h6 className="mb-2">
                         <i className="fas fa-qrcode me-2"></i>
                         QR Код уншуулах
                       </h6>
-                    {/* </div> */}
                     <div className="card-body text-center">
-                     
-                                            <img 
-                          src={`data:image/png;base64,${paymentData.qrImage || paymentData.qrCode}`}
-
-                        alt="QR Code" 
-                        style={{ 
-                          maxWidth: '250px', 
-                          height: 'auto', 
-                          border: '2px solid #dee2e6',
-                          borderRadius: '8px',
-                          padding: '10px'
-                        }}
-                        // onError={(e) => {
-                        //   console.error('QR code image failed to load:', e.target.src);
-                        //   // Try to show a fallback or error message
-                        //   e.target.style.display = 'none';
-                        //   const errorDiv = document.createElement('div');
-                        //   errorDiv.innerHTML = '<p class="text-danger">QR код харагдахгүй байна</p>';
-                        //   e.target.parentNode.appendChild(errorDiv);
-                        // }}
+                      <QRCodeDisplay 
+                        qrData={paymentData?.qrImage || paymentData?.qrCode}
+                        paymentMethod={paymentData?.paymentMethod}
                       />
                       <div className="mt-3">
                         <small className="text-muted">
                           <i className="fas fa-mobile-alt me-1"></i>
-                          QPay апп-аа нээж QR кодыг уншуулна уу
+                          {getPaymentAppName(paymentData.paymentMethod)} апп-аа нээж QR кодыг уншуулна уу
                         </small>
                       </div>
+
+                   
+
+                      {/* Alternative Payment - Bank List Button (Mobile Only) */}
+                      {paymentData.paymentUrl && isMobile && (
+                        <div className="mt-4 d-block d-md-none">
+                          <div className="text-center mb-3">
+                            <span className="text-muted" style={{ 
+                              fontSize: '0.9rem',
+                              fontWeight: '500',
+                              color: '#6c757d'
+                            }}>
+                              Эсвэл
+                            </span>
+                          </div>
+                          
+                          <button 
+                            onClick={() => setShowBankModal(true)}
+                            className="btn btn-primary w-100 mb-2"
+                            style={{
+                              borderRadius: '8px',
+                              padding: '0.75rem 1.5rem',
+                              fontSize: '1rem',
+                              fontWeight: '500',
+                              backgroundColor: '#495D35',
+                              borderColor: '#495D35',
+                              transition: 'all 0.3s ease'
+                            }}
+                          >
+                            <i className="fas fa-university me-2"></i>
+                            Интернет банкаар төлөх 
+                            {/* ({paymentData.bankUrls?.length || 0} банк) */}
+                            {/* Debug: {console.log('UI - paymentData.bankUrls:', paymentData.bankUrls)} */}
+                          </button>
+                          
+                          
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1334,11 +1696,24 @@ export default function Checkout() {
                 {paymentData.status === 'PENDING' && (
                   <div className="alert alert-info">
                     <h6><i className="fas fa-info-circle me-2"></i>Заавар:</h6>
-                    <ul className="mb-0">
-                      <li>QR кодыг уншуулж төлбөр хийх</li>
-                      <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
-                      <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
-                    </ul>
+                    {paymentData.paymentMethod === 'STOREPAY' ? (
+                      <div>
+                        <p className="mb-2" style={{ fontWeight: '600', color: '#495D35' }}>
+                          Төлбөрийн нэхэмжлэх Storepay -руу илгээсэн тул та эхний төлөлтөө хийж захиалгаа баталгаажуулна уу.
+                        </p>
+                        <ul className="mb-0">
+                          <li>Storepay апп-аа нээж төлбөр хийх</li>
+                          <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
+                          <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
+                        </ul>
+                      </div>
+                    ) : (
+                      <ul className="mb-0">
+                        <li>QR кодыг уншуулж төлбөр хийх</li>
+                        <li>Төлбөр хийсний дараа статус автоматаар шинэчлэгдэнэ</li>
+                        <li>Асуудал гарвал "Статус шалгах" товчийг дарна уу</li>
+                      </ul>
+                    )}
                   </div>
                 )}
                 
@@ -1389,30 +1764,6 @@ export default function Checkout() {
                       Статус шалгах
                     </button>
                     
-                    <button
-                      type="button"
-                      className="btn"
-                      style={{
-                        backgroundColor: '#f7f3d7',
-                        borderColor: '#927238',
-                        color: '#927238',
-                        fontWeight: '500',
-                        fontSize: '0.875rem',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '4px',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#f0e8c7';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = '#f7f3d7';
-                      }}
-                      onClick={handlePaymentCancel}
-                    >
-                      <i className="fas fa-ban me-2"></i>
-                      Төлбөр цуцлах
-                    </button>
                   </>
                 )}
                 
@@ -1479,10 +1830,199 @@ export default function Checkout() {
      {showPaymentModal && (
        <div 
          className="modal-backdrop fade show" 
-         onClick={handlePaymentCancel}
+         onClick={() => {
+           setShowPaymentModal(false);
+           if (paymentData?.orderId) {
+             router.push(`/account_orders?orderId=${paymentData.orderId}`);
+           }
+         }}
        ></div>
      )}
+{/* <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+          <div className="modal-dialog modal-lg" style={{ 
+            maxHeight: '90vh', 
+            margin: '1.75rem auto',
+            maxWidth: '600px'
+          }}>
+            <div className="modal-content" style={{ 
+              maxHeight: '90vh',
+              borderRadius: '8px'
+            }}></div> */}
+     {/* Bank List Modal */}
+     {showBankModal && paymentData?.bankUrls && (
+       <div 
+         className="modal fade show" 
+         style={{ 
+           display: 'block',
+           zIndex: 1060
+         }} 
+         tabIndex="-1"
+       >
+         <div className="modal-dialog modal-lg" style={{ 
+            maxHeight: '90vh', 
+            margin: '1.75rem auto',
+            maxWidth: '600px'
+          }}>
+          <div className="modal-content" style={{ 
+              maxHeight: '90vh',
+              borderRadius: '8px',
+              paddingBottom: '1.5rem',
+              
+            }}>
+             <div className="modal-header" style={{ borderBottom: '1px solid #dee2e6' }}>
+               <h5 className="modal-title" style={{ fontWeight: '600' }}>
+                 <i className="fas fa-university me-2"></i>
+                 Банк сонгох
+               </h5>
+               <button
+                 type="button"
+                 className="btn-close"
+                 onClick={() => setShowBankModal(false)}
+                //  style={{ filter: 'brightness(0) invert(1)' }}
+               />
+              
+             </div>
+             <div className="modal-body" style={{ 
+               maxHeight: '80vh', 
+               overflowY: 'auto',
+               padding: '1rem'
+             }}>
+               <p className="text-muted mb-4" style={{ fontSize: '0.95rem' }}>
+                 <i className="fas fa-info-circle me-2"></i>
+                 Доорх банкуудаас сонгоно уу
+               </p>
+               
+               <div className="row g-3">
+                 {paymentData.bankUrls.map((bank, index) => (
+                   <div key={index} className="col-12">
+                     <a
+                       href={bank.link}
+                       className="d-flex align-items-center p-3 border rounded-3 text-decoration-none"
+                       style={{
+                         backgroundColor: '#f8f9fa',
+                         borderColor: '#dee2e6',
+                         transition: 'all 0.2s ease',
+                         cursor: 'pointer'
+                       }}
+                       onMouseEnter={(e) => {
+                         e.currentTarget.style.backgroundColor = '#e9ecef';
+                         e.currentTarget.style.borderColor = '#28a745';
+                         e.currentTarget.style.transform = 'translateY(-2px)';
+                         e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                       }}
+                       onMouseLeave={(e) => {
+                         e.currentTarget.style.backgroundColor = '#f8f9fa';
+                         e.currentTarget.style.borderColor = '#dee2e6';
+                         e.currentTarget.style.transform = 'translateY(0)';
+                         e.currentTarget.style.boxShadow = 'none';
+                       }}
+                     >
+                       <div className="me-3" style={{ 
+                         width: '60px', 
+                         height: '60px',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center',
+                         backgroundColor: 'white',
+                         borderRadius: '8px',
+                         padding: '8px',
+                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                       }}>
+                         <img 
+                           src={bank.logo} 
+                           alt={bank.name}
+                           style={{ 
+                             maxWidth: '100%',
+                             maxHeight: '100%',
+                             objectFit: 'contain'
+                           }}
+                           onError={(e) => {
+                             e.target.style.display = 'none';
+                             e.target.nextSibling.style.display = 'flex';
+                           }}
+                         />
+                         <div style={{ 
+                           display: 'none',
+                           width: '100%',
+                           height: '100%',
+                           alignItems: 'center',
+                           justifyContent: 'center',
+                           fontSize: '1.5rem',
+                           color: '#28a745'
+                         }}>
+                           <i className="fas fa-university"></i>
+                         </div>
+                       </div>
+                       <div className="flex-grow-1">
+                         <h6 className="mb-1" style={{ 
+                           color: '#212529',
+                           fontWeight: '600',
+                           fontSize: '1rem'
+                         }}>
+                           {bank.name}
+                         </h6>
+                         <p className="mb-0" style={{ 
+                           color: '#6c757d',
+                           fontSize: '0.875rem'
+                         }}>
+                           {bank.description || bank.name}
+                         </p>
+                       </div>
+                       <div className="ms-auto">
+                         <i className="fas fa-chevron-right" style={{ 
+                           color: '#28a745',
+                           fontSize: '1.2rem'
+                         }}></i>
+                       </div>
+                     </a>
+                   </div>
+                 ))}
+               </div>
 
+               <div className="alert alert-warning mt-4 mb-0" style={{
+                 backgroundColor: '#fff3cd',
+                 borderColor: '#ffc107',
+                 borderRadius: '8px',
+                 padding: '1rem'
+               }}>
+                 <small style={{ fontSize: '0.875rem' }}>
+                   <i className="fas fa-exclamation-triangle me-2"></i>
+                   <strong>Анхаар:</strong> Банкны апп танд суусан байх ёстой. 
+                   Апп нээгдэхгүй бол QPay веб хуудсаар төлөх боломжтой.
+                 </small>
+               </div>
+             </div>
+             {/* <div  style={{ 
+         
+               padding: '1rem 1.5rem',
+             
+             }}>
+               
+             </div> */}
+           </div>
+         </div>
+       </div>
+     )}
+
+     {/* Bank Modal Backdrop */}
+     {showBankModal && (
+       <div 
+         className="modal-backdrop fade show" 
+         onClick={() => setShowBankModal(false)}
+         style={{
+           position: 'fixed',
+           top: 0,
+           left: 0,
+           width: '100%',
+           height: '100%',
+           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+           zIndex: 1050
+         }}
+       />
+     )}
+
+     {/* Terms Modal */}
+     <TermsModal />
 
      </>
    );

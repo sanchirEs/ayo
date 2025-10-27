@@ -14,82 +14,7 @@ import {
 export default function Footer14() {
   return (
     <footer className="footer footer_type_1 dark" style={{backgroundColor: "#495D35"}}>
-      <div className="footer-top container py-0">
-        <div className="service-promotion horizontal container">
-          <div className="row">
-            <div className="col-md-4 mb-5 mb-md-0 d-flex align-items-center justify-content-center gap-3">
-              <div className="service-promotion__icon">
-                <svg
-                  width="52"
-                  height="52"
-                  viewBox="0 0 52 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <use href="#icon_shipping" />
-                </svg>
-              </div>
-              <div className="service-promotion__content-wrap">
-                <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  Fast And Free Delivery
-                </h3>
-                <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Free delivery for all orders over $140
-                </p>
-              </div>
-            </div>
-            {/* <!-- /.col-md-4 text-center--> */}
-
-            <div className="col-md-4 mb-5 mb-md-0 d-flex align-items-center justify-content-center gap-3">
-              <div className="service-promotion__icon">
-                <svg
-                  width="53"
-                  height="52"
-                  viewBox="0 0 53 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <use href="#icon_headphone" />
-                </svg>
-              </div>
-              <div className="service-promotion__content-wrap">
-                <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  24/7 Customer Support
-                </h3>
-                <p className="service-promotion__content text-secondary mb-0 text-white">
-                  Friendly 24/7 customer support
-                </p>
-              </div>
-            </div>
-            {/* <!-- /.col-md-4 text-center--> */}
-
-            <div className="col-md-4 mb-5 mb-md-0 d-flex align-items-center justify-content-center gap-3">
-              <div className="service-promotion__icon">
-                <svg
-                  width="52"
-                  height="52"
-                  viewBox="0 0 52 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <use href="#icon_shield" />
-                </svg>
-              </div>
-              <div className="service-promotion__content-wrap">
-                <h3 className="service-promotion__title h6 text-uppercase mb-1 text-white">
-                  Money Back Guarantee
-                </h3>
-                <p className="service-promotion__content text-secondary mb-0 text-white">
-                  We return money within 30 days
-                </p>
-              </div>
-            </div>
-            {/* <!-- /.col-md-4 text-center--> */}
-          </div>
-          {/* <!-- /.row --> */}
-        </div>
-        {/* <!-- /.service-promotion container --> */}
-      </div>
+    
       {/* <!-- /.footer-top container --> */}
 
       <div className="footer-middle container">
@@ -98,9 +23,9 @@ export default function Footer14() {
             <div className="logo">
               <Link href="/">
                 <Image
-                  src="/assets/images/logo-white-cosmetics.png"
-                  width={112}
-                  height={28}
+                  src="/assets/images/logoAyo.png"
+                  width={120}
+                  height={60}
                   alt="Ayo"
                   className="logo__image d-block"
                 />
@@ -108,14 +33,14 @@ export default function Footer14() {
             </div>
             {/* <!-- /.logo --> */}
             <p className="footer-address">
-              1418 River Drive, Suite 35 Cottonhall, CA 9622 United States
+               2-р хороо, ЧД, 58-р байр 1 давхар Улаанбаатар хот, Монгол улс
             </p>
 
             <p className="m-0">
-                              <strong className="fw-medium">sale@ayo.com</strong>
+                              <strong className="fw-medium">sanchirenkhamgalan@gmail.com</strong>
             </p>
             <p>
-              <strong className="fw-medium">+1 246-345-0695</strong>
+              <strong className="fw-medium">+976 80940575</strong>
             </p>
 
             <ul className="social-links list-unstyled d-flex flex-wrap mb-0">
@@ -143,52 +68,77 @@ export default function Footer14() {
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Company</h6>
+            <h6 className="sub-menu__title text-uppercase">ТАНИЛЦУУЛГА</h6>
             <ul className="sub-menu__list list-unstyled">
-              {footerLinks1.map((elm, i) => (
-                <li key={i} className="sub-menu__item">
-                  <Link href={elm.href} className="menu-link menu-link_us-s">
-                    {elm.text}
-                  </Link>
-                </li>
-              ))}
+              <li className="sub-menu__item">
+                <Link href="#" className="menu-link menu-link_us-s">
+                  Бидний тухай
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/careers" className="menu-link menu-link_us-s">
+                  Ажлын анкет
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="#" className="menu-link menu-link_us-s">
+                  Хүргэлт
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="#" className="menu-link menu-link_us-s">
+                  Бэлгийн карт
+                </Link>
+              </li>
+            </ul>
+          </div>
+          {/* <!-- /.footer-column --> */}
+
+      
+          {/* <!-- /.footer-column --> */}
+
+          <div className="footer-column footer-menu mb-4 mb-lg-0">
+            <h6 className="sub-menu__title text-uppercase">Тусламж</h6>
+            <ul className="sub-menu__list list-unstyled">
+              <li className="sub-menu__item">
+                <Link href="#" className="menu-link menu-link_us-s">
+                  Нууцлал
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="#" className="menu-link menu-link_us-s">
+                  Түгээмэл асуулт, хариулт
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="#" className="menu-link menu-link_us-s">
+                  Үйлчилгээний нөхцөл
+                </Link>
+              </li>
+              <li className="sub-menu__item">
+                <Link href="/return-policy" className="menu-link menu-link_us-s">
+                  Бараа буцаалтын журам
+                </Link>
+              </li>
             </ul>
           </div>
           {/* <!-- /.footer-column --> */}
 
           <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Shop</h6>
+            <h6 className="sub-menu__title text-uppercase">САЛБАРЫН БАЙРШИЛ</h6>
             <ul className="sub-menu__list list-unstyled">
-              {footerLinks2.map((elm, i) => (
-                <li key={i} className="sub-menu__item">
-                  <Link href={elm.href} className="menu-link menu-link_us-s">
-                    {elm.text}
-                  </Link>
-                </li>
-              ))}
+              <li className="sub-menu__item">
+                <Link href="/store-locations" className="menu-link menu-link_us-s">
+                  Салбарын байршил харах
+                </Link>
+              </li>
             </ul>
           </div>
-          {/* <!-- /.footer-column --> */}
 
-          <div className="footer-column footer-menu mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Help</h6>
-            <ul className="sub-menu__list list-unstyled">
-              {footerLinks3.map((elm, i) => (
-                <li key={i} className="sub-menu__item">
-                  <Link href={elm.href} className="menu-link menu-link_us-s">
-                    {elm.text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* <!-- /.footer-column --> */}
-
-          <div className="footer-column footer-newsletter col-12 mb-4 mb-lg-0">
-            <h6 className="sub-menu__title text-uppercase">Subscribe</h6>
+          {/* <div className="footer-column footer-newsletter col-12 mb-4 mb-lg-0">
+            <h6 className="sub-menu__title text-uppercase">Бүртгүүлэх</h6>
             <p>
-              Be the first to get the latest news about trends, promotions, and
-              much more!
+              Хямдрал, урамшуулал болон бусад шинэ мэдээллийг хамгийн түрүүнд аваарай!
             </p>
             <form
               onSubmit={(e) => e.preventDefault()}
@@ -198,15 +148,15 @@ export default function Footer14() {
                 className="form-control border-white"
                 type="email"
                 name="email"
-                placeholder="Your email address"
+                placeholder="Таны имэйл хаяг"
               />
               <input
                 className="btn-link fw-medium bg-white position-absolute top-0 end-0 h-100"
                 type="submit"
-                defaultValue="JOIN"
+                defaultValue="НЭГДЭХ"
               />
             </form>
-          </div>
+          </div> */}
           {/* <!-- /.footer-column --> */}
         </div>
         {/* <!-- /.row-cols-5 --> */}
@@ -216,7 +166,7 @@ export default function Footer14() {
       <div className="footer-bottom container">
         <div className="d-block d-md-flex align-items-center">
           <span className="footer-copyright me-auto">
-                          ©{new Date().getFullYear()} Ayo
+                     Ayo Cosmetics
           </span>
           <div className="footer-settings d-block d-md-flex align-items-center">
             <div className="d-flex align-items-center">
@@ -224,9 +174,9 @@ export default function Footer14() {
                 htmlFor="footerSettingsLanguage"
                 className="me-2 text-white"
               >
-                Language
+                  © {new Date().getFullYear()}.  AIM TRENDSET LLC.  Бүх эрх хуулиар хамгаалагдсан
               </label>
-              <select
+              {/* <select
                 id="footerSettingsLanguage"
                 className="form-select form-select-sm bg-transparent border-0"
                 aria-label="Default select example"
@@ -241,15 +191,15 @@ export default function Footer14() {
                     {option.text}
                   </option>
                 ))}
-              </select>
+              </select> */}
             </div>
 
-            <div className="d-flex align-items-center">
+            {/* <div className="d-flex align-items-center">
               <label
                 htmlFor="footerSettingsCurrency"
                 className="ms-md-3 me-2 text-white"
               >
-                Currency
+                Валют
               </label>
               <select
                 id="footerSettingsCurrency"
@@ -267,7 +217,7 @@ export default function Footer14() {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
           </div>
           {/* <!-- /.footer-settings --> */}
         </div>

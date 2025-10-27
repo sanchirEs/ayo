@@ -44,7 +44,7 @@ export default function ShareComponent({ title = "title" }) {
       >
         <use href="#icon_sharing" />
       </svg>
-      <span>Share</span>
+      <span>Хуваалцах</span>
     </a>
   );
 }

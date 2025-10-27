@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 
-import ProductCard from "@/components/common/ProductCard";
+import ProductCardNew from "@/components/common/ProductCardNew";
 import api from "@/lib/api";
 
 export default function Featured() {
@@ -23,7 +23,7 @@ export default function Featured() {
         // Extract newArrivals from homepage response
         const newArrivals = res.data?.newArrivals || [];
         setData({ products: newArrivals, pagination: null });
-        console.log("new arrivals: ", newArrivals)
+        // console.log("new arrivals: ", newArrivals)
       })
       .catch((e) => setErr(e.message || "Failed to load new products"))
       .finally(() => setLoading(false));
@@ -91,7 +91,7 @@ export default function Featured() {
         <Swiper className="swiper-container js-swiper-slider" {...swiperOptions}>
                         {products.map((product) => (
                 <SwiperSlide key={product.id}>
-                  <ProductCard product={product} showNewBadge={true} />
+                  <ProductCardNew product={product} showNewBadge={true} />
                 </SwiperSlide>
               ))}
         </Swiper>

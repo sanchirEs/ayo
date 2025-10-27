@@ -10,6 +10,7 @@ export const useUserOrders = (page = 1, limit = 10) => {
   const [pagination, setPagination] = useState({
     total: 0,
     totalPages: 1,
+    pages: 1,
     currentPage: 1,
     limit: 10
   });
@@ -28,13 +29,25 @@ export const useUserOrders = (page = 1, limit = 10) => {
       });
       
       if (response.success) {
-        setOrders(response.data || []);
-        setPagination(response.pagination || {
+        const ordersData = response.data?.orders || [];
+        const paginationData = response.data?.pagination || {
           total: 0,
           totalPages: 1,
+          pages: 1,
           currentPage: pageNum,
           limit: limitNum
+        };
+        
+        // Debug logging
+        console.log('Orders API Response:', {
+          ordersType: typeof ordersData,
+          isArray: Array.isArray(ordersData),
+          ordersLength: ordersData?.length,
+          pagination: paginationData
         });
+        
+        setOrders(ordersData);
+        setPagination(paginationData);
       }
     } catch (err) {
       setError(err.message);
@@ -89,6 +102,14 @@ export const useUserOrders = (page = 1, limit = 10) => {
     cancelOrder
   };
 };
+
+
+
+
+
+
+
+
 
 
 

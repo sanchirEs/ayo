@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   // ---- Login form state ----
   const [identifier, setIdentifier] = useState("");
@@ -26,6 +26,31 @@ export default function LoginRegister() {
       setRedirectUrl(decodeURIComponent(redirect));
     }
   }, [searchParams]);
+
+  // Нэвтэрсэн хэрэглэгч login хуудас руу оролдвол home руу redirect
+  useEffect(() => {
+    if (user) {
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push('/');
+      }
+    }
+  }, [user, redirectUrl, router]);
+
+  // Loading state - нэвтэрсэн хэрэглэгч redirect хийх хүртэл
+  if (user) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3 text-secondary">Уучлаарай, та аль хэдийн нэвтэрсэн байна...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -69,6 +94,11 @@ export default function LoginRegister() {
       .trim()
       .email("И-мэйл буруу байна")
       .required("И-мэйл заавал шаардлагатай"),
+    telephone: Yup.string()
+      .trim()
+      .matches(/^[0-9+\-\s()]+$/, "Утасны дугаар зөвхөн тоо, +, -, (, ), хоосон зай агуулж болно")
+      .min(8, "Утасны дугаар хамгийн багадаа 8 тэмдэгт")
+      .required("Утасны дугаар заавал шаардлагатай"),
     password: Yup.string()
       .min(6, "Нууц үг хамгийн багадаа 6 тэмдэгт")
       .matches(/[A-Z]/, "Нууц үг дор хаяж 1 том үсэгтэй байх ёстой")
@@ -95,7 +125,7 @@ export default function LoginRegister() {
             aria-controls="tab-item-login"
             aria-selected="true"
           >
-            Login
+            Нэвтрэх
           </a>
         </li>
         <li className="nav-item" role="presentation">
@@ -108,7 +138,7 @@ export default function LoginRegister() {
             aria-controls="tab-item-register"
             aria-selected="false"
           >
-            Register
+            Бүртгүүлэх
           </a>
         </li>
       </ul>
@@ -128,12 +158,13 @@ export default function LoginRegister() {
                   name="login_identifier"
                   type="text"
                   className="form-control form-control_gray"
-                  placeholder="Email эсвэл Username *"
+                  placeholder="Имэйл эсвэл хэрэглэгчийн нэр *"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
+                  style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
                 />
-                <label>Email эсвэл Username *</label>
+                <label>Имэйл эсвэл хэрэглэгчийн нэр *</label>
               </div>
 
               <div className="pb-3"></div>
@@ -144,12 +175,13 @@ export default function LoginRegister() {
                   type="password"
                   className="form-control form-control_gray"
                   id="customerPasswodInput"
-                  placeholder="Password *"
+                  placeholder="Нууц үг *"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
+                  style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
                 />
-                <label htmlFor="customerPasswodInput">Password *</label>
+                <label htmlFor="customerPasswodInput">Нууц үг *</label>
               </div>
 
               <div className="d-flex align-items-center mb-3 pb-2">
@@ -161,12 +193,12 @@ export default function LoginRegister() {
                     defaultValue=""
                   />
                   <label className="form-check-label text-secondary">
-                    Remember me
+                    Намайг сана
                   </label>
                 </div>
-                <Link href="/reset_password" className="btn-text ms-auto">
-                  Lost password?
-                </Link>
+                {/* <Link href="#" className="btn-text ms-auto">
+                  Нууц үг мартсан?
+                </Link> */}
               </div>
 
               {loginErr && (
@@ -179,18 +211,102 @@ export default function LoginRegister() {
                 className="btn btn-primary w-100 text-uppercase"
                 type="submit"
                 disabled={loginLoading}
+                style={{backgroundColor: "#495D35", height: '45px'}}
               >
-                {loginLoading ? "Logging in..." : "Log In"}
+                {loginLoading ? "Нэвтэрч байна..." : "Нэвтрэх"}
               </button>
 
+              {/* OAuth Login Buttons */}
+              <div className="mt-3">
+                <div className="text-center mb-3">
+                  <span className="text-secondary">эсвэл</span>
+                </div>
+                
+                <div className="row g-2">
+                  <div className="col-6">
+                    <a 
+                      href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google`}
+                      className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center"
+                      style={{ 
+                        height: '45px',
+                        color: "#F76D6D", 
+                        borderColor: "#F76D6D",
+                        backgroundColor: "transparent",
+                        transition: "all 0.3s ease",
+                        // borderRadius: "8px",
+                        fontWeight: "500",
+                        textDecoration: "none"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "#F76D6D";
+                        e.target.style.color = "#ffffff";
+                        e.target.style.borderColor = "#F76D6D";
+                        e.target.style.transform = "translateY(-2px)";
+                        e.target.style.boxShadow = "0 4px 12px rgba(211, 47, 47, 0.3)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "transparent";
+                        e.target.style.color = "#F76D6D";
+                        e.target.style.borderColor = "#F76D6D";
+                        e.target.style.transform = "translateY(0)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    >
+                      <svg className="me-2" width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      <span className="d-none d-sm-inline">Google</span>
+                    </a>
+                  </div>
+                  <div className="col-6">
+                    <a 
+                      href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/facebook`}
+                      className="btn  w-100 d-flex align-items-center justify-content-center"
+                      style={{ 
+                        height: '45px', 
+                        color: "#1877F2", 
+                        borderColor: "#1877F2",
+                        backgroundColor: "transparent",
+                        transition: "all 0.3s ease",
+                        // borderRadius: "8px",
+                        fontWeight: "500",
+                        textDecoration: "none"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "#1976d2";
+                        e.target.style.color = "#ffffff";
+                        e.target.style.borderColor = "#1976d2";
+                        e.target.style.transform = "translateY(-2px)";
+                        e.target.style.boxShadow = "0 4px 12px rgba(25, 118, 210, 0.3)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "transparent";
+                        e.target.style.color = "#1877F2";
+                        e.target.style.borderColor = "#1877F2";
+                        e.target.style.transform = "translateY(0)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    >
+                      <svg className="me-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                      <span className="d-none d-sm-inline">Facebook</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
               <div className="customer-option mt-4 text-center">
-                <span className="text-secondary">No account yet?</span>{" "}
+                <span className="text-secondary">Бүртгэл байхгүй юу?</span>{" "}
                 <a
                   href="#register-tab"
                   className="btn-text js-show-register"
                   data-bs-toggle="tab"
                 >
-                  Create Account
+                  Бүртгүүлэх
                 </a>
               </div>
             </form>
@@ -211,6 +327,7 @@ export default function LoginRegister() {
                 lastName: "",
                 username: "",
                 email: "",
+                telephone: "",
                 password: "",
                 confirmPassword: "",
               }}
@@ -223,6 +340,7 @@ export default function LoginRegister() {
                     lastName: values.lastName,
                     username: values.username,
                     email: values.email,
+                    telephone: values.telephone,
                     password: values.password,
                   });
                   setStatus({
@@ -255,50 +373,55 @@ export default function LoginRegister() {
                 status,
               }) => (
                 <form onSubmit={handleSubmit} className="needs-validation">
-                  {/* First name */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="firstName"
-                      type="text"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.firstName && errors.firstName ? " is-invalid" : "")
-                      }
-                      placeholder="First name *"
-                      value={values.firstName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label>First name *</label>
-                    {touched.firstName && errors.firstName && (
-                      <div className="invalid-feedback d-block">{errors.firstName}</div>
-                    )}
+                  {/* First name and Last name in one row */}
+                  <div className="row g-1 mb-2">
+                    
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="lastName"
+                          type="text"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.lastName && errors.lastName ? " is-invalid" : "")
+                          }
+                          placeholder="Овог *"
+                          value={values.lastName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
+                        />
+                        <label>Овог *</label>
+                        {touched.lastName && errors.lastName && (
+                          <div className="invalid-feedback d-block">{errors.lastName}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="firstName"
+                          type="text"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.firstName && errors.firstName ? " is-invalid" : "")
+                          }
+                          placeholder="Нэр *"
+                          value={values.firstName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
+                        />
+                        <label>Нэр *</label>
+                        {touched.firstName && errors.firstName && (
+                          <div className="invalid-feedback d-block">{errors.firstName}</div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Last name */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="lastName"
-                      type="text"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.lastName && errors.lastName ? " is-invalid" : "")
-                      }
-                      placeholder="Last name *"
-                      value={values.lastName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label>Last name *</label>
-                    {touched.lastName && errors.lastName && (
-                      <div className="invalid-feedback d-block">{errors.lastName}</div>
-                    )}
-                  </div>
-
-                  <div className="pb-2"></div>
 
                   {/* Username */}
-                  <div className="form-floating mb-3">
+                  <div className="form-floating mb-2">
                     <input
                       name="username"
                       type="text"
@@ -307,46 +430,70 @@ export default function LoginRegister() {
                         (touched.username && errors.username ? " is-invalid" : "")
                       }
                       id="customerNameRegisterInput"
-                      placeholder="Username *"
+                      placeholder="Хэрэглэгчийн нэр *"
                       value={values.username}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
                     />
-                    <label htmlFor="customerNameRegisterInput">Username *</label>
+                    <label htmlFor="customerNameRegisterInput">Хэрэглэгчийн нэр *</label>
                     {touched.username && errors.username && (
                       <div className="invalid-feedback d-block">{errors.username}</div>
                     )}
                   </div>
 
-                  <div className="pb-2"></div>
-
-                  {/* Email */}
-                  <div className="form-floating mb-3">
-                    <input
-                      name="email"
-                      type="email"
-                      className={
-                        "form-control form-control_gray" +
-                        (touched.email && errors.email ? " is-invalid" : "")
-                      }
-                      id="customerEmailRegisterInput"
-                      placeholder="Email address *"
-                      value={values.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <label htmlFor="customerEmailRegisterInput">
-                      Email address *
-                    </label>
-                    {touched.email && errors.email && (
-                      <div className="invalid-feedback d-block">{errors.email}</div>
-                    )}
+                  {/* Email and Telephone in one row */}
+                  <div className="row g-1 mb-2">
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="email"
+                          type="email"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.email && errors.email ? " is-invalid" : "")
+                          }
+                          id="customerEmailRegisterInput"
+                          placeholder="Имэйл хаяг *"
+                          value={values.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
+                        />
+                        <label htmlFor="customerEmailRegisterInput">
+                          Имэйл хаяг *
+                        </label>
+                        {touched.email && errors.email && (
+                          <div className="invalid-feedback d-block">{errors.email}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-floating">
+                        <input
+                          name="telephone"
+                          type="text"
+                          className={
+                            "form-control form-control_gray" +
+                            (touched.telephone && errors.telephone ? " is-invalid" : "")
+                          }
+                          id="customerTelephoneRegisterInput"
+                          placeholder="Утасны дугаар *"
+                          value={values.telephone}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
+                        />
+                        <label htmlFor="customerTelephoneRegisterInput">Утасны дугаар *</label>
+                        {touched.telephone && errors.telephone && (
+                          <div className="invalid-feedback d-block">{errors.telephone}</div>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="pb-2"></div>
-
                   {/* Password */}
-                  <div className="form-floating mb-3">
+                  <div className="form-floating mb-2">
                     <input
                       name="password"
                       type="password"
@@ -355,19 +502,20 @@ export default function LoginRegister() {
                         (touched.password && errors.password ? " is-invalid" : "")
                       }
                       id="customerPasswodRegisterInput"
-                      placeholder="Password *"
+                      placeholder="Нууц үг *"
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
                     />
-                    <label htmlFor="customerPasswodRegisterInput">Password *</label>
+                    <label htmlFor="customerPasswodRegisterInput">Нууц үг *</label>
                     {touched.password && errors.password && (
                       <div className="invalid-feedback d-block">{errors.password}</div>
                     )}
                   </div>
 
                   {/* Confirm Password */}
-                  <div className="form-floating mb-3">
+                  <div className="form-floating mb-2">
                     <input
                       name="confirmPassword"
                       type="password"
@@ -377,12 +525,13 @@ export default function LoginRegister() {
                           ? " is-invalid"
                           : "")
                       }
-                      placeholder="Confirm Password *"
+                      placeholder="Нууц үг баталгаажуулах *"
                       value={values.confirmPassword}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      style={{ height: '45px', paddingTop: '1.625rem', paddingBottom: '0.625rem' }}
                     />
-                    <label>Confirm Password *</label>
+                    <label>Нууц үг баталгаажуулах *</label>
                     {touched.confirmPassword && errors.confirmPassword && (
                       <div className="invalid-feedback d-block">
                         {errors.confirmPassword}
@@ -390,17 +539,10 @@ export default function LoginRegister() {
                     )}
                   </div>
 
-                  <div className="d-flex align-items-center mb-3 pb-2">
-                    <p className="m-0">
-                      Your personal data will be used to support your experience
-                      throughout this website, to manage access to your account, and
-                      for other purposes described in our privacy policy.
-                    </p>
-                  </div>
 
                   {/* Server error list (backend) */}
                   {status?.error && (
-                    <div className="alert alert-danger mb-3" role="alert">
+                    <div className="alert alert-danger mb-2" role="alert">
                       {status.error}
                       {Array.isArray(status.serverErrors) && status.serverErrors.length > 0 && (
                         <ul className="mt-2 mb-0 ps-3">
@@ -412,7 +554,7 @@ export default function LoginRegister() {
                     </div>
                   )}
                   {status?.success && (
-                    <div className="alert alert-success mb-3" role="alert">
+                    <div className="alert alert-success mb-2" role="alert">
                       {status.success}
                     </div>
                   )}
@@ -421,9 +563,93 @@ export default function LoginRegister() {
                     className="btn btn-primary w-100 text-uppercase"
                     type="submit"
                     disabled={isSubmitting}
+                    style={{backgroundColor: "#495D35", height: '45px'}}
                   >
-                    {isSubmitting ? "Registering..." : "Register"}
+                    {isSubmitting ? "Бүртгүүлж байна..." : "Бүртгүүлэх"}
                   </button>
+                  
+                  {/* OAuth Register Buttons */}
+                  <div className="mt-3">
+                    <div className="text-center mb-3">
+                      <span className="text-secondary">эсвэл</span>
+                    </div>
+                    
+                    <div className="row g-2">
+                      <div className="col-6">
+                        <a 
+                          href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google`}
+                          className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center"
+                          style={{ 
+                            height: '45px',
+                            color: "#F76D6D", 
+                            borderColor: "#F76D6D",
+                            backgroundColor: "transparent",
+                            transition: "all 0.3s ease",
+                            // borderRadius: "8px",
+                            fontWeight: "500",
+                            textDecoration: "none"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#F76D6D";
+                            e.target.style.color = "#ffffff";
+                            e.target.style.borderColor = "#F76D6D";
+                            e.target.style.transform = "translateY(-2px)";
+                            e.target.style.boxShadow = "0 4px 12px rgba(247, 109, 109, 0.3)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "transparent";
+                            e.target.style.color = "#F76D6D";
+                            e.target.style.borderColor = "#F76D6D";
+                            e.target.style.transform = "translateY(0)";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        >
+                          <svg className="me-2" width="18" height="18" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                          </svg>
+                          <span className="d-none d-sm-inline">Google</span>
+                        </a>
+                      </div>
+                      <div className="col-6">
+                        <a 
+                          href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/facebook`}
+                          className="btn w-100 d-flex align-items-center justify-content-center"
+                          style={{ 
+                            height: '45px', 
+                            color: "#1877F2", 
+                            borderColor: "#1877F2",
+                            backgroundColor: "transparent",
+                            transition: "all 0.3s ease",
+                            // borderRadius: "8px",
+                            fontWeight: "500",
+                            textDecoration: "none"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#1976d2";
+                            e.target.style.color = "#ffffff";
+                            e.target.style.borderColor = "#1976d2";
+                            e.target.style.transform = "translateY(-2px)";
+                            e.target.style.boxShadow = "0 4px 12px rgba(25, 118, 210, 0.3)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "transparent";
+                            e.target.style.color = "#1877F2";
+                            e.target.style.borderColor = "#1877F2";
+                            e.target.style.transform = "translateY(0)";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        >
+                          <svg className="me-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                          </svg>
+                          <span className="d-none d-sm-inline">Facebook</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </form>
               )}
             </Formik>

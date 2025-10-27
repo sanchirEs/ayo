@@ -55,7 +55,7 @@ export default function EditAccount() {
   const safeEmail = user?.email || "";
 
   return (
-    <div className="col-lg-9">
+    <div className="col-12 col-lg-9">
       <div className="page-content my-account__edit">
         {/* ============== Профайл мэдээлэл шинэчлэх ============== */}
         <div className="my-account__edit-form mb-5">
@@ -247,7 +247,7 @@ export default function EditAccount() {
 
                   <div className="col-md-12">
                     <div className="my-3">
-                      <button className="btn btn-primary" disabled={isSubmitting}>
+                      <button style={{ backgroundColor: '#495D35' }} className="btn btn-primary" disabled={isSubmitting}>
                         {isSubmitting ? "Өөрчилж байна..." : "Өөрчлөлтийг хадгалах"}
                       </button>
                     </div>
@@ -402,7 +402,7 @@ export default function EditAccount() {
 
                   <div className="col-md-12">
                     <div className="my-3">
-                      <button className="btn btn-primary" disabled={isSubmitting}>
+                      <button style={{ backgroundColor: '#495D35' }} className="btn btn-primary" disabled={isSubmitting}>
                         {isSubmitting ? "Өөрчилж байна..." : "Өөрчлөлтийг хадгалах"}
                       </button>
                     </div>

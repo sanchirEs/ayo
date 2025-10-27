@@ -24,7 +24,7 @@ export default function BrandProduct() {
         // Extract featured products from homepage response
         const featuredProducts = res.data?.featured || [];
         setData({ products: featuredProducts, pagination: null });
-        console.log("converse products: ", featuredProducts)
+        // console.log("converse products: ", featuredProducts)
       })
       .catch((e) => setErr(e.message || "Failed to load converse products"))
       .finally(() => setLoading(false));
@@ -59,79 +59,79 @@ export default function BrandProduct() {
 
   if (loading) {
     return (
-      <section className="converse-brand-section">
-        <div className="converse-bg-pattern"></div>
-        <div className="converse-bg-overlay"></div>
-        <div className="container">
-          <div className="converse-brand-logo">
-            <h2 className="converse-logo-text">CONVERSE</h2>
+        <section className="converse-brand-section">
+          <div className="converse-bg-pattern"></div>
+          <div className="converse-bg-overlay"></div>
+          <div className="container">
+            <div className="converse-brand-logo">
+              <h2 className="converse-logo-text">Brand Name</h2>
+            </div>
+            <p className="text-center">Loading products…</p>
           </div>
-          <p className="text-center">Loading products…</p>
-        </div>
-      </section>
+        </section>
     );
   }
 
   if (err) {
     return (
-      <section className="converse-brand-section">
-        <div className="converse-bg-pattern"></div>
-        <div className="converse-bg-overlay"></div>
-        <div className="container">
-          <div className="converse-brand-logo">
-            <h2 className="converse-logo-text">CONVERSE</h2>
+        <section className="converse-brand-section">
+          <div className="converse-bg-pattern"></div>
+          <div className="converse-bg-overlay"></div>
+          <div className="container">
+            <div className="converse-brand-logo">
+              <h2 className="converse-logo-text">Brand Name</h2>
+            </div>
+            <p className="text-danger text-center">{err}</p>
           </div>
-          <p className="text-danger text-center">{err}</p>
-        </div>
-      </section>
+        </section>
     );
   }
 
       return (
-    <section className="converse-brand-section">
-      {/* Desktop: Hero-style banner with background image */}
-      <div className="d-none d-lg-block">
-        <div className="overflow-hidden position-relative h-100">
-          <div className="slideshow-bg ">
-            <Image
-              loading="lazy"
-              src="/assets/images/brandsBg/converse_banner.jpg"
-              width="1920"
-              height="600"
-              alt="Converse Background"
-              className="slideshow-bg__img object-fit-cover"
-            />
-          </div>
-          <div className="slideshow-text container position-absolute start-100 top-50 translate-middle">
-            {/* <div className="converse-brand-logo">
-              <h2 className="converse-logo-text">CONVERSE</h2>
-            </div> */}
+      <section className="converse-brand-section">
+        {/* Desktop: Hero-style banner with background image */}
+        <div className="">
+          <div className="overflow-hidden position-relative h-100">
+            <div className="slideshow-bg ">
+              <Image
+                loading="lazy"
+                src="/assets/images/brandsBg/brands1.webp"
+                width="1920"
+                height="600"
+                alt="Brand Background"
+                className="slideshow-bg__img object-fit-cover"
+              />
+            </div>
+            <div className="slideshow-text container position-absolute start-100 top-50 translate-middle">
+              {/* <div className="converse-brand-logo">
+                <h2 className="converse-logo-text">CONVERSE</h2>
+              </div> */}
+            
           
-      
           
-                     {/* View All Button */}
-           {/* <div className="converse-view-all">
-             <Link href="/shop-4" className="btn">
-               Бүгдийг үзэх
-             </Link>
-           </div> */}
+                       {/* View All Button */}
+             {/* <div className="converse-view-all">
+               <Link href="/shop-4" className="btn">
+                 Бүгдийг үзэх
+               </Link>
+             </div> */}
+           </div>
          </div>
        </div>
-     </div>
-         
-     {/* Mobile: Show only banner with clickable area */}
-     <div className="d-lg-none">
-       <Link href="/shop-4" className="converse-mobile-banner">
-         <div className="converse-mobile-bg">
-           <img
-             src="/assets/images/brandsBg/converse_banner_center.png"
-             alt="Converse"
-             className="converse-mobile-img"
-             style={{ width: '100%', height: 'auto' }}
-           />
-         </div>
-       </Link>
-     </div>
-   </section>
+           
+       {/* Mobile: Show only banner with clickable area */}
+       {/* <div className="d-lg-none">
+         <Link href="/shop" className="converse-mobile-banner">
+           <div className="converse-mobile-bg">
+             <img
+               src="/assets/images/brandsBg/converse_banner_center.png"
+               alt="Converse"
+               className="converse-mobile-img"
+               style={{ width: '100%', height: 'auto' }}
+             />
+           </div>
+         </Link>
+                </div> */}
+       </section>
   );
 }

@@ -12,24 +12,70 @@ export default function AccountWishlist() {
   const [error, setError] = useState(null);
   const [removingProducts, setRemovingProducts] = useState(new Set());
   
-  // Fetch wishlist products from backend
+  // Fetch wishlist products from backend or use context data
   const fetchWishlistProducts = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      // First try to get from backend
       const response = await api.wishlist.get();
-      if (response.success) {
-        setWishlistProducts(response.data || []);
-      } else {
-        setError('Failed to fetch wishlist products');
+      if (response.success && response.data && response.data.length > 0) {
+        setWishlistProducts(response.data);
+        return;
       }
+      
+      // If backend is empty but context has items, try to get product details
+      if (wishList.length > 0) {
+        console.log('Backend wishlist is empty but context has items, attempting to fetch product details');
+        
+        // Try to get product details for each wishlist item
+        const productPromises = wishList.map(async (productId) => {
+          try {
+            const productResponse = await api.products.getById(productId);
+            if (productResponse.success && productResponse.data) {
+              return productResponse.data;
+            }
+          } catch (err) {
+            console.log(`Failed to fetch product ${productId}:`, err);
+            return null;
+          }
+        });
+        
+        const products = await Promise.all(productPromises);
+        const validProducts = products.filter(p => p !== null);
+        
+        if (validProducts.length > 0) {
+          setWishlistProducts(validProducts);
+          return;
+        }
+      }
+      
+      // If all else fails, set empty array
+      setWishlistProducts([]);
+      
     } catch (err) {
       console.error('Error fetching wishlist:', err);
-      setError('Error loading wishlist products');
+      
+      // Handle authentication errors specifically
+      if (err.message.includes('Invalid TOKEN') || 
+          err.message.includes('Authentication required') ||
+          err.message.includes('401') ||
+          err.message.includes('403')) {
+        setError('Please log in to view your wishlist');
+      } else if (err.message.includes('404') || 
+                 err.message.includes('Not Found') || 
+                 err.message.includes('fetch')) {
+        setError('Wishlist service temporarily unavailable');
+      } else {
+        setError('Error loading wishlist products');
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  // Load wishlist products when component mounts
   useEffect(() => {
     fetchWishlistProducts();
   }, []);
@@ -64,7 +110,7 @@ export default function AccountWishlist() {
 
   if (loading) {
     return (
-      <div className="col-lg-9">
+      <div className="col-12 col-lg-9">
         <div className="page-content my-account__wishlist">
           <div className="text-center py-5">
             <div className="spinner-border text-primary" role="status">
@@ -79,7 +125,7 @@ export default function AccountWishlist() {
 
   if (error) {
     return (
-      <div className="col-lg-9">
+      <div className="col-12 col-lg-9">
         <div className="page-content my-account__wishlist">
           <div className="text-center py-5">
             <div className="text-danger mb-3">{error}</div>
@@ -96,17 +142,26 @@ export default function AccountWishlist() {
   }
 
   return (
-    <div className="col-lg-9">
+    <div className="col-12 col-lg-9">
       <div className="page-content my-account__wishlist">
         {/* Header */}
-        <div className="d-flex align-items-center mb-4">
+       
+        {wishlistProducts.length > 0 ? (
+           <div className="d-flex align-items-center mb-4">
           <h4 className="mb-0 me-2" style={{ color: '#6c757d', fontWeight: 'normal' }}>
-            Танд хадгалсан
-          </h4>
-          <span className="text-muted">
+          Танд хадгалсан
+        </h4>
+        <span className="text-muted">
+        
             {wishlistProducts.length} бараа байна.
-          </span>
+    
+        </span>
         </div>
+        ) : (
+          <span></span>
+        )}
+          
+        
 
         {wishlistProducts.length > 0 ? (
           <div
@@ -122,7 +177,7 @@ export default function AccountWishlist() {
                       <Link href={`/product1_simple/${product.id}`}>
                         <Image
                           loading="lazy"
-                          src={product.images?.[0]?.imageUrl || product.imgSrc || '/assets/images/products/product-1.jpg'}
+                          src={product.ProductImages?.[0]?.imageUrl || product.imgSrc || '/assets/images/products/product-1.jpg'}
                           width="200"
                           height="200"
                           alt={product.name || product.title || 'Product'}
@@ -180,7 +235,7 @@ export default function AccountWishlist() {
           </div>
         ) : (
           <div className="text-center py-5">
-            <div className="fs-18 mb-3">No products added to wishlist yet</div>
+            <div className="fs-18 mb-3">Танд хадгалсан бараа байхгүй байна.</div>
             {/* <Link href="/shop-1" className="btn btn-primary">
               Continue Shopping
             </Link> */}

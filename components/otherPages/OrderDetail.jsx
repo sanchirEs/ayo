@@ -5,6 +5,42 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
 export default function OrderDetail({ orderId }) {
+  // CSS styles for timer and payment modal
+  const modalStyles = {
+    timerDisplay: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '15px'
+    },
+    timerLabel: {
+      fontWeight: '600',
+      color: '#495D35',
+      fontSize: '1rem'
+    },
+    timeLeft: {
+      fontSize: '1.3rem',
+      fontWeight: 'bold',
+      color: '#28a745',
+      padding: '8px 16px',
+      backgroundColor: '#f8fff9',
+      borderRadius: '8px',
+      border: '2px solid #28a745',
+      boxShadow: '0 2px 4px rgba(40, 167, 69, 0.2)'
+    },
+    timeLeftExpired: {
+      fontSize: '1.3rem',
+      fontWeight: 'bold',
+      color: '#dc3545',
+      padding: '8px 16px',
+      backgroundColor: '#fff8f8',
+      borderRadius: '8px',
+      border: '2px solid #dc3545',
+      boxShadow: '0 2px 4px rgba(220, 53, 69, 0.2)'
+    }
+  };
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,11 +56,19 @@ export default function OrderDetail({ orderId }) {
     const fetchOrderDetails = async () => {
       try {
         setLoading(true);
-        const response = await api.orders.getById(orderId);
-        console.log("response in order detail: ", response);
+        const response = await api.orders.getOrderDetails(orderId);
+        console.log("Order detail response: ", response);
         
         if (response.success) {
-          setOrder(response.data);
+          // Handle enhanced response structure
+          // Enhanced endpoint returns { order, analytics, timeline }
+          if (response.data.order) {
+            // Use the order data from the enhanced response
+            setOrder(response.data.order);
+          } else {
+            // Fallback for basic response structure
+            setOrder(response.data);
+          }
         } else {
           setError('Захиалгын мэдээлэл олдсонгүй');
         }
@@ -82,6 +126,26 @@ export default function OrderDetail({ orderId }) {
     }).format(price);
   };
 
+  // State for payment modal
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  // Function to calculate time left
+  const calculateTimeLeft = (expiresAt) => {
+    if (!expiresAt) return null;
+    
+    const now = new Date().getTime();
+    const expiry = new Date(expiresAt).getTime();
+    const difference = expiry - now;
+    
+    if (difference > 0) {
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    } else {
+      return 'Хугацаа дууссан';
+    }
+  };
+
   // Function to handle payment for existing order
   const handlePaymentForOrder = async () => {
     try {
@@ -95,26 +159,29 @@ export default function OrderDetail({ orderId }) {
       };
 
       const response = await api.payments.create(paymentData);
-      
+        // console.log("res in order detail: ", response);
       if (response.success) {
         const result = response.data;
         const payment = result.payment;
-        const providerResponse = result.providerResponse;
-        console.log("payment in order detail: ", payment);
+        // console.log("payment in order detail: ", payment);
+        // console.log("result in order detail: ", result);
         
-        setPaymentData({
+        const paymentDataToSet = {
           orderId: order.id,
           paymentId: payment.id,
           paymentMethod: 'QPAY',
           amount: payment.amount,
           currency: payment.currency,
           status: payment.status,
-          qrImage: providerResponse?.qrImage,
-          qrCode: providerResponse?.qrCode,
-          paymentUrl: providerResponse?.paymentUrl,
-          transactionId: payment.providerTransactionId
-        });
+          qrImage: result.qrImage,
+          qrCode: result.qrImage, // Use qrImage as qrCode fallback
+          paymentUrl: result.paymentUrl,
+          transactionId: result.transactionId,
+          expiresAt: payment.expiresAt
+        };
         
+        // console.log("Setting payment data:", paymentDataToSet);
+        setPaymentData(paymentDataToSet);
         setShowPaymentModal(true);
       }
     } catch (error) {
@@ -124,6 +191,40 @@ export default function OrderDetail({ orderId }) {
       setIsProcessingPayment(false);
     }
   };
+
+  // Function to refresh payment (create new QR code)
+  const handleRefreshPayment = async () => {
+    try {
+      setIsProcessingPayment(true);
+      
+      // Close current modal
+      setShowPaymentModal(false);
+      
+      // Create new payment
+      await handlePaymentForOrder();
+    } catch (error) {
+      console.error('Payment refresh error:', error);
+      alert('Төлбөр дахин үүсгэхэд алдаа гарлаа');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  // Effect to update timer
+  useEffect(() => {
+    if (!paymentData?.expiresAt) return;
+    
+    const timer = setInterval(() => {
+      const timeLeftValue = calculateTimeLeft(paymentData.expiresAt);
+      setTimeLeft(timeLeftValue);
+      
+      if (timeLeftValue === 'Хугацаа дууссан') {
+        clearInterval(timer);
+      }
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [paymentData?.expiresAt]);
 
   if (loading) {
     return (
@@ -267,27 +368,29 @@ export default function OrderDetail({ orderId }) {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-6">
-                  <p><strong>Төлбөрийн төрөл:</strong> {order.payment.provider || 'QPAY'}</p>
-                  <p><strong>Төлбөрийн статус:</strong></p>
-                  {order.payment.status === 'COMPLETED' ? (
-                    <span className="badge" style={{ backgroundColor: '#6B8E5A', color: 'white' }}>
-                      <i className="fas fa-check-circle me-1"></i>
-                      Төлбөр төлөгдсөн
-                    </span>
-                  ) : order.payment.status === 'PENDING' ? (
-                    <span className="badge" style={{ backgroundColor: '#C7D4BA', color: 'white' }}>
-                      <i className="fas fa-clock me-1"></i>
-                      Төлбөр хүлээгдэж буй
-                    </span>
-                  ) : (
-                    <span className="badge" style={{ backgroundColor: '#495D35', color: 'white' }}>
-                      <i className="fas fa-times-circle me-1"></i>
-                      Төлбөр амжилтгүй
-                    </span>
-                  )}
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="me-3"><strong>Төлбөрийн төрөл:</strong> {order.payment.provider || 'QPAY'}</span>
+                    <span><strong>Төлбөрийн статус:</strong></span>
+                    {order.payment.status === 'COMPLETED' ? (
+                      <span className="badge ms-2" style={{ backgroundColor: '#6B8E5A', color: 'white' }}>
+                        <i className="fas fa-check-circle me-1"></i>
+                        Төлбөр төлөгдсөн
+                      </span>
+                    ) : order.payment.status === 'PENDING' ? (
+                      <span className="badge ms-2" style={{ backgroundColor: '#C7D4BA', color: 'white' }}>
+                        <i className="fas fa-clock me-1"></i>
+                        Төлбөр хүлээгдэж буй
+                      </span>
+                    ) : (
+                      <span className="badge ms-2" style={{ backgroundColor: '#495D35', color: 'white' }}>
+                        <i className="fas fa-times-circle me-1"></i>
+                        Төлбөр амжилтгүй
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="col-md-6 text-md-end">
-                  {order.payment.status === 'PENDING' && (
+                {/* <div className="col-md-6 text-md-end">
+                  {order.payment.status === 'PENDING' && order.status === 'PENDING' && (
                     <button 
                       className="btn"
                       style={{
@@ -324,7 +427,7 @@ export default function OrderDetail({ orderId }) {
                       )}
                     </button>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -345,7 +448,7 @@ export default function OrderDetail({ orderId }) {
                   <tr>
                     <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Бүтээгдэхүүн</th>
                     <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Үнэ</th>
-                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Тоо ширхэг</th>
+                    <th style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Тоо</th>
                     <th className="text-end" style={{ color: 'white', borderColor: '#495D35', backgroundColor: '#495D35' }}>Нийт</th>
                   </tr>
                 </thead>
@@ -384,11 +487,32 @@ export default function OrderDetail({ orderId }) {
 
         {/* Payment Modal */}
         {showPaymentModal && paymentData && (
-          <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-            <div className="modal-dialog modal-lg">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">
+          <div className="modal fade show" style={{ display: 'block', zIndex: 1050, position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }} tabIndex="-1">
+            <div className="modal-dialog modal-lg" style={{ 
+              maxHeight: '80vh', 
+              margin: '1.75rem auto',
+              maxWidth: '600px',
+              display: 'flex',
+              alignItems: 'center',
+              minHeight: 'auto'
+            }}>
+              <div className="modal-content" style={{ 
+                maxHeight: '80vh',
+                borderRadius: '8px',
+                width: '100%',
+                boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)',
+                border: 'none',
+                transition: 'all 0.3s ease',
+                transform: 'scale(1)',
+                opacity: '1'
+              }}>
+                <div className="modal-header" style={{ 
+                  borderBottom: '1px solid #dee2e6',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '8px 8px 0 0',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <h5 className="modal-title" style={{ color: '#495D35', fontWeight: '600' }}>
                     <i className="fas fa-credit-card me-2"></i>
                     QPay төлбөр хийх
                   </h5>
@@ -396,32 +520,143 @@ export default function OrderDetail({ orderId }) {
                     type="button"
                     className="btn-close"
                     onClick={() => setShowPaymentModal(false)}
+                    style={{ fontSize: '1.2rem' }}
                   ></button>
                 </div>
-                <div className="modal-body">
-                  {/* QR Code Section */}
-                  {(paymentData.qrImage || paymentData.qrCode) && (
-                    <div className="card mb-4">
-                      <div className="card-header">
-                        <h6 className="mb-0">
-                          <i className="fas fa-qrcode me-2"></i>
-                          QR Кодоор төлөх
-                        </h6>
+                <div className="modal-body" style={{ 
+                  maxHeight: '60vh', 
+                  overflowY: 'auto',
+                  padding: '1.5rem',
+                  minHeight: 'auto',
+                  backgroundColor: '#ffffff',
+                  transition: 'all 0.3s ease'
+                }}>
+                  {/* Order Information */}
+                  <div className="mb-4" style={{
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    border: '1px solid #e9ecef',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="row g-3" style={{ transition: 'all 0.3s ease' }}>
+                      <div className="col-md-6" style={{ transition: 'all 0.3s ease' }}>
+                        <div style={{ fontSize: '0.9rem', transition: 'all 0.3s ease' }}>
+                          <span style={{ color: '#6c757d', fontWeight: '500', fontSize: '0.85rem', transition: 'all 0.3s ease' }}>Захиалгын дугаар:</span>
+                          <div style={{ color: '#212529', fontWeight: '600', marginTop: '4px', fontSize: '1rem', transition: 'all 0.3s ease' }}>#{paymentData.orderId}</div>
+                        </div>
                       </div>
-                      <div className="card-body text-center">
+                      <div className="col-md-6" style={{ transition: 'all 0.3s ease' }}>
+                        <div style={{ fontSize: '0.9rem', transition: 'all 0.3s ease' }}>
+                          <div style={{ color: '#6c757d', fontWeight: '500', fontSize: '0.85rem', transition: 'all 0.3s ease' }}>Төлбөрийн дүн:</div>
+                          <div style={{ color: '#212529', fontWeight: '600', marginTop: '4px', fontSize: '1rem', transition: 'all 0.3s ease' }}>{paymentData.amount} {paymentData.currency}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* QR Code Section */}
+                  {paymentData.qrImage && (
+                    <div className="text-center mb-4" style={{ transition: 'all 0.3s ease' }}>
+                      <h6 className="mb-3" style={{ 
+                        color: '#495D35', 
+                        fontWeight: '600',
+                        fontSize: '1.1rem',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        <i className="fas fa-qrcode me-2" style={{ transition: 'all 0.3s ease' }}></i>
+                        QR Код уншуулах
+                      </h6>
+                      <div className="card-body text-center" style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        padding: '1.5rem',
+                        border: '1px solid #e9ecef',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                        transition: 'all 0.3s ease'
+                      }}>
                         <img 
-                          src={paymentData.qrImage || paymentData.qrCode} 
+                          src={paymentData.qrImage} 
                           alt="QPay QR Code" 
                           style={{ 
-                            maxWidth: '250px', 
+                            maxWidth: '280px', 
                             height: 'auto', 
-                            border: '2px solid #dee2e6',
-                            borderRadius: '8px',
-                            padding: '10px'
+                            border: '3px solid #f8f9fa',
+                            borderRadius: '12px',
+                            padding: '15px',
+                            backgroundColor: '#ffffff',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onError={(e) => {
+                            console.error('QR Image failed to load:', paymentData.qrImage);
+                            e.target.style.display = 'none';
+                          }}
+                          onLoad={() => {
+                            // console.log('QR Image loaded successfully:', paymentData.qrImage);
                           }}
                         />
-                        <div className="mt-3">
-                          <small className="text-muted">
+                        
+                        {/* Timer Section */}
+                        {timeLeft && (
+                          <div className="mt-4 mb-3" style={{ transition: 'all 0.3s ease' }}>
+                            <div style={modalStyles.timerDisplay}>
+                              <span style={modalStyles.timerLabel}>Хугацаа: </span>
+                              <span style={timeLeft === 'Хугацаа дууссан' ? modalStyles.timeLeftExpired : modalStyles.timeLeft}>
+                                {timeLeft}
+                              </span>
+                            </div>
+                            
+                            {timeLeft === 'Хугацаа дууссан' && (
+                              <button 
+                                onClick={handleRefreshPayment}
+                                className="btn btn-warning btn-sm mt-3"
+                                disabled={isProcessingPayment}
+                                style={{
+                                  borderRadius: '8px',
+                                  padding: '0.5rem 1rem',
+                                  fontSize: '0.875rem',
+                                  backgroundColor: '#ffc107',
+                                  borderColor: '#ffc107',
+                                  color: '#212529',
+                                  fontWeight: '500',
+                                  border: 'none',
+                                  transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isProcessingPayment) {
+                                    e.target.style.backgroundColor = '#e0a800';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!isProcessingPayment) {
+                                    e.target.style.backgroundColor = '#ffc107';
+                                    e.target.style.transform = 'translateY(0)';
+                                  }
+                                }}
+                              >
+                                {isProcessingPayment ? (
+                                  <>
+                                    <span className="spinner-border spinner-border-sm me-2" style={{ transition: 'all 0.3s ease' }}></span>
+                                    Дахин үүсгэж байна...
+                                  </>
+                                ) : (
+                                  <>
+                                    <i className="fas fa-sync-alt me-2" style={{ transition: 'all 0.3s ease' }}></i>
+                                    Дахин үүсгэх
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="mt-4" style={{ transition: 'all 0.3s ease' }}>
+                          <small className="text-muted" style={{ 
+                            fontSize: '0.9rem',
+                            transition: 'all 0.3s ease'
+                          }}>
                             <i className="fas fa-mobile-alt me-1"></i>
                             QPay апп-аа нээж QR кодыг уншуулна уу
                           </small>
@@ -432,40 +667,170 @@ export default function OrderDetail({ orderId }) {
 
                   {/* Payment URL Section */}
                   {paymentData.paymentUrl && (
-                    <div className="card mb-4">
-                      <div className="card-header">
-                        <h6 className="mb-0">
-                          <i className="fas fa-external-link-alt me-2"></i>
+                    <div className="card mb-4" style={{
+                      border: '1px solid #e9ecef',
+                      borderRadius: '12px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <div className="card-header bg-light" style={{
+                        backgroundColor: '#f8f9fa !important',
+                        borderBottom: '1px solid #e9ecef',
+                        borderRadius: '12px 12px 0 0',
+                        padding: '1rem 1.5rem',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        <h6 className="mb-0" style={{ 
+                          color: '#495D35', 
+                          fontWeight: '600',
+                          fontSize: '1rem',
+                          transition: 'all 0.3s ease'
+                        }}>
+                          <i className="fas fa-external-link-alt me-2" style={{ transition: 'all 0.3s ease' }}></i>
                           Веб хуудас руу орох
                         </h6>
                       </div>
-                      <div className="card-body text-center">
+                      <div className="card-body text-center" style={{ 
+                        padding: '1.5rem',
+                        transition: 'all 0.3s ease'
+                      }}>
                         <a 
                           href={paymentData.paymentUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="btn btn-primary btn-lg"
+                          style={{
+                            borderRadius: '8px',
+                            padding: '0.75rem 1.5rem',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            backgroundColor: '#495D35',
+                            borderColor: '#495D35',
+                            transition: 'all 0.3s ease'
+                          }}
                         >
                           <i className="fas fa-external-link-alt me-2"></i>
                           QPay төлбөр хийх
                         </a>
-                        <div className="mt-2">
-                          <small className="text-muted">
+                        <div className="mt-3" style={{ transition: 'all 0.3s ease' }}>
+                          <small className="text-muted" style={{ 
+                            fontSize: '0.9rem',
+                            transition: 'all 0.3s ease'
+                          }}>
                             Шинэ цонхонд QPay төлбөрийн хуудас нээгдэнэ
                           </small>
                         </div>
                       </div>
                     </div>
                   )}
+
+                  {/* Instructions */}
+                  <div className="alert alert-info" style={{
+                    backgroundColor: '#e7f3ff',
+                    borderColor: '#b3d9ff',
+                    color: '#0c5460',
+                    borderRadius: '12px',
+                    border: '1px solid #b3d9ff',
+                    padding: '1.5rem',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <h6 style={{ 
+                      color: '#0c5460', 
+                      fontWeight: '600',
+                      marginBottom: '1rem',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <i className="fas fa-info-circle me-2" style={{ transition: 'all 0.3s ease' }}></i>Заавар:
+                    </h6>
+                    <ul className="mb-0" style={{ 
+                      paddingLeft: '1.5rem',
+                      fontSize: '0.95rem',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <li style={{ marginBottom: '0.5rem', transition: 'all 0.3s ease' }}>QPay апп-аа нээнэ үү</li>
+                      <li style={{ marginBottom: '0.5rem', transition: 'all 0.3s ease' }}>QR кодыг уншуулна уу</li>
+                      <li style={{ marginBottom: '0.5rem', transition: 'all 0.3s ease' }}>Төлбөрийн дүнг баталгаажуулна уу</li>
+                      <li style={{ marginBottom: '0.5rem', transition: 'all 0.3s ease' }}>PIN код оруулна уу</li>
+                    </ul>
+                  </div>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowPaymentModal(false)}
-                  >
-                    Хаах
-                  </button>
+                <div className="modal-footer" style={{ 
+                  borderTop: '1px solid #e4e4e4',
+                  padding: '1rem 1.5rem',
+                  backgroundColor: '#faf9f8',
+                  borderRadius: '0 0 8px 8px',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <div className="d-flex justify-content-between align-items-center w-100" style={{ transition: 'all 0.3s ease' }}>
+                    <button
+                      type="button"
+                      className="btn"
+                      style={{
+                        backgroundColor: '#e2e3e5',
+                        borderColor: '#6c757d',
+                        color: '#6c757d',
+                        fontWeight: '500',
+                        fontSize: '0.875rem',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: '8px',
+                        transition: 'all 0.3s ease',
+                        border: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#d1d3d4';
+                        e.target.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#e2e3e5';
+                        e.target.style.transform = 'translateY(0)';
+                      }}
+                      onClick={() => setShowPaymentModal(false)}
+                    >
+                      <i className="fas fa-times me-2" style={{ transition: 'all 0.3s ease' }}></i>
+                      Хаах
+                    </button>
+                    
+                    {/* Refresh payment button when expired */}
+                    {timeLeft === 'Хугацаа дууссан' && (
+                      <button
+                        type="button"
+                        className="btn"
+                        style={{
+                          backgroundColor: '#f7f3d7',
+                          borderColor: '#927238',
+                          color: '#927238',
+                          fontWeight: '500',
+                          fontSize: '0.875rem',
+                          padding: '0.75rem 1.5rem',
+                          borderRadius: '8px',
+                          transition: 'all 0.3s ease',
+                          border: 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = '#f0e8c7';
+                          e.target.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = '#f7f3d7';
+                          e.target.style.transform = 'translateY(0)';
+                        }}
+                        onClick={handleRefreshPayment}
+                        disabled={isProcessingPayment}
+                      >
+                        {isProcessingPayment ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" style={{ transition: 'all 0.3s ease' }}></span>
+                            Дахин үүсгэж байна...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-sync-alt me-2" style={{ transition: 'all 0.3s ease' }}></i>
+                            Дахин төлбөр үүсгэх
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -477,6 +842,17 @@ export default function OrderDetail({ orderId }) {
           <div 
             className="modal-backdrop fade show" 
             onClick={() => setShowPaymentModal(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              zIndex: 1040,
+              backdropFilter: 'blur(2px)',
+              transition: 'all 0.3s ease'
+            }}
           ></div>
         )}
       </div>
