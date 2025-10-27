@@ -128,3 +128,8 @@ Click "ҮНЭРТЭН" → Should navigate to: /shop/12 (or appropriate category
 
 The component now works flawlessly with proper routing, clean URLs, and optimized performance!
 
+
+
+
+
+
