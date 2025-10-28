@@ -3,6 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
 import { InvalidLoginError } from "@/auth.errors";
 import { type UserRole } from "@/types/next-auth";
+import { env } from "@/lib/env";
+
 export default {
   providers: [
     Credentials({
@@ -24,12 +26,9 @@ export default {
           }
           return null;
         }
-        const baseUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
-        if (!baseUrl) {
-          throw new InvalidLoginError("BACKEND_URL is not configured");
-        }
+        // ✅ No fallback - env.ts validates this at startup
         const res = await fetch(
-          `${baseUrl}/api/v1/auth/login`,
+          `${env.backendUrl}/api/v1/auth/login`,
           {
             method: "POST",
             headers: {
