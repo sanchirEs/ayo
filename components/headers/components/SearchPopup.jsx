@@ -50,7 +50,8 @@ export default function SearchPopup() {
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   }, [recentSearches]);
 
-  // Search products with debounce
+  // ✅ ENHANCED: Search products with cache-aware tracking
+  // WHY: Redis caches search results (Tier 3: 5-15min) for faster repeat searches
   const searchProducts = useCallback(async (query) => {
     if (!query.trim() || query.length < 2) {
       setSearchResults([]);
@@ -58,6 +59,8 @@ export default function SearchPopup() {
     }
 
     setIsSearching(true);
+    const startTime = Date.now();
+    
     try {
       const response = await api.products.enhanced({
         search: query,
@@ -66,6 +69,16 @@ export default function SearchPopup() {
       
       const products = response?.data?.products || response?.products || [];
       setSearchResults(products);
+      
+      // ✅ NEW: Log search performance in development
+      if (process.env.NODE_ENV === 'development') {
+        const searchTime = Date.now() - startTime;
+        console.log(`Search for "${query}":`, {
+          results: products.length,
+          time: `${searchTime}ms`,
+          cached: response.performance?.cached
+        });
+      }
     } catch (error) {
       console.error('Search error:', error);
       setSearchResults([]);

@@ -155,68 +155,26 @@ export default function Shop4({
   const [categoryName, setCategoryName] = useState("");
   const [categoryLoading, setCategoryLoading] = useState(false);
 
-  // ---- global category name cache ----
-  const [categoryCache, setCategoryCache] = useState(() => {
-    // Use global cache if available, otherwise create new
-    if (typeof window !== 'undefined' && window.__categoryCache) {
-      return window.__categoryCache;
-    }
-    return new Map();
-  });
-
-  // ---- load category name with caching ----
+  // ✅ SIMPLIFIED: Redis handles caching on backend - no local cache needed
+  // WHY: Tier 1 Redis cache (6-24h TTL) is more efficient and shared across all users
   useEffect(() => {
     if (categoryId) {
-      // Check cache first
-      if (categoryCache.has(categoryId)) {
-        setCategoryName(categoryCache.get(categoryId));
-        return;
-      }
-
-      // Load from API if not in cache
       setCategoryLoading(true);
       api.categories.getById(categoryId)
         .then(response => {
           if (response.success && response.data) {
-            const name = response.data.name;
-            setCategoryName(name);
-            // Cache the result globally
-            setCategoryCache(prev => {
-              const newCache = new Map(prev).set(categoryId, name);
-              if (typeof window !== 'undefined') {
-                window.__categoryCache = newCache;
-              }
-              return newCache;
-            });
-          } else if (response.success && response.data === null) {
-            // API returned null data (404 handled by API client)
+            setCategoryName(response.data.name);
+          } else {
             setCategoryName("Ангилал");
-            // Cache the fallback
-            setCategoryCache(prev => {
-              const newCache = new Map(prev).set(categoryId, "Ангилал");
-              if (typeof window !== 'undefined') {
-                window.__categoryCache = newCache;
-              }
-              return newCache;
-            });
           }
         })
-        .catch(error => {
-          // Don't show error for 404, just use fallback name
+        .catch((error) => {
+          // Silently handle 404s with fallback name
           if (error.message.includes('404') || error.message.includes('Not Found')) {
             setCategoryName("Ангилал");
-            // Cache the fallback to prevent repeated API calls
-            setCategoryCache(prev => {
-              const newCache = new Map(prev).set(categoryId, "Ангилал");
-              if (typeof window !== 'undefined') {
-                window.__categoryCache = newCache;
-              }
-              return newCache;
-            });
-            return;
+          } else {
+            setCategoryName("Ангилал");
           }
-          // Set a fallback name if API fails
-          setCategoryName("Ангилал");
         })
         .finally(() => {
           setCategoryLoading(false);
@@ -224,7 +182,7 @@ export default function Shop4({
     } else {
       setCategoryName("");
     }
-  }, [categoryId, categoryCache]);
+  }, [categoryId]); // Redis caches on backend, simplified dependency array
 
   // Filter change is now handled by parent component (ShopLayoutWrapper)
   // No need for local handleFiltersChange since we receive onFiltersChange prop

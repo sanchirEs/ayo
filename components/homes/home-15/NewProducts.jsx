@@ -1,39 +1,18 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
-
 import ProductCardNew from "@/components/common/ProductCardNew";
-import api from "@/lib/api";
 
-export default function Featured() {
-
-  const [data, setData] = useState({ products: [], pagination: null });
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
-
-  useEffect(() => {
-    let mounted = true;
-    // Use homepageService to get new arrivals
-    api.homepage
-      .bundled({ sections: 'new', limit: 20, include: 'card' })
-      .then((res) => {
-        if (!mounted) return;
-        // Extract newArrivals from homepage response
-        const newArrivals = res.data?.newArrivals || [];
-        setData({ products: newArrivals, pagination: null });
-        // console.log("new arrivals: ", newArrivals)
-      })
-      .catch((e) => setErr(e.message || "Failed to load new products"))
-      .finally(() => setLoading(false));
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const products = data.products;
-
+/**
+ * NewProducts Component
+ * Displays new arrival products in a carousel
+ * 
+ * ✅ OPTIMIZED: Now accepts products as props (no API calls, no loading state)
+ * WHY: Parent fetches all data in single API call = faster, no duplicates
+ */
+export default function Featured({ products = [] }) {
   const swiperOptions = useMemo(
     () => ({
       autoplay: { delay: 5000 },
@@ -41,7 +20,7 @@ export default function Featured() {
       slidesPerView: 5,
       slidesPerGroup: 5,
       effect: "none",
-      loop: products.length > 5, // loop only if enough items
+      loop: products.length > 5,
       pagination: false,
       navigation: {
         nextEl: ".products-carousel__next",
@@ -56,32 +35,15 @@ export default function Featured() {
     [products.length]
   );
 
-  if (loading) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Шинээр нэмэгдсэн бүтээгдэхүүнүүд
-        </h2>
-        <p className="text-center">Loading products…</p>
-      </section>
-    );
-  }
-
-  if (err) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Шинээр нэмэгдсэн бүтээгдэхүүнүүд
-        </h2>
-        <p className="text-danger text-center">{err}</p>
-      </section>
-    );
+  // Don't render if no products
+  if (!products || products.length === 0) {
+    return null;
   }
 
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-      Шинээр нэмэгдсэн бүтээгдэхүүнүүд
+        Шинээр нэмэгдсэн бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
         Хамгийн сүүлийн үеийн шинэ бүтээгдэхүүнүүд
@@ -89,11 +51,11 @@ export default function Featured() {
 
       <div className="position-relative">
         <Swiper className="swiper-container js-swiper-slider" {...swiperOptions}>
-                        {products.map((product) => (
-                <SwiperSlide key={product.id}>
-                  <ProductCardNew product={product} showNewBadge={true} />
-                </SwiperSlide>
-              ))}
+          {products.map((product) => (
+            <SwiperSlide key={product.id}>
+              <ProductCardNew product={product} showNewBadge={true} />
+            </SwiperSlide>
+          ))}
         </Swiper>
 
         <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">

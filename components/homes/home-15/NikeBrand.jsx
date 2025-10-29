@@ -18,7 +18,7 @@ export default function NikeBrand() {
     let mounted = true;
     // Use homepageService to get featured products for Nike brand
     api.homepage
-      .bundled({ sections: 'featured', limit: 20, include: 'card' })
+      .cached({ sections: 'featured', limit: 20, include: 'card' })
       .then((res) => {
         if (!mounted) return;
         // Extract featured products from homepage response

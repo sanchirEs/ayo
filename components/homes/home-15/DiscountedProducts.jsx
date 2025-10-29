@@ -1,102 +1,71 @@
 "use client";
 
+import { useMemo } from "react";
 import Star from "@/components/common/Star";
 import { useContextElement } from "@/context/Context";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
-import api from "@/lib/api";
 
-export default function DiscountedProducts() {
+/**
+ * DiscountedProducts Component
+ * Displays discounted products with sale badges
+ * 
+ * ✅ OPTIMIZED: Now accepts products as props (no API calls, no loading state)
+ * WHY: Parent fetches all data in single API call = faster, no duplicates
+ */
+export default function DiscountedProducts({ products = [] }) {
   const { toggleWishlist, isAddedtoWishlist } = useContextElement();
   const { setQuickViewItem } = useContextElement();
   const { addProductToCart, isAddedToCartProducts } = useContextElement();
-  
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
-    // Use homepageService to get discounted products
-    api.homepage
-      .bundled({ sections: 'discounted', limit: 20, include: 'card' })
-      .then((res) => {
-        if (!mounted) return;
-        // Extract discounted products from homepage response
-        const discountedProducts = res.data?.discounted || [];
-        setProducts(discountedProducts);
-        // console.log("discounted products: ", discountedProducts)
-      })
-      .catch((e) => setErr(e.message || "Failed to load discounted products"))
-      .finally(() => setLoading(false));
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const swiperOptions = {
-    autoplay: {
-      delay: 4000,
-    },
-    slidesPerView: 5,
-    slidesPerGroup: 5,
-    effect: "none",
-    loop: false,
-    pagination: false,
-    modules: [Navigation, Autoplay],
-    navigation: {
-      nextEl: "#discounted_products .products-carousel__next",
-      prevEl: "#discounted_products .products-carousel__prev",
-    },
-    breakpoints: {
-      320: {
-        slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 14,
+  const swiperOptions = useMemo(
+    () => ({
+      autoplay: {
+        delay: 4000,
       },
-      768: {
-        slidesPerView: 3,
-        slidesPerGroup: 3,
-        spaceBetween: 24,
+      slidesPerView: 5,
+      slidesPerGroup: 5,
+      effect: "none",
+      loop: false,
+      pagination: false,
+      modules: [Navigation, Autoplay],
+      navigation: {
+        nextEl: "#discounted_products .products-carousel__next",
+        prevEl: "#discounted_products .products-carousel__prev",
       },
-      992: {
-        slidesPerView: 4,
-        slidesPerGroup: 1,
-        spaceBetween: 30,
-        pagination: false,
+      breakpoints: {
+        320: {
+          slidesPerView: 2,
+          slidesPerGroup: 2,
+          spaceBetween: 14,
+        },
+        768: {
+          slidesPerView: 3,
+          slidesPerGroup: 3,
+          spaceBetween: 24,
+        },
+        992: {
+          slidesPerView: 4,
+          slidesPerGroup: 1,
+          spaceBetween: 30,
+          pagination: false,
+        },
       },
-    },
-  };
+    }),
+    []
+  );
 
-  if (loading) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Хямдралтай бүтээгдэхүүнүүд
-        </h2>
-        <p className="text-center">Loading products…</p>
-      </section>
-    );
-  }
-
-  if (err) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Хямдралтай бүтээгдэхүүнүүд
-        </h2>
-        <p className="text-danger text-center">{err}</p>
-      </section>
-    );
+  // Don't render if no products
+  if (!products || products.length === 0) {
+    return null;
   }
 
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-      Хямдралтай бүтээгдэхүүнүүд
+        Хямдралтай бүтээгдэхүүнүүд
       </h2>
       <p className="fs-15 mb-2 pb-xl-2 text-secondary text-center">
         Чанартай бүтээгдэхүүнийг хямд үнээр
@@ -232,10 +201,7 @@ export default function DiscountedProducts() {
                   </SwiperSlide>
                 );
               })}
-
-              {/* <!-- /.swiper-wrapper --> */}
             </Swiper>
-            {/* <!-- /.swiper-container js-swiper-slider --> */}
 
             <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">
               <svg
@@ -247,7 +213,6 @@ export default function DiscountedProducts() {
                 <use href="#icon_prev_md" />
               </svg>
             </div>
-            {/* <!-- /.products-carousel__prev --> */}
             <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center">
               <svg
                 width="25"
@@ -258,9 +223,7 @@ export default function DiscountedProducts() {
                 <use href="#icon_next_md" />
               </svg>
             </div>
-            {/* <!-- /.products-carousel__next --> */}
           </div>
-          {/* <!-- /.position-relative --> */}
         </div>
       </div>
     </section>

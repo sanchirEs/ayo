@@ -140,6 +140,11 @@ app/layout-client.jsx (Client)
 - [ ] Deploy to staging
 - [ ] Verify in staging before production
 
+### 📝 Known Issues (Non-Critical):
+- ⚠️ React render warning in FilterAll.jsx (console only, app works)
+- See `KNOWN_ISSUES.md` for details and future fix
+- Priority: LOW (doesn't affect functionality)
+
 ---
 
 ## 📚 Documentation Created

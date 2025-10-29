@@ -1,23 +1,29 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import Image from "next/image";
-import api from "@/lib/api";
 
-export default function Categories() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
+/**
+ * Categories Component
+ * Displays category images with links to shop pages
+ * 
+ * ✅ OPTIMIZED: Now accepts categories as props (no API calls)
+ * WHY: Parent fetches all data in single API call = faster, no duplicates
+ * 
+ * NOTE: Category images are still hardcoded as they're local static assets
+ * TODO: Backend should eventually return imageUrl for each category
+ */
+export default function Categories({ categories = [] }) {
   const [isMobile, setIsMobile] = useState(false);
 
-  // List of all available category images with their types (category or tag)
-  // Tags match exactly what's in the database/filter sidebar
+  // Local category images mapping
+  // These are static local images that match category/tag names from backend
   const categoryImages = [
     {
       image: '/assets/images/categories/АМПУЛЬ.png',
-      name: 'Ампуль', // Exact name from your filter
+      name: 'Ампуль',
       type: 'tag'
     },
     {
@@ -37,22 +43,22 @@ export default function Categories() {
     },
     {
       image: '/assets/images/categories/МАСК.png',
-      name: 'Маск', // Exact name from your filter
+      name: 'Маск',
       type: 'tag'
     },
     {
       image: '/assets/images/categories/НАРНЫ-ТОС.png',
-      name: 'Нарны тос', // Exact name from your filter
+      name: 'Нарны тос',
       type: 'tag'
     },
     {
       image: '/assets/images/categories/НҮҮРНИЙ-ТОС.png',
-      name: 'Нүүрний тос', // Exact name from your filter
+      name: 'Нүүрний тос',
       type: 'tag'
     },
     {
       image: '/assets/images/categories/ТОНЕР.png',
-      name: 'Тонер', // Exact name from your filter
+      name: 'Тонер',
       type: 'tag'
     },
     {
@@ -77,33 +83,7 @@ export default function Categories() {
     }
   ];
 
-  // Function to generate the correct URL based on type
-  const generateUrl = (item) => {
-    if (item.type === 'tag') {
-      // For tags, use /shop?tags= with proper URL encoding
-      const encodedTag = encodeURIComponent(item.name);
-      return `/shop?tags=${encodedTag}`;
-    } else {
-      // For categories, find matching category from backend
-      const matchingCategory = findMatchingCategory(item.name, categories);
-      if (matchingCategory) {
-        return `/shop/${matchingCategory.id}`;
-      }
-      // Fallback to shop page without filters
-      return '/shop';
-    }
-  };
-
-  // Function to find matching category from backend based on image name
-  const findMatchingCategory = (imageName, backendCategories) => {
-    return backendCategories.find(category => 
-      category.name === imageName || 
-      category.name.toLowerCase() === imageName.toLowerCase()
-    );
-  };
-
   useEffect(() => {
-    // Check if mobile
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 991);
     };
@@ -114,46 +94,25 @@ export default function Categories() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    let mounted = true;
-    
-    // Optimized category loading - only fetch if we have category-type items
-    const loadCategories = async () => {
-      // Check if we have any category-type items
-      const hasCategories = categoryImages.some(item => item.type === 'category');
+  // Generate URL based on type
+  const generateUrl = (item) => {
+    if (item.type === 'tag') {
+      const encodedTag = encodeURIComponent(item.name);
+      return `/shop?tags=${encodedTag}`;
+    } else {
+      // Find matching category from backend data
+      const matchingCategory = categories.find(cat => 
+        cat.name === item.name || 
+        cat.name.toLowerCase() === item.name.toLowerCase()
+      );
       
-      if (!hasCategories) {
-        // No need to fetch categories if all items are tags
-        if (mounted) setLoading(false);
-        return;
+      if (matchingCategory) {
+        return `/shop/${matchingCategory.id}`;
       }
-
-      try {
-        // Single API call to get all categories
-        const allCategoriesRes = await api.fetch('/categories?all=true', { auth: false });
-        
-        if (mounted && allCategoriesRes.data && allCategoriesRes.data.length > 0) {
-          setCategories(allCategoriesRes.data);
-          setLoading(false);
-          return;
-        }
-      } catch (e) {
-        console.error("Failed to load categories:", e.message);
-      }
-
-      // If API fails, still set loading to false
-      if (mounted) {
-        setLoading(false);
-        setErr("Failed to load categories");
-      }
-    };
-
-    loadCategories();
       
-    return () => {
-      mounted = false;
-    };
-  }, []);
+      return '/shop';
+    }
+  };
 
   const swiperOptions = {
     autoplay: {
@@ -199,28 +158,6 @@ export default function Categories() {
     },
   };
 
-  if (loading) {
-    return (
-      <section className="category-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Онцлох ангиллууд
-        </h2>
-        <p className="text-center">Loading categories…</p>
-      </section>
-    );
-  }
-
-  if (err) {
-    return (
-      <section className="category-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Онцлох ангиллууд
-        </h2>
-        <p className="text-danger text-center">{err}</p>
-      </section>
-    );
-  }
-
   return (
     <section 
       className="category-carousel container" 
@@ -228,13 +165,6 @@ export default function Categories() {
         padding: isMobile ? '0' : '0px 80px'
       }}
     >
-
-{/* <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-        Онцлох ангиллууд
-      </h2>
-      <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
-        Бүх захиалгыг нэг дороос
-      </p> */}
       <div className="section-header d-flex align-items-center justify-content-center" style={{
         position: 'relative',
         width: '100%',
@@ -261,7 +191,6 @@ export default function Categories() {
           backgroundColor: '#DCDCDC',
           maxWidth: '150px'
         }}></div>
-        
       </div>
 
       <div id="category_1" className="position-relative" style={{ padding: '0' }}>
@@ -275,45 +204,32 @@ export default function Categories() {
               padding: '0'
             }}
           >
-            {categoryImages.map((item, i) => {
-              return (
-                <Link 
-                  key={`mobile-category-${i}-${item.name}`} 
-                  href={generateUrl(item)} 
-                  style={{
-                    display: 'block',
-                    textAlign: 'center',
-                    textDecoration: 'none',
-                    color: 'inherit'
+            {categoryImages.map((item, i) => (
+              <Link 
+                key={`mobile-category-${i}-${item.name}`} 
+                href={generateUrl(item)} 
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  color: 'inherit'
+                }}
+              >
+                <Image
+                  src={item.image}
+                  width={150}
+                  height={150}
+                  alt={item.name}
+                  style={{ 
+                    width: '100%',
+                    height: 'auto',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease'
                   }}
-                >
-                  <Image
-                    src={item.image}
-                    width={150}
-                    height={150}
-                    alt={item.name}
-                    style={{ 
-                      width: '100%',
-                      height: 'auto',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      // boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                  {/* <div style={{
-                    marginTop: '4px',
-                    fontSize: '10px',
-                    fontWeight: '500',
-                    color: '#333',
-                    textAlign: 'center',
-                    lineHeight: '1.2'
-                  }}>
-                    {item.name}
-                  </div> */}
-                </Link>
-              );
-            })}
+                />
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -321,26 +237,19 @@ export default function Categories() {
         <div className="d-none d-lg-block" style={{ padding: '0 20px' }}>
           <Swiper
             className="swiper-container js-swiper-slider"
-          
             {...swiperOptions}
           >
-          {categoryImages.map((item, i) => {
-            return (
+            {categoryImages.map((item, i) => (
               <SwiperSlide 
                 key={`category-${i}-${item.name}`} 
                 className="swiper-slide product-card"
-             
               >
-                 <div className="text-center">
-                
+                <div className="text-center">
                   <Link
                     href={generateUrl(item)}
-                    className="category-link d-block "
-                   
+                    className="category-link d-block"
                   >
-                    <div className="category-image-wrapper mb-3 ">
-                   
-                    
+                    <div className="category-image-wrapper mb-3">
                       <Image
                         loading="lazy"
                         src={item.image}
@@ -355,50 +264,25 @@ export default function Categories() {
                           borderRadius: '12px'
                         }}
                       />
-                      
-                 
-                    {/* <div 
-                      className="category-name text-center"
-                      style={{
-                        marginTop: '10px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        color: '#333',
-                        textAlign: 'center',
-                        lineHeight: '1.4',
-                        width: '100%'
-                      }}
-                    >
-                      {item.name}
-                    </div> */}
-                   </div>
+                    </div>
                   </Link>
                 </div>
               </SwiperSlide>
-            );
-          })}
-
-          {/* <!-- /.swiper-wrapper --> */}
+            ))}
           </Swiper>
-          {/* <!-- /.swiper-container js-swiper-slider --> */}
 
-          <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center" >
+          <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">
             <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
               <use href="#icon_prev_md" />
             </svg>
           </div>
-          <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center" >
+          <div className="cursor-pointer products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center">
             <svg width="25" height="25" viewBox="0 0 25 25" style={{ fill: '#495D35', stroke: '#495D35', strokeWidth: '2px', transform: 'scale(1.15)' }}>
               <use href="#icon_next_md" />
             </svg>
           </div>
         </div>
-      
-       
-     
-        {/* <!-- /.category-carousel__next --> */}
       </div>
-      {/* <!-- /.position-relative --> */}
     </section>
   );
 }

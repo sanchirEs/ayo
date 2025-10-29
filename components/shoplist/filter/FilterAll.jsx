@@ -58,14 +58,27 @@ export default function FilterAll({ onFiltersChange, externalFilters }) {
     }
   }, [externalFilters]);
 
-  // Fetch filter options from API
+  // ✅ OPTIMIZED: Only fetch filter options on shop pages
+  // Prevents unnecessary API calls on homepage/other pages
   useEffect(() => {
+    // Check if we're on a shop page
+    if (typeof window === 'undefined') return;
+    const isShopPage = window.location.pathname.includes('/shop');
+    
+    if (!isShopPage) {
+      // Not on shop page, don't load filters yet
+      setLoading(false);
+      return;
+    }
+
     const fetchFilterOptions = async () => {
       try {
         setLoading(true);
+        const startTime = Date.now();
         
-        // Fetch brands (using featured for now - can be all brands later)
-        const brandsRes = await api.brands.featured();
+        // Fetch all brands for filter (Redis Tier 1: 6-24h cache)
+        // WHY: Brands rarely change, perfect for long-term caching
+        const brandsRes = await api.brands.getAll();
         if (brandsRes?.success && brandsRes?.data) {
           setBrands(brandsRes.data);
         }
@@ -78,10 +91,19 @@ export default function FilterAll({ onFiltersChange, externalFilters }) {
           }
         } catch (err) {
           // Attributes endpoint may not exist - that's okay
-          console.log("Attributes endpoint not available");
+          if (process.env.NODE_ENV === 'development') {
+            console.log("Attributes endpoint not available");
+          }
         }
 
         // Specs and tags can be loaded dynamically or from product data
+        
+        const loadTime = Date.now() - startTime;
+        
+        // ✅ NEW: Log cache performance in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Filter options loaded in ${loadTime}ms`);
+        }
         
         setLoading(false);
       } catch (error) {

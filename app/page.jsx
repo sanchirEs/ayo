@@ -1,8 +1,8 @@
 import HomePage15 from "./home/page";
 
 export const metadata = {
-  title: "Home || Ayo eCommerce",
-  description: "Ayo eCommerce",
+  title: "Нүүр хуудас || Ayo eCommerce",
+  description: "Монголын шилдэг онлайн дэлгүүр - Ayo eCommerce",
 };
 
 export default function Home() {

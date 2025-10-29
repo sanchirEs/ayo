@@ -1,47 +1,27 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import ProductCard from "@/components/common/ProductCard";
 import FlashSaleCountdown from "./FlashSaleCountdown";
-import api from "@/lib/api";
 
-export default function FlashSaleProducts() {
-  const [data, setData] = useState({ products: [], pagination: null });
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
-
-  useEffect(() => {
-    let mounted = true;
-    // Use homepageService to get flash sale products
-    api.homepage
-      .bundled({ sections: 'flash', limit: 20, include: 'card' })
-      .then((res) => {
-        if (!mounted) return;
-        // Extract flashSale from homepage response
-        const flashSaleProducts = res.data?.flashSale || [];
-        setData({ products: flashSaleProducts, pagination: null });
-        // console.log("flash sale products: ", flashSaleProducts)
-      })
-      .catch((e) => setErr(e.message || "Failed to load flash sale products"))
-      .finally(() => setLoading(false));
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const products = data.products;
-
-  // Always call useMemo hook before any conditional returns
+/**
+ * FlashSaleProducts Component
+ * Displays flash sale products with urgency indicators
+ * 
+ * ✅ OPTIMIZED: Now accepts products as props (no API calls, no loading state)
+ * WHY: Parent fetches all data in single API call = faster, no duplicates
+ */
+export default function FlashSaleProducts({ products = [] }) {
   const swiperOptions = useMemo(
     () => ({
-      autoplay: { delay: 3000 }, // Faster autoplay for flash sale
+      autoplay: { delay: 3000 }, // Faster autoplay for urgency
       modules: [Autoplay, Navigation],
       slidesPerView: 5,
       slidesPerGroup: 5,
       effect: "none",
-      loop: products.length > 5, // loop only if enough items
+      loop: products.length > 5,
       pagination: false,
       navigation: {
         nextEl: ".flash-sale-carousel__next",
@@ -56,37 +36,15 @@ export default function FlashSaleProducts() {
     [products.length]
   );
 
-  // If no products, show the countdown
-  if (!loading && !err && products.length === 0) {
+  // If no products, show countdown (flash sale not active yet)
+  if (!products || products.length === 0) {
     return <FlashSaleCountdown />;
-  }
-
-  if (loading) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          Flash Sale
-        </h2>
-        <p className="text-center">Loading products…</p>
-      </section>
-    );
-  }
-
-  if (err) {
-    return (
-      <section className="products-carousel container">
-        <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-          10 минутын хямдрал	
-        </h2>
-        <p className="text-danger text-center">{err}</p>
-      </section>
-    );
   }
 
   return (
     <section className="products-carousel container">
       <h2 className="section-title text-uppercase fs-25 fw-medium text-center mb-2">
-       Flash Sale
+        Flash Sale
       </h2>
       <p className="fs-15 mb-4 pb-xl-2 mb-xl-4 text-secondary text-center">
         Хязгаарлагдмал хугацааны хямдрал - Амжиж захиалаарай!
@@ -104,7 +62,6 @@ export default function FlashSaleProducts() {
                   </span>
                 </div>
                 
-                {/* Use ProductCard component */}
                 <ProductCard 
                   product={product} 
                   imageWidth={330} 
@@ -115,7 +72,6 @@ export default function FlashSaleProducts() {
           ))}
         </Swiper>
 
-        {/* Navigation arrows */}
         <div className="cursor-pointer products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">
           <svg width="25" height="25" viewBox="0 0 25 25">
             <use href="#icon_prev_md" />
