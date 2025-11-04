@@ -295,7 +295,7 @@ export default function Shop4({
 
 
 
-      // Use new enhanced products API
+      // Use new enhanced products API (NOW WITH REDIS CACHING!)
       const res = await api.products.enhanced(params);
 
       // Handle response structure from new API
@@ -310,6 +310,23 @@ export default function Shop4({
         hasPrev: false
       };
       
+      // ✅ Extract filter options from response (NEW!)
+      const filterOptions = responseData?.filterOptions || {
+        brands: [],
+        priceRange: { min: 0, max: 100000 },
+        attributes: []
+      };
+      
+      // ✅ Store filter options globally for FilterAll component
+      if (typeof window !== 'undefined') {
+        window.__shopFilterOptions = filterOptions;
+        console.log('🏷️  FilterOptions available:', {
+          brands: filterOptions.brands?.length || 0,
+          priceRange: filterOptions.priceRange,
+          attributes: filterOptions.attributes?.length || 0,
+          cached: responseData?.meta?.cached || false
+        });
+      }
 
       // Map pagination fields to match current structure
       const mappedPagination = {
@@ -323,6 +340,16 @@ export default function Shop4({
 
       // Performance tracking
       const requestDuration = typeof window !== 'undefined' ? Date.now() - requestStartTime : 0;
+      
+      // ✅ Log performance with cache info
+      console.log('📊 Shop4 Products Loaded:', {
+        products: productList.length,
+        total: mappedPagination.total,
+        page: `${mappedPagination.currentPage}/${mappedPagination.totalPages}`,
+        responseTime: `${requestDuration}ms`,
+        cached: responseData?.meta?.cached || false,
+        cacheTime: responseData?.meta?.cacheResponseTime || 'N/A'
+      });
       
       // Update products with smooth transition
       setProducts(productList);

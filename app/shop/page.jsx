@@ -44,8 +44,8 @@ export default async function ShopPage({ searchParams }) {
   
   // URL: /shop?page=2&limit=12&sort=price-asc&brands=1,2&priceMin=10000&priceMax=50000&tags=Нарны+тос
   const page = Number(resolvedSearchParams?.page || 1);
-  const limit = Number(resolvedSearchParams?.limit || 12);
-  const sort = String(resolvedSearchParams?.sort || "newest");
+  const limit = Number(resolvedSearchParams?.limit || 20);
+  const sort = String(resolvedSearchParams?.sortBy || resolvedSearchParams?.sort || "newest");
   
   // Extract filter parameters from URL
   const urlFilters = {
@@ -56,7 +56,7 @@ export default async function ShopPage({ searchParams }) {
     specs: resolvedSearchParams?.specs ? parseSpecsFromUrl(resolvedSearchParams.specs) : {},
     tags: resolvedSearchParams?.tags ? resolvedSearchParams.tags.split(',') : [],
     hierarchicalTags: resolvedSearchParams?.hierarchicalTags ? resolvedSearchParams.hierarchicalTags.split(',') : [],
-    inStock: resolvedSearchParams?.inStock === 'true',
+    inStock: resolvedSearchParams?.inStock !== 'false', // Default true
     hasDiscount: resolvedSearchParams?.hasDiscount === 'true',
     minRating: resolvedSearchParams?.minRating ? Number(resolvedSearchParams.minRating) : null,
     search: resolvedSearchParams?.search || "",
@@ -68,23 +68,23 @@ export default async function ShopPage({ searchParams }) {
 
   return (
     <div className="shop-products">
-    <Suspense fallback={
-      <div className="d-flex justify-content-center align-items-center" style={{minHeight: '400px'}}>
-        <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status">
-            <span className="visually-hidden">Loading...</span>
+      <Suspense fallback={
+        <div className="d-flex justify-content-center align-items-center" style={{minHeight: '400px'}}>
+          <div className="text-center">
+            <div className="spinner-border text-primary mb-3" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <h6 className="text-primary">Бүтээгдэхүүн ачаалж байна...</h6>
           </div>
-          <h6 className="text-primary">Бүтээгдэхүүн ачаалж байна...</h6>
         </div>
-      </div>
-    }>
-      <ShopLayoutWrapper 
-        initialPage={page}
-        initialLimit={limit}
-        initialSort={sort}
-        initialFilters={urlFilters}
-      />
-    </Suspense>
-  </div>
+      }>
+        <ShopLayoutWrapper 
+          initialPage={page}
+          initialLimit={limit}
+          initialSort={sort}
+          initialFilters={urlFilters}
+        />
+      </Suspense>
+    </div>
   );
 }

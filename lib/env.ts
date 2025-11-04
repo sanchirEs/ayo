@@ -216,13 +216,18 @@ export function getOAuthUrls() {
 
 /**
  * Type guard for checking if OAuth is configured
+ * 
+ * NOTE: Frontend only needs public IDs (NEXT_PUBLIC_*) to show buttons.
+ * Secrets are only needed in backend - frontend doesn't need them.
  */
 export function isOAuthConfigured(provider: 'google' | 'facebook'): boolean {
+  // Frontend only needs public IDs to show/hide OAuth buttons
+  // Secrets are backend-only and not accessible to frontend
   if (provider === 'google') {
-    return !!(env.googleClientId && env.googleClientSecret);
+    return !!env.googleClientId; // Only check public ID, not secret
   }
   if (provider === 'facebook') {
-    return !!(env.facebookAppId && env.facebookAppSecret);
+    return !!env.facebookAppId; // Only check public ID, not secret
   }
   return false;
 }
@@ -236,8 +241,21 @@ if (typeof window === 'undefined' && env.isDevelopment) {
     console.log('✅ Environment variables validated successfully');
     console.log(`   Backend: ${env.backendUrl}`);
     console.log(`   NextAuth URL: ${env.nextAuthUrl}`);
-    console.log(`   Google OAuth: ${isOAuthConfigured('google') ? '✅' : '❌'}`);
-    console.log(`   Facebook OAuth: ${isOAuthConfigured('facebook') ? '✅' : '❌'}`);
+    
+    // Only log OAuth status if actually configured (frontend only needs public IDs)
+    // If not configured, it's normal - OAuth is optional
+    const googleConfigured = isOAuthConfigured('google');
+    const facebookConfigured = isOAuthConfigured('facebook');
+    
+    if (googleConfigured || facebookConfigured) {
+      if (googleConfigured) {
+        console.log(`   Google OAuth: ✅ (public ID configured - secret in backend)`);
+      }
+      if (facebookConfigured) {
+        console.log(`   Facebook OAuth: ✅ (public ID configured - secret in backend)`);
+      }
+    }
+    // If OAuth not configured, don't log anything - it's optional
   }
 }
 

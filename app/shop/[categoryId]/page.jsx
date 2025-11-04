@@ -10,8 +10,8 @@ export default async function ShopCategoryPage({ params, searchParams }) {
   
   // URL: /shop/123?page=2&limit=12&sort=price-asc&brands=1,2&priceMin=10000&priceMax=50000
   const page = Number(resolvedSearchParams?.page || 1);
-  const limit = Number(resolvedSearchParams?.limit || 12);
-  const sort = String(resolvedSearchParams?.sort || "newest");
+  const limit = Number(resolvedSearchParams?.limit || 20);
+  const sort = String(resolvedSearchParams?.sortBy || resolvedSearchParams?.sort || "newest");
   
   // Extract filter parameters from URL
   const urlFilters = {
@@ -21,7 +21,7 @@ export default async function ShopCategoryPage({ params, searchParams }) {
     attributes: resolvedSearchParams?.attributes ? parseAttributesFromUrl(resolvedSearchParams.attributes) : {},
     specs: resolvedSearchParams?.specs ? parseSpecsFromUrl(resolvedSearchParams.specs) : {},
     tags: resolvedSearchParams?.tags ? resolvedSearchParams.tags.split(',') : [],
-    inStock: resolvedSearchParams?.inStock === 'true',
+    inStock: resolvedSearchParams?.inStock !== 'false',
     hasDiscount: resolvedSearchParams?.hasDiscount === 'true',
     minRating: resolvedSearchParams?.minRating ? Number(resolvedSearchParams.minRating) : null,
     search: resolvedSearchParams?.search || "",
@@ -81,7 +81,7 @@ function parseSpecsFromUrl(specsString) {
   
   const pairs = specsString.split(',');
   pairs.forEach(pair => {
-    const [key, value] = pair.split(':');
+    const [key, value] = pair.split('::');
     if (key && value) {
       if (!specs[key]) {
         specs[key] = [];

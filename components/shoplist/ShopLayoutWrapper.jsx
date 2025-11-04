@@ -9,6 +9,8 @@ import { useFilterContext } from "@/context/FilterContext";
 /**
  * ShopLayoutWrapper - Manages filter state between FilterAll and Shop4 components
  * This component coordinates the filter state and ensures both components stay in sync
+ * 
+ * Now enhanced to work with server-side data and Redis caching
  */
 export default function ShopLayoutWrapper({ 
   categoryId = null,
@@ -25,7 +27,7 @@ export default function ShopLayoutWrapper({
   // Initialize filters from URL if provided
   React.useEffect(() => {
     if (initialFilters && Object.keys(initialFilters).length > 0) {
-      // console.log('🔄 SHOP LAYOUT: Initializing filters from URL:', initialFilters);
+      console.log('🔄 SHOP LAYOUT: Initializing filters from URL:', initialFilters);
       handleFiltersChange(initialFilters);
     }
   }, [initialFilters, handleFiltersChange]);
@@ -46,11 +48,11 @@ export default function ShopLayoutWrapper({
 
           <div className="pt-4 pt-lg-0"></div>
 
-                 {/* FILTER COMPONENT - Pass the filter change handler and current filters */}
-                 <FilterAll 
-                   onFiltersChange={handleFiltersChange} 
-                   externalFilters={appliedFilters}
-                 />
+          {/* FILTER COMPONENT - Pass the filter change handler and current filters */}
+          <FilterAll 
+            onFiltersChange={handleFiltersChange} 
+            externalFilters={appliedFilters}
+          />
         </div>
       )}
 
