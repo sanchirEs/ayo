@@ -19,7 +19,22 @@ export default function Nav() {
   const pathname = usePathname();
 
   const isMenuActive = (menu) => {
-    return menu.split("/")[1] === pathname.split("/")[1];
+    const normalize = (value) =>
+      (value ?? "")
+        .split(/[?#]/)[0]
+        .split("/")
+        .filter(Boolean);
+
+    const menuSegments = normalize(menu);
+    const pathSegments = normalize(pathname);
+
+    if (menuSegments.length === 0) {
+      return pathname === menu;
+    }
+
+    return menuSegments.every(
+      (segment, index) => pathSegments[index] === segment
+    );
   };
 
   // === Categories data from backend (tree or flat) ===
