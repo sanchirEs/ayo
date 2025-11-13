@@ -293,6 +293,17 @@ export default function Shop4({
         params.minRating = filters.minRating;
       }
 
+      // Add delivery filters
+      if (filters.deliveryType) {
+        params.deliveryType = filters.deliveryType;
+      }
+      if (filters.isImported) {
+        params.isImported = "true";
+      }
+      if (filters.maxDeliveryDays) {
+        params.maxDeliveryDays = filters.maxDeliveryDays;
+      }
+
 
 
       // Use new enhanced products API (NOW WITH REDIS CACHING!)
@@ -837,10 +848,10 @@ export default function Shop4({
               )}
             </div>
 
-            <div className="shop-asc__seprator mx-3 bg-light d-none d-md-block order-md-0" />
+            {/* <div className="shop-asc__seprator mx-3 bg-light d-none d-md-block order-md-0" /> */}
 
             {/* Grid size */}
-            <div className="col-size align-items-center order-1 d-none d-lg-flex">
+            {/* <div className="col-size align-items-center order-1 d-none d-lg-flex">
               <span className="text-uppercase fw-medium me-2">View</span>
               {itemPerRow.map((elm, i) => (
                 <button
@@ -851,7 +862,7 @@ export default function Shop4({
                   {elm}
                 </button>
               ))}
-            </div>
+            </div> */}
 
             {/* Mobile filter open */}
             {/* <div className="shop-filter d-flex align-items-center order-0 order-md-3 d-lg-none">

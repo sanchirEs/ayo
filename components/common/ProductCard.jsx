@@ -113,6 +113,13 @@ export default function ProductCard({ product, imageWidth = 330, imageHeight = 4
             </svg>
           </button> */}
         </div>
+        
+        {/* Delivery Information Badge - Simple */}
+        <div className="position-absolute top-0 start-0 mt-3 ms-3">
+          {product.delivery?.isImported || product.isImportedProduct ? (
+            <small className="badge bg-warning text-dark">Захиалгын</small>
+          ) : null}
+        </div>
       </div>
 
       <div className="pc__info position-relative text-center">
@@ -123,6 +130,13 @@ export default function ProductCard({ product, imageWidth = 330, imageHeight = 4
         <div className="product-card__price d-flex align-items-center justify-content-center mb-2">
           <span className="money price fw-medium">₮{price.toLocaleString()}</span>
         </div>
+        
+        {/* Simple Delivery Information */}
+        {(product.delivery?.isImported || product.isImportedProduct) && (
+          <div className="text-muted small text-center">
+            Захиалгын бараа
+          </div>
+        )}
       </div>
     </div>
   );

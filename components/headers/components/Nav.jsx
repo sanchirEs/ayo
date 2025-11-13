@@ -6,6 +6,15 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import api from "@/lib/api";
 
+const HEADER_NAV_CATEGORIES = [
+  { id: 14, name: "Хямдралын багц" },
+  { id: 1, name: "Арьс арчилгаа" },
+  { id: 2, name: "Нүүр будалт" },
+  { id: 10, name: "Үнэртэн" },
+  { id: 13, name: "Маск" },
+  { id: 62, name: "Захиалгын бараа" },
+];
+
 export default function Nav() {
   const pathname = usePathname();
 
@@ -354,52 +363,41 @@ export default function Nav() {
           </li>
 
           {/* Specific categories in order */}
-          {(() => {
-            const specificCategories = [
-              'Хямдралын багц',
-              'Арьс арчилгаа',
-              'Нүүр будалт',
-              'Үнэртэн',
-              'Маск',
-              // 'Үс, хуйх эмчилгээ'
-              'Эмэгтэйчүүдийн бүтээгдэхүүн'
-            ];
-            
-            return specificCategories.map((categoryName, index) => {
-              const category = catTree.find(cat => cat.name === categoryName);
-              if (!category) return null;
-              
-              return (
-                <li key={category.id} className="navigation__item">
-                  <Link 
-                    href={`/shop/${category.id}`} 
-                    className="navigation__link"
-                    onClick={closeMegaMenu}
-                    style={{
-                      color: 'var(--color-text)',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s ease',
-                      padding: '6px 8px 6px 8px',   
-                      borderRadius: '6px',
-                      fontWeight: '500',
-                      fontSize: '0.85rem',
-                      marginRight: '24px'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.color = 'var(--color-primary)';
-                      e.target.style.backgroundColor = 'rgba(47, 79, 47, 0.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.color = 'var(--color-text)';
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    {category.name}
-                  </Link>
-                </li>
-              );
-            });
-          })()}
+          {HEADER_NAV_CATEGORIES.map((category) => {
+            const href = `/shop/${category.id}`;
+            return (
+              <li key={category.id} className="navigation__item">
+                <Link
+                  href={href}
+                  className={`navigation__link ${
+                    isMenuActive(href) ? "menu-active" : ""
+                  }`}
+                  onClick={closeMegaMenu}
+                  style={{
+                    color: "var(--color-text)",
+                    textDecoration: "none",
+                    transition: "color 0.3s ease",
+                    padding: "6px 8px 6px 8px",
+                    borderRadius: "6px",
+                    fontWeight: "500",
+                    fontSize: "0.85rem",
+                    marginRight: "24px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "var(--color-primary)";
+                    e.target.style.backgroundColor =
+                      "rgba(47, 79, 47, 0.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "var(--color-text)";
+                    e.target.style.backgroundColor = "transparent";
+                  }}
+                >
+                  {category.name}
+                </Link>
+              </li>
+            );
+          })}
         </>
       )}
     </>
